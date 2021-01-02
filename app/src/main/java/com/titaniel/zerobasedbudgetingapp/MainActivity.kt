@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_add_transaction.AddTransactionFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 
 class MainActivity : AppCompatActivity() {
