@@ -84,7 +84,7 @@ Set Category
 
 New Payee
 
-![alt text](/prototypes/pngs/Create-Edit%20transaction%20-%20New Payee.png)
+![alt text](/prototypes/pngs/Create-Edit%20transaction%20-%20New%20Payee.png)
 
 
 ### All transactions
