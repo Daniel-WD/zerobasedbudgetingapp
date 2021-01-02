@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.titaniel.zerobasedbudgetingapp.fragment_budget.BudgetFragment
-import com.titaniel.zerobasedbudgetingapp.fragment_new_transaction.NewTransactionFragment
-import com.titaniel.zerobasedbudgetingapp.fragment_transactions.TransactionsFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_add_transaction.AddTransactionFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
                         BudgetFragment()
                     }
                     R.id.page_add_transaction -> {
-                        NewTransactionFragment()
+                        AddTransactionFragment()
                     }
                     R.id.page_transactions -> {
                         TransactionsFragment()

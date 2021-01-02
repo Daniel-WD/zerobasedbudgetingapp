@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragment_budget
+package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.os.Bundle
 import android.view.LayoutInflater

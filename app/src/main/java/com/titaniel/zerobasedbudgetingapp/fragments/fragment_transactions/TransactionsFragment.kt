@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragment_new_transaction
+package com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.titaniel.zerobasedbudgetingapp.R
 
-class NewTransactionFragment : Fragment() {
+class TransactionsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_new_transaction, container, false)
+        return inflater.inflate(R.layout.fragment_transactions, container, false)
     }
 
 }
