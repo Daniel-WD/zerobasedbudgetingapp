@@ -23,6 +23,7 @@ Things to consider after MVP:
 - Transaction tags/colors
 - Support split categories per transaction
 - Set if transaction is registered in bank account
+- New Transaction guidance
 
 ## Features
 
@@ -39,26 +40,70 @@ Things to consider after MVP:
 
 ## Screens
 
-- Categories
-  - List of categories
-  - Category contains currently budgeted and available money
-  - Click category to change budgeted value
-  - Shows "to be budgeted" value
-  - Split by months
-  
-- Create/Create Transaction
-  - Value of transaction
-  - Positive or negative transaction
-  - Set category, payee, description, date
-  - Delete
+### Categories
+- List of categories
+- Category contains currently budgeted and available money
+- Click category to change budgeted value
+- Shows "to be budgeted" value
+- Split by months
 
-- All transactions
-  - List of transactions
-  - Entry contains: payee, value, date
-  - Entries ordered by date
-  - Split by months
-  
-- Organize Categories
-  - Add category
-  - Remove category
-  - Set category order
+Categories
+
+![alt text](/prototypes/pngs/categories.png)
+
+Budget
+
+![alt text](/prototypes/pngs/categories%20-%20Change%20Budget%20of%20category.png)
+
+Select month
+
+![alt text](/prototypes/pngs/categories%20–%20select%20month.png)
+
+
+### Create/Create Transaction
+- Value of transaction
+- Positive or negative transaction
+- Set category, payee, description, date
+- Delete
+
+Create transaction
+
+![alt text](/prototypes/pngs/Create%20transaction.png)
+
+Edit transaction
+
+![alt text](/prototypes/pngs/Edit%20transaction.png)
+
+Set Payee
+
+![alt text](/prototypes/pngs/Create-Edit%20transaction%20-%20Set%20Payee.png)
+
+Set Category
+
+![alt text](/prototypes/pngs/Create-Edit%20transaction%20-%20Set%20Category.png)
+
+New Payee
+
+![alt text](/prototypes/pngs/Create-Edit%20transaction%20-%20New Payee.png)
+
+
+### All transactions
+- List of transactions
+- Entry contains: payee, value, date
+- Entries ordered by date
+- Split by months
+
+Transactions
+
+![alt text](/prototypes/pngs/Transactions.png)
+
+
+### Organize Categories
+- Add category
+- Remove category
+- Set category order
+- Edit
+
+Organize Categories
+
+![alt text](/prototypes/pngs/Organize%20Categories.png)
