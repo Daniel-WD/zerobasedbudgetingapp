@@ -107,3 +107,9 @@ Transactions
 Organize Categories
 
 ![alt text](/prototypes/pngs/Organize%20Categories.png)
+
+## Diagrams
+
+### Class Diagram
+
+![alt text](/architecture/class_diagram.jpg)
