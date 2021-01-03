@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.titaniel.zerobasedbudgetingapp.R
 
+/**
+ * Fragment to show a list of categories. Each item contains budgeting information, which can be edited.
+ */
 class BudgetFragment : Fragment() {
 
     override fun onCreateView(

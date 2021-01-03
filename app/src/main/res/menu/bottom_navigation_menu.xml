@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_baseline_money_24"
         android:title="@string/navigation_tab_budget" />
     <item
-        android:id="@+id/page_add_transaction"
+        android:id="@+id/page_add_edit_transaction"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_add_24"
         android:title="@string/navigation_tab_add_transaction" />
