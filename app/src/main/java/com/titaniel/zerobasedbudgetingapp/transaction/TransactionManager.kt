@@ -1,3 +1,3 @@
 package com.titaniel.zerobasedbudgetingapp.transaction
 
-class TransactionManager(payees: List<String>, transactions: List<Transaction>)
+class TransactionManager(val payees: List<String>, val transactions: List<Transaction>)
