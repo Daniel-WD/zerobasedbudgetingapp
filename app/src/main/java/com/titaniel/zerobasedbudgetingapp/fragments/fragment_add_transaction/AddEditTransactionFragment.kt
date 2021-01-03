@@ -7,14 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.titaniel.zerobasedbudgetingapp.R
 
-class AddTransactionFragment : Fragment() {
+/**
+ * Fragment to add/edit a transaction
+ */
+class AddEditTransactionFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_add_transaction, container, false)
+        return inflater.inflate(R.layout.fragment_add_edit_transaction, container, false)
     }
 
 }
