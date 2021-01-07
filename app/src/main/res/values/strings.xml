@@ -5,4 +5,21 @@
     <string name="navigation_tab_budget">Budget</string>
     <string name="navigation_tab_add_transaction">Add transaction</string>
     <string name="navigation_tab_transactions">Transactions</string>
+
+    <!-- Activity add/edit transaction -->
+    <string name="activity_add_edit_transaction_delete">Delete</string>
+
+    <string name="activity_add_edit_transaction_payee">Payee</string>
+    <string name="activity_add_edit_transaction_category">Category</string>
+    <string name="activity_add_edit_transaction_date">Date</string>
+    <string name="activity_add_edit_transaction_description">Description (optional)</string>
+
+    <string name="activity_add_edit_transaction_payee_hint">Choose payee</string>
+    <string name="activity_add_edit_transaction_category_hint">Choose category</string>
+    <string name="activity_add_edit_transaction_date_hint">Set date</string>
+    <string name="activity_add_edit_transaction_description_hint">Add description</string>
+
+    <string name="activity_add_edit_transaction_create">Create</string>
+    <string name="activity_add_edit_transaction_apply">Apply</string>
+
 </resources>

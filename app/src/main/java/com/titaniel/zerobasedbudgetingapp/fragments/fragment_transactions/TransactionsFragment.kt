@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.titaniel.zerobasedbudgetingapp.MainActivity
+import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 import com.titaniel.zerobasedbudgetingapp.R
 
 /**
