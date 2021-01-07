@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Holds data for transactions.
      */
-    lateinit var transactionManager: TransactionManager;
+    lateinit var mTransactionManager: TransactionManager;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
      * Load saved transaction and budgeting data.
      */
     private fun initData() {
-        transactionManager = TransactionManager(
+        mTransactionManager = TransactionManager(
             emptyList(), listOf(
                 Transaction(5, "Aldi", "Hallaölskdjf", Date(), Category(HashMap(), "Lebensmittel")),
                 Transaction(10, "Rossmann", "", Date(), Category(HashMap(), "Süßes")),
