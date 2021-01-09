@@ -9,13 +9,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.budget.Category
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
 
 class AddEditTransactionActivity : AppCompatActivity() {
 
     companion object {
         const val PAYEE_REQUEST_KEY = "payee_request_key"
+        const val CATEGORY_REQUEST_KEY = "category_request_key"
     }
 
     private lateinit var mToolbar: MaterialToolbar
@@ -60,17 +62,26 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
         }
 
-        // Layout payee listener.
+        // Set listeners for setting transaction values
         mLlPayee.setOnClickListener {
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
         }
+        mLlCategory.setOnClickListener {
+            val selectCategoryFragment = SelectCategoryFragment()
+            selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
+        }
 
-        // Select payee listener
+        // Set listeners for fragment results
         supportFragmentManager
             .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
                 val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
                 mTvPayee.text = payee
+            }
+        supportFragmentManager
+            .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
+                val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
+                mTvCategory.text = category
             }
 
     }
