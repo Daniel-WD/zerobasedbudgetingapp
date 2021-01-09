@@ -22,4 +22,6 @@
     <string name="activity_add_edit_transaction_create">Create</string>
     <string name="activity_add_edit_transaction_apply">Apply</string>
 
+    <string name="activity_add_edit_transaction_select_payee">Select payee</string>
+
 </resources>
