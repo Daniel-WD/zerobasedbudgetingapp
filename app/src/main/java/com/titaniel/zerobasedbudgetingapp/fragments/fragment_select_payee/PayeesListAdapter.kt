@@ -13,6 +13,7 @@ import com.titaniel.zerobasedbudgetingapp.R
  */
 class PayeesListAdapter(
     private val payees: List<String>,
+    private val payeeClickedListener: (String) -> Unit,
     private val context: Context
 ): RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
 
@@ -28,7 +29,11 @@ class PayeesListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PayeeItem {
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
-        return PayeeItem(view)
+        val viewHolder = PayeeItem(view)
+        view.setOnClickListener {
+            payeeClickedListener(viewHolder.tvPayee.text as String)
+        }
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: PayeeItem, position: Int) {

@@ -44,7 +44,7 @@ class TransactionsFragment : Fragment() {
         transactionsList.setHasFixedSize(true)
         transactionsList.adapter = TransactionsListAdapter(
             (activity as MainActivity).transactionManager.transactions,
-            context!!
+            requireContext()
         )
         transactionsList.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
 

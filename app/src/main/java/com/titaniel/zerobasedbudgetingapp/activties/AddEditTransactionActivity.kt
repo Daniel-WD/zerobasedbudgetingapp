@@ -10,9 +10,13 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.transaction.TransactionManager
+import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
 
 class AddEditTransactionActivity : AppCompatActivity() {
+
+    companion object {
+        const val PAYEE_REQUEST_KEY = "payee_request_key"
+    }
 
     private lateinit var mToolbar: MaterialToolbar
     private lateinit var mEtValue: EditText
@@ -61,6 +65,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
         }
+
+        // Select payee listener
+        supportFragmentManager
+            .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
+                val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
+                mTvPayee.text = payee
+            }
+
     }
 
 }

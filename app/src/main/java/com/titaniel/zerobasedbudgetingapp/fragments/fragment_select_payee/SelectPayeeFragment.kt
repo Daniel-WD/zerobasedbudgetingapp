@@ -5,13 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 
 class SelectPayeeFragment : BottomSheetDialogFragment() {
+
+    companion object {
+        const val PAYEE_KEY = "payee_key"
+    }
 
     private lateinit var mIvAddPayee: ImageView
     private lateinit var mListPayees: RecyclerView
@@ -28,7 +35,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         mListPayees = view.findViewById(R.id.listPayees)
 
         // ListPayees initialization.
-        mListPayees.layoutManager = LinearLayoutManager(context!!)
+        mListPayees.layoutManager = LinearLayoutManager(requireContext())
         mListPayees.setHasFixedSize(true)
         mListPayees.adapter = PayeesListAdapter(
             listOf(
@@ -53,7 +60,11 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
                 "Payee",
                 "Payee"
             ).sorted(),
-            context!!
+            { payee ->
+                setFragmentResult(AddEditTransactionActivity.PAYEE_REQUEST_KEY, bundleOf(PAYEE_KEY to payee))
+                dismiss()
+            },
+            requireContext()
         )
 
         return view
