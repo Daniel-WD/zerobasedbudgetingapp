@@ -23,7 +23,7 @@ class TransactionsListAdapter(
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     /**
-     * Holder class that contains data for a specify entry.
+     * Holder class that contains data for a specific transaction entry.
      */
     class TransactionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
