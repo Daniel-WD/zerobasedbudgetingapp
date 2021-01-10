@@ -10,6 +10,6 @@ data class Transaction(
     val value: Long,
     val payee: String,
     val description: String,
-    val date: Date,
+    val utcTimestamp: Long,
     val category: Category
 )

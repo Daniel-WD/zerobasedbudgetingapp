@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
+import com.titaniel.zerobasedbudgetingapp.utils.Utils
 import java.text.SimpleDateFormat
 
 /**
@@ -50,9 +51,7 @@ class TransactionsListAdapter(
         holder.tvValue.text = transaction.value.toString()
         holder.cpPayee.text = transaction.payee
         holder.cpCategory.text = transaction.category.name
-
-        val dateFormat = SimpleDateFormat.getDateInstance();
-        holder.tvDate.text = dateFormat.format(transaction.date)
+        holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)
 
     }
 

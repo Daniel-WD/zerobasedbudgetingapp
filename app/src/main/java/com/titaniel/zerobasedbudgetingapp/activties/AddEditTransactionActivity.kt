@@ -7,11 +7,18 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.budget.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
+import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 class AddEditTransactionActivity : AppCompatActivity() {
 
@@ -49,8 +56,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mLlDate = findViewById(R.id.layoutDate);
         mLlDescription = findViewById(R.id.layoutDescription);
 
-
-        // Toolbar listener.
+        // Toolbar listener
         mToolbar.setOnMenuItemClickListener { menuItem ->
             when(menuItem.itemId) {
                 R.id.delete -> {
@@ -62,6 +68,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
         }
 
+        // Setup date picker
+        val builder = MaterialDatePicker.Builder.datePicker()
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+        val datePicker = builder.build()
+        datePicker.addOnPositiveButtonClickListener {
+            mTvDate.text = Utils.convertUtcToString(it)
+        }
+
         // Set listeners for setting transaction values
         mLlPayee.setOnClickListener {
             val selectPayeeFragment = SelectPayeeFragment()
@@ -70,6 +84,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mLlCategory.setOnClickListener {
             val selectCategoryFragment = SelectCategoryFragment()
             selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
+        }
+        mLlDate.setOnClickListener {
+            datePicker.show(supportFragmentManager, "DatePicker")
         }
 
         // Set listeners for fragment results
@@ -83,6 +100,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
                 mTvCategory.text = category
             }
+
+
 
     }
 

@@ -77,10 +77,10 @@ class MainActivity : AppCompatActivity() {
                 "Payee"
             ),
             listOf(
-                Transaction(5, "Aldi", "Hallaölskdjf", Date(), Category(HashMap(), "Lebensmittel")),
-                Transaction(10, "Rossmann", "", Date(), Category(HashMap(), "Süßes")),
-                Transaction(-34, "Lidl", "", Date(), Category(HashMap(), "Lebensmittel")),
-                Transaction(-235, "Autohaus", "", Date(), Category(HashMap(), "Autos"))
+                Transaction(5, "Aldi", "Hallaölskdjf", 347583945, Category(HashMap(), "Lebensmittel")),
+                Transaction(10, "Rossmann", "", 23452345, Category(HashMap(), "Süßes")),
+                Transaction(-34, "Lidl", "", 7567364, Category(HashMap(), "Lebensmittel")),
+                Transaction(-235, "Autohaus", "", 3464593, Category(HashMap(), "Autos"))
             )
         )
     }
