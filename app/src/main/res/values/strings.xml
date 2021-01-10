@@ -25,4 +25,6 @@
     <string name="activity_add_edit_transaction_select_payee">Select payee</string>
     <string name="activity_add_edit_transaction_select_category">Select category</string>
 
+    <string name="activity_add_edit_transaction_add_payee_hint">New payee</string>
+
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
@@ -21,6 +22,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
     private lateinit var mIvAddPayee: ImageView
     private lateinit var mListPayees: RecyclerView
+    private lateinit var mEtPayee: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +34,17 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         // View initialization.
         mIvAddPayee = view.findViewById(R.id.ivAddPayee)
         mListPayees = view.findViewById(R.id.listPayees)
+        mEtPayee = view.findViewById(R.id.etPayee)
+
+        // Add payee listener.
+        mIvAddPayee.setOnClickListener {
+            returnPayee(mEtPayee.text.toString())
+        }
+        mEtPayee.setOnEditorActionListener { _, _, _ ->
+            returnPayee(mEtPayee.text.toString())
+            true
+        }
+
 
         // ListPayees initialization.
         mListPayees.layoutManager = LinearLayoutManager(requireContext())
@@ -59,14 +72,25 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
                 "Payee",
                 "Payee"
             ).sorted(),
-            { payee ->
-                setFragmentResult(AddEditTransactionActivity.PAYEE_REQUEST_KEY, bundleOf(PAYEE_KEY to payee))
-                dismiss()
+            {
+                returnPayee(it)
             },
             requireContext()
         )
 
         return view
+    }
+
+    private fun returnPayee(payee: String): Boolean {
+        if (payee.isNotBlank()) {
+            setFragmentResult(
+                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
+                bundleOf(PAYEE_KEY to payee)
+            )
+            dismiss()
+            return true
+        }
+        return false
     }
 
 }

@@ -29,16 +29,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPayee" />
 
-    <ImageView
-        android:id="@+id/ivAddPayee"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="24dp"
-        android:src="@drawable/ic_baseline_add_24"
-        app:layout_constraintBottom_toTopOf="@+id/vDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <View
         android:id="@+id/vDivider"
         android:layout_width="0dp"
@@ -49,14 +39,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:layout_marginTop="8dp"
+        android:id="@+id/vDivider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_add_edit_transaction"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etPayee" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/listPayees"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="78dp"
+        android:paddingTop="134dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_bottom_sheet" />
+
+    <EditText
+        android:id="@+id/etPayee"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:hint="@string/activity_add_edit_transaction_add_payee_hint"
+        android:singleLine="true"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/ivAddPayee"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
+
+    <ImageView
+        android:id="@+id/ivAddPayee"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_baseline_add_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
