@@ -7,18 +7,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.budget.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 
 class AddEditTransactionActivity : AppCompatActivity() {
 
@@ -32,7 +26,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private lateinit var mTvPayee: TextView
     private lateinit var mTvCategory: TextView
     private lateinit var mTvDate: TextView
-    private lateinit var mTvDescription: TextView
+    private lateinit var mEtDescription: EditText
     private lateinit var mFabCreate: ExtendedFloatingActionButton
     private lateinit var mLlPayee: LinearLayout
     private lateinit var mLlCategory: LinearLayout
@@ -49,7 +43,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mTvPayee = findViewById(R.id.tvPayee)
         mTvCategory = findViewById(R.id.tvCategory)
         mTvDate = findViewById(R.id.tvDate)
-        mTvDescription = findViewById(R.id.tvDescription)
+        mEtDescription = findViewById(R.id.etDescription)
         mFabCreate = findViewById(R.id.fabCreate)
         mLlPayee = findViewById(R.id.layoutPayee);
         mLlCategory = findViewById(R.id.layoutCategory);
@@ -78,14 +72,17 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Set listeners for setting transaction values
         mLlPayee.setOnClickListener {
+            mEtDescription.clearFocus()
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
         }
         mLlCategory.setOnClickListener {
+            mEtDescription.clearFocus()
             val selectCategoryFragment = SelectCategoryFragment()
             selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
         }
         mLlDate.setOnClickListener {
+            mEtDescription.clearFocus()
             datePicker.show(supportFragmentManager, "DatePicker")
         }
 
