@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.activties
 
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -45,14 +46,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mTvDate = findViewById(R.id.tvDate)
         mEtDescription = findViewById(R.id.etDescription)
         mFabCreate = findViewById(R.id.fabCreate)
-        mLlPayee = findViewById(R.id.layoutPayee);
-        mLlCategory = findViewById(R.id.layoutCategory);
-        mLlDate = findViewById(R.id.layoutDate);
-        mLlDescription = findViewById(R.id.layoutDescription);
+        mLlPayee = findViewById(R.id.layoutPayee)
+        mLlCategory = findViewById(R.id.layoutCategory)
+        mLlDate = findViewById(R.id.layoutDate)
+        mLlDescription = findViewById(R.id.layoutDescription)
 
         // Toolbar listener
         mToolbar.setOnMenuItemClickListener { menuItem ->
-            when(menuItem.itemId) {
+            when (menuItem.itemId) {
                 R.id.delete -> {
                     finish()
                     // Handle delete icon press.
@@ -68,6 +69,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
         val datePicker = builder.build()
         datePicker.addOnPositiveButtonClickListener {
             mTvDate.text = Utils.convertUtcToString(it)
+        }
+
+        // Money value formatting
+        mEtValue.setOnClickListener {
+            mEtValue.setSelection(mEtValue.text.length)
         }
 
         // Set listeners for setting transaction values
@@ -97,7 +103,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
                 mTvCategory.text = category
             }
-
 
 
     }

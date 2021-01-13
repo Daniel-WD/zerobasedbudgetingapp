@@ -26,16 +26,36 @@
                 app:menu="@menu/actitvity_add_edit_menu"
                 app:title="Create Transaction" />
 
-            <!-- EditText for entering transaction value. -->
-            <EditText
-                android:id="@+id/etValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:fontFamily="sans-serif-medium"
-                android:inputType="numberSigned"
-                android:textSize="36sp"
-                tools:text="+599€" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- EditText for entering transaction value. -->
+                <EditText
+                    android:id="@+id/etValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="false"
+                    android:fontFamily="sans-serif-medium"
+                    android:hint="0"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberSigned"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp"
+                    android:textSize="36sp"
+                    tools:text="599" />
+
+                <TextView
+                    android:id="@+id/tvCents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="36sp"
+                    android:text="@string/activity_add_edit_transaction_cents"
+                    tools:text="cents" />
+
+            </LinearLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -156,11 +176,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="16dp"
-                android:singleLine="true"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/activity_add_edit_transaction_description_hint"
+                android:singleLine="true"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

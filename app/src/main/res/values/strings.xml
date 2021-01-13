@@ -27,4 +27,7 @@
 
     <string name="activity_add_edit_transaction_add_payee_hint">New payee</string>
 
+    <string name="activity_add_edit_transaction_cents">cents</string>
+    <string name="activity_add_edit_transaction_zero">0</string>
+
 </resources>
