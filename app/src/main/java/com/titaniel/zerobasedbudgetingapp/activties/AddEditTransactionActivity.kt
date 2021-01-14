@@ -1,7 +1,9 @@
 package com.titaniel.zerobasedbudgetingapp.activties
 
+import android.content.Context
 import android.os.Bundle
-import android.view.WindowManager
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,8 +13,10 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.budget.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
+import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 class AddEditTransactionActivity : AppCompatActivity() {
@@ -55,8 +59,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delete -> {
+                    hideSoftKeyboard()
                     finish()
-                    // Handle delete icon press.
                     true
                 }
                 else -> false
@@ -69,25 +73,46 @@ class AddEditTransactionActivity : AppCompatActivity() {
         val datePicker = builder.build()
         datePicker.addOnPositiveButtonClickListener {
             mTvDate.text = Utils.convertUtcToString(it)
+            checkCreateEnabled()
         }
 
-        // Money value formatting
+        // Edit text value listeners
         mEtValue.setOnClickListener {
             mEtValue.setSelection(mEtValue.text.length)
         }
 
+        // Create btn listener
+        mFabCreate.setOnClickListener {
+            // TODO -> save this:
+            hideSoftKeyboard()
+            val moneyValue = mEtValue.text.toString()
+            val transaction = Transaction(
+                if (moneyValue.isBlank()) 0 else moneyValue.toLong(),
+                mTvPayee.text.toString(),
+                mEtDescription.text.toString().trim(),
+                datePicker.selection!!,
+                Category( // TODO -> replace by search for category by string
+                    emptyMap(), mTvCategory.text.toString()
+                )
+            )
+            finish()
+        }
+
         // Set listeners for setting transaction values
         mLlPayee.setOnClickListener {
+            hideSoftKeyboard()
             mEtDescription.clearFocus()
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
         }
         mLlCategory.setOnClickListener {
+            hideSoftKeyboard()
             mEtDescription.clearFocus()
             val selectCategoryFragment = SelectCategoryFragment()
             selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
         }
         mLlDate.setOnClickListener {
+            hideSoftKeyboard()
             mEtDescription.clearFocus()
             datePicker.show(supportFragmentManager, "DatePicker")
         }
@@ -97,14 +122,33 @@ class AddEditTransactionActivity : AppCompatActivity() {
             .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
                 val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
                 mTvPayee.text = payee
+                checkCreateEnabled()
             }
         supportFragmentManager
             .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
                 val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
                 mTvCategory.text = category
+                checkCreateEnabled()
             }
 
+        // Focus on transaction value input and show keyboard
+        mEtValue.requestFocus()
+        showSoftKeyboard()
+    }
 
+    private fun checkCreateEnabled() {
+        mFabCreate.isEnabled =
+            mTvPayee.text.isNotBlank() && mTvCategory.text.isNotBlank() && mTvDate.text.isNotBlank()
+    }
+
+    private fun showSoftKeyboard() {
+        val inputMethodManager: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    private fun hideSoftKeyboard() {
+        val inputMethodManager: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(mEtValue.windowToken, 0)
     }
 
 }
