@@ -13,10 +13,11 @@ import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
-import java.text.SimpleDateFormat
 
 /**
- * Adapter for displaying a list of transactions.
+ * Adapter for displaying list of transactions.
+ * @param transactions Containing transactions
+ * @param context Context
  */
 class TransactionsListAdapter(
     private val transactions: List<Transaction>,
@@ -28,34 +29,66 @@ class TransactionsListAdapter(
      */
     class TransactionItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val imgDescription: ImageView = itemView.findViewById(R.id.imgDescription)
+        /**
+         * Description available image
+         */
+        val imgDescrAvailable: ImageView = itemView.findViewById(R.id.imgDescrAvailable)
+
+        /**
+         * Value text
+         */
         val tvValue: TextView = itemView.findViewById(R.id.tvValue)
+
+        /**
+         * Date text
+         */
         val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+
+        /**
+         * Payee chip
+         */
         val cpPayee: Chip = itemView.findViewById(R.id.cpPayee)
+
+        /**
+         * Category chip
+         */
         val cpCategory: Chip = itemView.findViewById(R.id.cpCategory)
 
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionItem {
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false)
+
+        // Create viewholder
         return TransactionItem(view)
     }
 
     override fun onBindViewHolder(holder: TransactionItem, position: Int) {
+        // Transaction
         val transaction = transactions[position]
 
-        // Set item content
-        holder.imgDescription.visibility =
+        // Set image description available visibility
+        holder.imgDescrAvailable.visibility =
             if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
+
+        // Set value text
         holder.tvValue.text = transaction.value.toString()
+
+        // Set payee text
         holder.cpPayee.text = transaction.payee
+
+        // Set category text
         holder.cpCategory.text = transaction.category.name
+
+        // Set date text
         holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)
 
     }
 
     override fun getItemCount(): Int {
+        // Return number transactions
         return transactions.size
     }
 

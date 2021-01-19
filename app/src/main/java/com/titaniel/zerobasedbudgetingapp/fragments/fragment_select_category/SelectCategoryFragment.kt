@@ -13,12 +13,21 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.budget.Category
 
+/**
+ * Bottom sheet dialog fragment for category selection
+ */
 class SelectCategoryFragment : BottomSheetDialogFragment() {
 
     companion object {
+        /**
+         * Category key
+         */
         const val CATEGORY_KEY = "category_key"
     }
 
+    /**
+     * Categories list
+     */
     private lateinit var mListCategories: RecyclerView
 
     override fun onCreateView(
@@ -26,14 +35,20 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Create root view
         val view = inflater.inflate(R.layout.fragment_select_category, container, false)
 
-        // View initialization.
+        // Initialize views
         mListCategories = view.findViewById(R.id.listCategories)
 
-        // ListPayees initialization.
+        // Category list init
+        // Set layout manager
         mListCategories.layoutManager = LinearLayoutManager(requireContext())
+
+        // Fix size
         mListCategories.setHasFixedSize(true)
+
+        // Set adapter
         mListCategories.adapter = CategoriesListAdapter(
             listOf(
                 Category(emptyMap(), "Category 1658"),
@@ -55,8 +70,14 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
                 Category(emptyMap(), "Category 121345"),
                 Category(emptyMap(), "Category 1fdgd")
             ),
-            { categoryName ->
-                setFragmentResult(AddEditTransactionActivity.CATEGORY_REQUEST_KEY, bundleOf(CATEGORY_KEY to categoryName))
+            { categoryName -> // Category click callback
+                // Return fragment result
+                setFragmentResult(
+                    AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
+                    bundleOf(CATEGORY_KEY to categoryName)
+                )
+
+                // Close fragment
                 dismiss()
             },
             requireContext()
