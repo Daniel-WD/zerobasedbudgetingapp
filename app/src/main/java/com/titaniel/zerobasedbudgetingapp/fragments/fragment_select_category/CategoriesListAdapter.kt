@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.budget.Category
+import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 
 /**
  * Adapter for displaying a list of categories.

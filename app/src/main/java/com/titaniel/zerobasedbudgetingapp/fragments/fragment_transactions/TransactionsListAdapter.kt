@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
+import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
@@ -80,7 +80,7 @@ class TransactionsListAdapter(
         holder.cpPayee.text = transaction.payee
 
         // Set category text
-        holder.cpCategory.text = transaction.category.name
+        holder.cpCategory.text = transaction.category
 
         // Set date text
         holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)

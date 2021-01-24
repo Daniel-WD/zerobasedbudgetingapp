@@ -1,19 +1,17 @@
-package com.titaniel.zerobasedbudgetingapp.transaction
-
-import com.titaniel.zerobasedbudgetingapp.budget.Category
+package com.titaniel.zerobasedbudgetingapp.datamanager
 
 /**
  * Data class representing a transaction
  * @param value Transaction value
  * @param payee Payee
+ * @param category Category
  * @param description Description
  * @param utcTimestamp Timestamp
- * @param category Category
  */
 data class Transaction(
     val value: Long,
     val payee: String,
+    val category: String,
     val description: String,
-    val utcTimestamp: Long,
-    val category: Category
+    val utcTimestamp: Long
 )

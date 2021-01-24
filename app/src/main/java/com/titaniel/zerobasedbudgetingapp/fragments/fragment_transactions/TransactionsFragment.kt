@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
+import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 
 /**
  * Fragment to display list of transactions
@@ -27,6 +28,11 @@ class TransactionsFragment : Fragment() {
      */
     private lateinit var transactionsList: RecyclerView
 
+    /**
+     * Data manager
+     */
+    private lateinit var mDataManager: DataManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,6 +45,9 @@ class TransactionsFragment : Fragment() {
         toolbar = view!!.findViewById(R.id.toolbar)
         transactionsList = view.findViewById(R.id.transactionsList)
 
+        // Init data manager
+        mDataManager = DataManager(requireContext(), lifecycle)
+
         // Init transactionList
         // Set layout manager
         transactionsList.layoutManager = LinearLayoutManager(context)
@@ -48,7 +57,7 @@ class TransactionsFragment : Fragment() {
 
         // Set adapter
         transactionsList.adapter = TransactionsListAdapter(
-            (activity as MainActivity).transactionManager.transactions,
+            mDataManager.transactions,
             requireContext()
         )
 

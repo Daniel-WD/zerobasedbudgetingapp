@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 
 /**
  * Bottom sheet dialog fragment for payee selection
@@ -41,6 +42,11 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
      */
     private lateinit var mListPayees: RecyclerView
 
+    /**
+     * Data manager
+     */
+    private lateinit var mDataManager: DataManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,6 +54,9 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     ): View? {
         // Create root view
         val view = inflater.inflate(R.layout.fragment_select_payee, container, false)
+
+        // Init data manager
+        mDataManager = DataManager(requireContext(), lifecycle)
 
         // Initialize views
         mIvAddPayee = view.findViewById(R.id.ivAddPayee)
@@ -73,28 +82,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         mListPayees.adapter = PayeesListAdapter(
-            listOf(
-                "Aldi",
-                "Rossmann",
-                "Lidl",
-                "Autohaus",
-                "Kaufland",
-                "New Yorker",
-                "Centrum Galerie",
-                "Check24",
-                "Amazon Ratenzahlung",
-                "Samsung",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee",
-                "Payee"
-            ).sorted(),
+            mDataManager.payees.sorted(),
             { payee -> // Payee click callback
                 selectPayee(payee)
             },
