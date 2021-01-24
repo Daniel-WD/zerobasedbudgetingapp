@@ -10,6 +10,6 @@
 
     <!-- Activity add/edit transaction -->
     <color name="activity_add_edit_transaction_label_color">#59000000</color>
-    <color name="activity_add_edit_transaction_divider_color">#1f000000</color>
+    <color name="activity_add_edit_transaction_divider_color">#1F000000</color>
 
 </resources>

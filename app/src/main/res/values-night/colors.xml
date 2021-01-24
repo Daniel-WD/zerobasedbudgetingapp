@@ -3,6 +3,6 @@
 
     <!-- Activity add/edit transaction -->
     <color name="activity_add_edit_transaction_label_color">#59FFFFFF</color>
-    <color name="activity_add_edit_transaction_divider_color">#1fffffff</color>
+    <color name="activity_add_edit_transaction_divider_color">#1FFFFFFF</color>
 
 </resources>

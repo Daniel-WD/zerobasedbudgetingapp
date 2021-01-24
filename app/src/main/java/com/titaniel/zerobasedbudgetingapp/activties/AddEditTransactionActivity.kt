@@ -131,9 +131,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         val datePicker = builder.build()
 
         // Date confirmation listener
-        datePicker.addOnPositiveButtonClickListener {
+        datePicker.addOnPositiveButtonClickListener { timestamp ->
             // Set date text
-            mTvDate.text = Utils.convertUtcToString(it)
+            mTvDate.text = Utils.convertUtcToString(timestamp)
             checkCreateEnabled()
         }
 
