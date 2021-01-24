@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Layout for add/edit transaction fragment -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Layout for transaction data manipulation -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@drawable/divider_add_edit_transaction"
+        android:orientation="vertical"
+        android:showDividers="middle|end">
+
+        <!-- Appbar layout  -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Toolbar -->
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:menu="@menu/actitvity_add_edit_menu"
+                app:title="Create Transaction" />
+
+            <!-- Layout for transaction value -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- EditText for entering transaction value. -->
+                <EditText
+                    android:id="@+id/etValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:cursorVisible="false"
+                    android:fontFamily="sans-serif-medium"
+                    android:hint="0"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberSigned"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp"
+                    android:textSize="36sp"
+                    tools:text="599" />
+
+                <!-- Textview cents text -->
+                <TextView
+                    android:id="@+id/tvCents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/activity_add_edit_transaction_cents"
+                    android:textSize="36sp"
+                    tools:text="cents" />
+
+            </LinearLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Payee layout -->
+        <LinearLayout
+            android:id="@+id/layoutPayee"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_add_edit_transaction_row_height"
+            android:orientation="horizontal">
+
+            <!-- Payee icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_baseline_store_24" />
+
+            <!-- Chosen payee -->
+            <TextView
+                android:id="@+id/tvPayee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:hint="@string/activity_add_edit_transaction_payee_hint"
+                android:textSize="16sp" />
+
+            <!-- Payee text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginVertical="16dp"
+                android:gravity="end"
+                android:text="@string/activity_add_edit_transaction_payee"
+                android:textColor="@color/activity_add_edit_transaction_label_color"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Category layout -->
+        <LinearLayout
+            android:id="@+id/layoutCategory"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_add_edit_transaction_row_height"
+            android:orientation="horizontal">
+
+            <!-- Category icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_baseline_category_24" />
+
+            <!-- Chosen category -->
+            <TextView
+                android:id="@+id/tvCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:hint="@string/activity_add_edit_transaction_category_hint"
+                android:textSize="16sp" />
+
+            <!-- Category text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginVertical="16dp"
+                android:gravity="end"
+                android:text="@string/activity_add_edit_transaction_category"
+                android:textColor="@color/activity_add_edit_transaction_label_color"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Date layout -->
+        <LinearLayout
+            android:id="@+id/layoutDate"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_add_edit_transaction_row_height"
+            android:orientation="horizontal">
+
+            <!-- Date icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_baseline_date_range_24" />
+
+            <!-- Chosen date -->
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:hint="@string/activity_add_edit_transaction_date_hint"
+                android:textSize="16sp" />
+
+            <!-- Date text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginVertical="16dp"
+                android:gravity="end"
+                android:text="@string/activity_add_edit_transaction_date"
+                android:textColor="@color/activity_add_edit_transaction_label_color"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Description layout -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <!-- Description icon -->
+            <ImageView
+                android:id="@+id/ivDescription"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_baseline_description_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Description content -->
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:hint="@string/activity_add_edit_transaction_description_hint"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/ivDescription"
+                app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
+
+            <!-- Description text -->
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/activity_add_edit_transaction_description"
+                android:textColor="@color/activity_add_edit_transaction_label_color"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@+id/ivDescription"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <!-- Create/Edit button -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabCreateApply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:enabled="false"
+        android:text="@string/activity_add_edit_transaction_create"
+        app:icon="@drawable/ic_baseline_add_24" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

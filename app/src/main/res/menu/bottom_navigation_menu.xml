@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- Menu for bottom navigation bar in main activity-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Budgeting page -->
     <item
         android:id="@+id/page_budget"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_money_24"
         android:title="@string/navigation_tab_budget" />
+
+    <!-- Add/edit transaction -->
     <item
         android:id="@+id/page_add_edit_transaction"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_add_24"
         android:title="@string/navigation_tab_add_transaction" />
+
+    <!-- Trnasactions page -->
     <item
         android:id="@+id/page_transactions"
         android:enabled="true"

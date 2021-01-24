@@ -9,21 +9,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.titaniel.zerobasedbudgetingapp.MainActivity
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 
 /**
- * Fragment to display a list of transactions.
+ * Fragment to display list of transactions
  */
 class TransactionsFragment : Fragment() {
 
     /**
-     * Toolbar.
+     * Toolbar
      */
     private lateinit var toolbar: MaterialToolbar
 
     /**
-     * List of all transactions.
+     * List of all transactions
      */
     private lateinit var transactionsList: RecyclerView
 
@@ -40,13 +40,25 @@ class TransactionsFragment : Fragment() {
         transactionsList = view.findViewById(R.id.transactionsList)
 
         // Init transactionList
+        // Set layout manager
         transactionsList.layoutManager = LinearLayoutManager(context)
+
+        // Fix size
         transactionsList.setHasFixedSize(true)
+
+        // Set adapter
         transactionsList.adapter = TransactionsListAdapter(
             (activity as MainActivity).transactionManager.transactions,
-            context!!
+            requireContext()
         )
-        transactionsList.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+
+        // Add horizontal dividers
+        transactionsList.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
         return view
     }
