@@ -82,7 +82,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         mListPayees.adapter = PayeesListAdapter(
-            mDataManager.payees.sorted(),
+            mDataManager.payees,
             { payee -> // Payee click callback
                 selectPayee(payee)
             },

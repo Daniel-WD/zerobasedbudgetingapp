@@ -44,33 +44,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- New payee input -->
-    <EditText
-        android:id="@+id/etNewPayee"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:hint="@string/activity_add_edit_transaction_add_payee_hint"
-        android:inputType="text"
-        android:singleLine="true"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/ivAddPayee"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
-
-    <!-- Image view add payee -->
-    <ImageView
-        android:id="@+id/ivAddPayee"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_baseline_add_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
-
     <!-- Divider 2 -->
     <View
         android:id="@+id/vDivider2"
@@ -92,5 +65,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_bottom_sheet" />
+
+    <!-- New payee input (At the bottom so its ontop of recycler view) -->
+    <EditText
+        android:id="@+id/etNewPayee"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:hint="@string/activity_add_edit_transaction_add_payee_hint"
+        android:inputType="text"
+        android:singleLine="true"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/ivAddPayee"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
+
+    <!-- Image view add payee (At the bottom so its ontop of recycler view) -->
+    <ImageView
+        android:id="@+id/ivAddPayee"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_baseline_add_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -72,4 +72,9 @@ class TransactionsFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        transactionsList.adapter?.notifyDataSetChanged()
+    }
+
 }
