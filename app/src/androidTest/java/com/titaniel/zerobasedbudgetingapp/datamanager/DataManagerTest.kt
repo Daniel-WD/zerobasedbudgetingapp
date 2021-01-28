@@ -1,36 +1,45 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
-import android.content.Context
-import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario.launch
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
-import com.titaniel.zerobasedbudgetingapp.test.BuildConfig
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 
+/**
+ * Tests for DataManager
+ */
 @RunWith(AndroidJUnit4::class)
 class DataManagerTests {
 
+    /**
+     * DataManager to test
+     */
     private lateinit var dataManager: DataManager
 
     @Before
     fun setup() {
-        val scenario = launch(MainActivity::class.java)
-        scenario.onActivity { activity ->
-            dataManager = DataManager(activity, activity.lifecycle)
+
+        // Create activity scenario
+        launch(MainActivity::class.java).use { scenario ->
+            // Wait until acitivity is created
+            scenario.onActivity { activity ->
+                // Initialize data manager
+                dataManager = DataManager(activity, activity.lifecycle)
+            }
         }
-        scenario.close()
 
     }
 
+    /**
+     * Test validity of saved and then loaded data
+     */
     @Test
     fun loadSaveDataTest() {
 
+        // Fake data
         val fakePayees =
             mutableListOf(
                 "Aldi",
@@ -56,6 +65,7 @@ class DataManagerTests {
             Transaction(-235, "Autohaus", "Autos", "", 3464593)
         )
 
+        // Prepare data manager
         dataManager.payees.clear()
         dataManager.payees.addAll(fakePayees)
 
@@ -65,10 +75,11 @@ class DataManagerTests {
         dataManager.transactions.clear()
         dataManager.transactions.addAll(fakeTransactions)
 
+        // Save and load
         dataManager.save()
         dataManager.load()
 
-        // Assert
+        // Check validity
         assertEquals(dataManager.payees, fakePayees)
         assertEquals(dataManager.transactions, fakeTransactions)
         assertEquals(dataManager.categories, fakeCategories)

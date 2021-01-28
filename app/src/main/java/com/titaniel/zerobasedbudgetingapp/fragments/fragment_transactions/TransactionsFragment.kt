@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 
 /**
@@ -38,6 +37,7 @@ class TransactionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         // Inflate view
         val view = inflater.inflate(R.layout.fragment_transactions, container, false)
 
@@ -74,6 +74,8 @@ class TransactionsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        // Reload transactions list
         transactionsList.adapter?.notifyDataSetChanged()
     }
 

@@ -159,7 +159,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
             val payee = mTvPayee.text.toString()
 
             // Add payee to data manager, if new
-            if(!mDataManager.payees.contains(payee)) {
+            if (!mDataManager.payees.contains(payee)) {
                 mDataManager.payees.add(payee)
             }
 
