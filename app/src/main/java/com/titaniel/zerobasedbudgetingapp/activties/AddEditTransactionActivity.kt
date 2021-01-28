@@ -171,6 +171,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 mEtDescription.text.toString().trim(),
                 datePicker.selection!!
             )
+
+            // Save transaction
             mDataManager.transactions.add(transaction)
 
             // Close activity
