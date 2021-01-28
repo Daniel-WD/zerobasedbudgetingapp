@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.budget.Category
+import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 
 /**
  * Bottom sheet dialog fragment for category selection
@@ -30,6 +30,11 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
      */
     private lateinit var mListCategories: RecyclerView
 
+    /**
+     * Data manager
+     */
+    private lateinit var mDataManager: DataManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,6 +46,9 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         // Initialize views
         mListCategories = view.findViewById(R.id.listCategories)
 
+        // Init data manager
+        mDataManager = DataManager(requireContext(), lifecycle)
+
         // Category list init
         // Set layout manager
         mListCategories.layoutManager = LinearLayoutManager(requireContext())
@@ -50,26 +58,7 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         mListCategories.adapter = CategoriesListAdapter(
-            listOf(
-                Category(emptyMap(), "Category 1658"),
-                Category(emptyMap(), "Category 164590"),
-                Category(emptyMap(), "Category 098657341"),
-                Category(emptyMap(), "Category 1650498"),
-                Category(emptyMap(), "Category 0345981"),
-                Category(emptyMap(), "Category 39804851"),
-                Category(emptyMap(), "Category 34563451"),
-                Category(emptyMap(), "Category 381"),
-                Category(emptyMap(), "Category 76891"),
-                Category(emptyMap(), "Category 1855"),
-                Category(emptyMap(), "Category 234551"),
-                Category(emptyMap(), "Category 32451"),
-                Category(emptyMap(), "Category 23451"),
-                Category(emptyMap(), "Category 3241"),
-                Category(emptyMap(), "Category 23451"),
-                Category(emptyMap(), "Category 12345"),
-                Category(emptyMap(), "Category 121345"),
-                Category(emptyMap(), "Category 1fdgd")
-            ),
+            mDataManager.categories,
             { categoryName -> // Category click callback
                 // Return fragment result
                 setFragmentResult(

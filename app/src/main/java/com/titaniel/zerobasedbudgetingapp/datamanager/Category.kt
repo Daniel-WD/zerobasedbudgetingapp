@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.budget
+package com.titaniel.zerobasedbudgetingapp.datamanager
 
 /**
  * Represents a budgeting category.

@@ -13,10 +13,10 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.budget.Category
+import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
+import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.transaction.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
@@ -91,6 +91,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var mLlDescription: ConstraintLayout
 
+    /**
+     * Data manager
+     */
+    private lateinit var mDataManager: DataManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -121,6 +126,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
         }
 
+        // Init data manager
+        mDataManager = DataManager(this, lifecycle)
+
         // Date picker setup
         // Create builder for date picker
         val builder = MaterialDatePicker.Builder.datePicker()
@@ -145,20 +153,27 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Create-button listener
         mFabCreateApply.setOnClickListener {
-            // TODO -> save this:
             hideSoftKeyboard()
 
-            // Create transaction
             val moneyValue = mEtValue.text.toString()
+            val payee = mTvPayee.text.toString()
+
+            // Add payee to data manager, if new
+            if (!mDataManager.payees.contains(payee)) {
+                mDataManager.payees.add(payee)
+            }
+
+            // Create transaction
             val transaction = Transaction(
                 if (moneyValue.isBlank()) 0 else moneyValue.toLong(),
                 mTvPayee.text.toString(),
+                mTvCategory.text.toString(),
                 mEtDescription.text.toString().trim(),
-                datePicker.selection!!,
-                Category( // TODO -> replace by search for category by string
-                    emptyMap(), mTvCategory.text.toString()
-                )
+                datePicker.selection!!
             )
+
+            // Save transaction
+            mDataManager.transactions.add(transaction)
 
             // Close activity
             finish()
