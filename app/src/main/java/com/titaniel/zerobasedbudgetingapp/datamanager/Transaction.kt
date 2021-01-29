@@ -1,5 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
+import java.util.*
+
 /**
  * Data class representing a transaction
  * @param value Transaction value
@@ -14,4 +16,6 @@ data class Transaction(
     val category: String,
     val description: String,
     val utcTimestamp: Long
-)
+) {
+    val uuid = UUID.randomUUID().toString()
+}

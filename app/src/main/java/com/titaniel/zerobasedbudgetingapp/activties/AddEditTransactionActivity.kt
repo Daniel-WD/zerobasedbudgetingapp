@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -34,6 +35,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
          * Category request key
          */
         const val CATEGORY_REQUEST_KEY = "category_request_key"
+
+        /**
+         * Edit transaction key
+         */
+        const val EDIT_TRANSACTION_UUID_KEY = "edit_transaction_key"
     }
 
     /**
@@ -96,6 +102,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var mDataManager: DataManager
 
+    /**
+     * Date picker
+     */
+    private lateinit var datePicker: MaterialDatePicker<Long>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -127,22 +138,34 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Init data manager
-        mDataManager = DataManager(this, lifecycle)
+        mDataManager = DataManager(this, lifecycle) {
+            val transactionUuid = intent.extras?.get(EDIT_TRANSACTION_UUID_KEY)
+            val editTransaction = mDataManager.transactions.find { transaction -> transaction.uuid == transactionUuid }
 
-        // Date picker setup
-        // Create builder for date picker
-        val builder = MaterialDatePicker.Builder.datePicker()
+            if(editTransaction != null) {
+                mEtValue.setText(editTransaction.value.toString())
+                mTvPayee.text = editTransaction.payee
+                mTvCategory.text = editTransaction.category
+                mTvDate.text = Utils.convertUtcToString(editTransaction.utcTimestamp)
+                mEtDescription.setText(editTransaction.description)
 
-        // Set default date to today
-        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            }
 
-        val datePicker = builder.build()
+            // Date picker setup
+            // Create builder for date picker
+            val builder = MaterialDatePicker.Builder.datePicker()
 
-        // Date confirmation listener
-        datePicker.addOnPositiveButtonClickListener { timestamp ->
-            // Set date text
-            mTvDate.text = Utils.convertUtcToString(timestamp)
-            checkCreateEnabled()
+            // Set default date to today
+            builder.setSelection(editTransaction?.utcTimestamp ?: MaterialDatePicker.todayInUtcMilliseconds())
+
+            datePicker = builder.build()
+
+            // Date confirmation listener
+            datePicker.addOnPositiveButtonClickListener { timestamp ->
+                // Set date text
+                mTvDate.text = Utils.convertUtcToString(timestamp)
+                checkCreateEnabled()
+            }
         }
 
         // Value text clicked listener

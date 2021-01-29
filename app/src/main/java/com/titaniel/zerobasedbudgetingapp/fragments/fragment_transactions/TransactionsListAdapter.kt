@@ -21,6 +21,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.Utils
  */
 class TransactionsListAdapter(
     private val mTransactions: List<Transaction>,
+    private val mTransactionClickedListener: (Transaction) -> Unit,
     private val mContext: Context
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
@@ -84,6 +85,11 @@ class TransactionsListAdapter(
 
         // Set date text
         holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)
+
+        // Set click listener
+        holder.itemView.setOnClickListener {
+            mTransactionClickedListener(transaction)
+        }
 
     }
 

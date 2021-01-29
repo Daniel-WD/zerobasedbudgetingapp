@@ -10,10 +10,14 @@ import com.google.gson.reflect.TypeToken
 
 /**
  * Helper class to load and save data to shared preferences
- * @param context Context
+ * @param mContext Context
  * @param lifecycle Lifecycle of client
  */
-class DataManager(private val context: Context, lifecycle: Lifecycle) : LifecycleObserver {
+class DataManager(
+    private val mContext: Context,
+    lifecycle: Lifecycle,
+    private val mLoadedCallback: (() -> Unit) = {}
+) : LifecycleObserver {
 
     companion object {
 
@@ -79,11 +83,12 @@ class DataManager(private val context: Context, lifecycle: Lifecycle) : Lifecycl
      */
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun load() {
+
         // Init gson parser
         val gson = Gson()
 
         // Get shared preferences
-        val preferences = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+        val preferences = mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         // Get saved serielized data
         val serializedPayees = preferences.getString(PAYEES_KEY, "[]")
@@ -112,6 +117,9 @@ class DataManager(private val context: Context, lifecycle: Lifecycle) : Lifecycl
             )
         )
 
+        // Data loaded, notify callback
+        this.mLoadedCallback()
+
     }
 
     /**
@@ -124,7 +132,7 @@ class DataManager(private val context: Context, lifecycle: Lifecycle) : Lifecycl
         val gson = Gson()
 
         // Get shared preferences
-        val preferences = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+        val preferences = mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         // Serialize data
         val serializedPayees = gson.toJson(payees)
