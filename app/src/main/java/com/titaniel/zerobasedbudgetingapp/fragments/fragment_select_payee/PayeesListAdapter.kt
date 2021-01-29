@@ -10,14 +10,14 @@ import com.titaniel.zerobasedbudgetingapp.R
 
 /**
  * Adapter for displaying a list of payees.
- * @param payees Containing payees
- * @param payeeClickedListener Callback for click event on payee
- * @param context Context
+ * @param mPayees Containing payees
+ * @param mPayeeClickedListener Callback for click event on payee
+ * @param mContext Context
  */
 class PayeesListAdapter(
-    private val payees: List<String>,
-    private val payeeClickedListener: (String) -> Unit,
-    private val context: Context
+    private val mPayees: List<String>,
+    private val mPayeeClickedListener: (String) -> Unit,
+    private val mContext: Context
 ) : RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
 
     /**
@@ -34,26 +34,26 @@ class PayeesListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PayeeItem {
         // Inflate view
-        val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.item_bottom_sheet, parent, false)
 
         // Create viewholder
         val viewHolder = PayeeItem(view)
 
         // Entry click listener
         view.setOnClickListener {
-            payeeClickedListener(viewHolder.tvPayee.text as String)
+            mPayeeClickedListener(viewHolder.tvPayee.text as String)
         }
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: PayeeItem, position: Int) {
         // Set payee text
-        holder.tvPayee.text = payees[position]
+        holder.tvPayee.text = mPayees[position]
     }
 
     override fun getItemCount(): Int {
         // Return number of payees
-        return payees.size
+        return mPayees.size
     }
 
 }

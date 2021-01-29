@@ -16,12 +16,12 @@ import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
  * Adapter for displaying list of transactions.
- * @param transactions Containing transactions
- * @param context Context
+ * @param mTransactions Containing transactions
+ * @param mContext Context
  */
 class TransactionsListAdapter(
-    private val transactions: List<Transaction>,
-    private val context: Context
+    private val mTransactions: List<Transaction>,
+    private val mContext: Context
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     /**
@@ -59,7 +59,7 @@ class TransactionsListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionItem {
         // Inflate view
-        val view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.item_transaction, parent, false)
 
         // Create viewholder
         return TransactionItem(view)
@@ -67,7 +67,7 @@ class TransactionsListAdapter(
 
     override fun onBindViewHolder(holder: TransactionItem, position: Int) {
         // Transaction
-        val transaction = transactions[position]
+        val transaction = mTransactions[position]
 
         // Set image description available visibility
         holder.imgDescrAvailable.visibility =
@@ -89,7 +89,7 @@ class TransactionsListAdapter(
 
     override fun getItemCount(): Int {
         // Return number transactions
-        return transactions.size
+        return mTransactions.size
     }
 
 }
