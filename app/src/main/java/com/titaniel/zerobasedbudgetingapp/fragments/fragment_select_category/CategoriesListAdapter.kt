@@ -11,14 +11,14 @@ import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 
 /**
  * Adapter for displaying a list of categories.
- * @param categories Containing categories
- * @param categoryClickedListener Callback for click event on category
- * @param context Context
+ * @param mCategories Containing categories
+ * @param mCategoryClickedListener Callback for click event on category
+ * @param mContext Context
  */
 class CategoriesListAdapter(
-    private val categories: List<Category>,
-    private val categoryClickedListener: (String) -> Unit,
-    private val context: Context
+    private val mCategories: List<Category>,
+    private val mCategoryClickedListener: (String) -> Unit,
+    private val mContext: Context
 ) : RecyclerView.Adapter<CategoriesListAdapter.CategoryItem>() {
 
     /**
@@ -35,14 +35,14 @@ class CategoriesListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItem {
         // Inflate view
-        val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.item_bottom_sheet, parent, false)
 
         // Create viewholder
         val viewHolder = CategoryItem(view)
 
         // Entry click listener
         view.setOnClickListener {
-            categoryClickedListener(viewHolder.tvCategory.text as String)
+            mCategoryClickedListener(viewHolder.tvCategory.text as String)
         }
 
         return viewHolder
@@ -50,12 +50,12 @@ class CategoriesListAdapter(
 
     override fun onBindViewHolder(holder: CategoryItem, position: Int) {
         // Set category text to name
-        holder.tvCategory.text = categories[position].name
+        holder.tvCategory.text = mCategories[position].name
     }
 
     override fun getItemCount(): Int {
         // Return number of categories
-        return categories.size
+        return mCategories.size
     }
 
 }

@@ -57,17 +57,17 @@ class DataManager(private val context: Context, lifecycle: Lifecycle) : Lifecycl
     /**
      * Payee list type token
      */
-    private val payeesTypeToken = object : TypeToken<MutableList<String>>() {}.type
+    private val mPayeesTypeToken = object : TypeToken<MutableList<String>>() {}.type
 
     /**
      * Transaction list type token
      */
-    private val transactionsTypeToken = object : TypeToken<MutableList<Transaction>>() {}.type
+    private val mTransactionsTypeToken = object : TypeToken<MutableList<Transaction>>() {}.type
 
     /**
      * Category list type token
      */
-    private val categoriesTypeToken = object : TypeToken<MutableList<Category>>() {}.type
+    private val mCategoriesTypeToken = object : TypeToken<MutableList<Category>>() {}.type
 
     init {
         // Hook to lifecycle events of client
@@ -96,9 +96,9 @@ class DataManager(private val context: Context, lifecycle: Lifecycle) : Lifecycl
         categories.clear()
 
         // Deserialize and fill data
-        payees.addAll(gson.fromJson(serializedPayees, payeesTypeToken))
-        transactions.addAll(gson.fromJson(serializedTransactions, transactionsTypeToken))
-        categories.addAll(gson.fromJson(serializedCategories, categoriesTypeToken))
+        payees.addAll(gson.fromJson(serializedPayees, mPayeesTypeToken))
+        transactions.addAll(gson.fromJson(serializedTransactions, mTransactionsTypeToken))
+        categories.addAll(gson.fromJson(serializedCategories, mCategoriesTypeToken))
 
         // TODO remove, when changeble through user
         categories.clear()

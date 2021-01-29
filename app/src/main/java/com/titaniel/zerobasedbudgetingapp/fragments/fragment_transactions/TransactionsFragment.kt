@@ -20,12 +20,12 @@ class TransactionsFragment : Fragment() {
     /**
      * Toolbar
      */
-    private lateinit var toolbar: MaterialToolbar
+    private lateinit var mToolbar: MaterialToolbar
 
     /**
      * List of all transactions
      */
-    private lateinit var transactionsList: RecyclerView
+    private lateinit var mTransactionsList: RecyclerView
 
     /**
      * Data manager
@@ -42,27 +42,27 @@ class TransactionsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_transactions, container, false)
 
         // Init views
-        toolbar = view!!.findViewById(R.id.toolbar)
-        transactionsList = view.findViewById(R.id.transactionsList)
+        mToolbar = view!!.findViewById(R.id.toolbar)
+        mTransactionsList = view.findViewById(R.id.transactionsList)
 
         // Init data manager
         mDataManager = DataManager(requireContext(), lifecycle)
 
         // Init transactionList
         // Set layout manager
-        transactionsList.layoutManager = LinearLayoutManager(context)
+        mTransactionsList.layoutManager = LinearLayoutManager(context)
 
         // Fix size
-        transactionsList.setHasFixedSize(true)
+        mTransactionsList.setHasFixedSize(true)
 
         // Set adapter
-        transactionsList.adapter = TransactionsListAdapter(
+        mTransactionsList.adapter = TransactionsListAdapter(
             mDataManager.transactions,
             requireContext()
         )
 
         // Add horizontal dividers
-        transactionsList.addItemDecoration(
+        mTransactionsList.addItemDecoration(
             DividerItemDecoration(
                 context,
                 DividerItemDecoration.VERTICAL
@@ -76,7 +76,7 @@ class TransactionsFragment : Fragment() {
         super.onResume()
 
         // Reload transactions list
-        transactionsList.adapter?.notifyDataSetChanged()
+        mTransactionsList.adapter?.notifyDataSetChanged()
     }
 
 }
