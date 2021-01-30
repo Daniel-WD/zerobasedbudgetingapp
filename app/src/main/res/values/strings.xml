@@ -7,6 +7,9 @@
     <string name="navigation_tab_transactions">Transactions</string>
 
     <!-- Activity add/edit transaction -->
+    <string name="activity_add_edit_transaction_create_transaction">Create Transaction</string>
+    <string name="activity_add_edit_transaction_edit_transaction">Edit Transaction</string>
+
     <string name="activity_add_edit_transaction_delete">Delete</string>
 
     <string name="activity_add_edit_transaction_payee">Payee</string>

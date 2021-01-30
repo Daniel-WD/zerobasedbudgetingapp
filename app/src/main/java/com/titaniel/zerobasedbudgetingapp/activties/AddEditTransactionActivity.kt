@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -34,6 +35,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
          * Category request key
          */
         const val CATEGORY_REQUEST_KEY = "category_request_key"
+
+        /**
+         * Edit transaction key
+         */
+        const val EDIT_TRANSACTION_UUID_KEY = "edit_transaction_key"
     }
 
     /**
@@ -96,6 +102,16 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var mDataManager: DataManager
 
+    /**
+     * Date picker
+     */
+    private lateinit var datePicker: MaterialDatePicker<Long>
+
+    /**
+     * Transaction
+     */
+    private lateinit var mTransaction: Transaction
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -117,6 +133,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delete -> {
+                    // Delete transaction, if existing
+                    val delTransaction =
+                        mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid }
+                    mDataManager.transactions.remove(delTransaction)
+
                     // Hide keyboard and close activity
                     hideSoftKeyboard()
                     finish()
@@ -127,22 +148,56 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Init data manager
-        mDataManager = DataManager(this, lifecycle)
+        mDataManager = DataManager(this, lifecycle) {
+            // Find transaction to edit, if existing
+            val transactionUuid = intent.extras?.get(EDIT_TRANSACTION_UUID_KEY)
+            val editTransaction =
+                mDataManager.transactions.find { transaction -> transaction.uuid == transactionUuid }
 
-        // Date picker setup
-        // Create builder for date picker
-        val builder = MaterialDatePicker.Builder.datePicker()
+            if (editTransaction != null) { // Edit existing transaction
+                // Set editTransaction as transaction data
+                mTransaction = editTransaction
 
-        // Set default date to today
-        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                // Change texts for edit mode
+                updateUiToEditMode()
 
-        val datePicker = builder.build()
+                // Update ui
+                updateUi()
 
-        // Date confirmation listener
-        datePicker.addOnPositiveButtonClickListener { timestamp ->
-            // Set date text
-            mTvDate.text = Utils.convertUtcToString(timestamp)
-            checkCreateEnabled()
+                // Set value text cursor to end
+                mEtValue.setSelection(mEtValue.text.length)
+
+                // Update save btn enabled
+                checkCreateApplyEnabled()
+            } else { // Create new transaction
+                mTransaction = Transaction(0, "", "", "", -1)
+            }
+
+            // Date picker setup
+            // Create builder for date picker
+            val builder = MaterialDatePicker.Builder.datePicker()
+
+            // Set default date to transaction date(when editing transaction), today otherwise
+            builder.setSelection(
+                if (mTransaction.utcTimestamp != -1L) mTransaction.utcTimestamp else MaterialDatePicker.todayInUtcMilliseconds()
+            )
+
+            // Builder date picker
+            datePicker = builder.build()
+
+            // Date confirmation listener
+            datePicker.addOnPositiveButtonClickListener { timestamp ->
+
+                // Set transaction timestamp
+                mTransaction.utcTimestamp = timestamp
+
+                // Update ui
+                updateUi()
+
+                // Check save enabled
+                checkCreateApplyEnabled()
+
+            }
         }
 
         // Value text clicked listener
@@ -151,11 +206,24 @@ class AddEditTransactionActivity : AppCompatActivity() {
             mEtValue.setSelection(mEtValue.text.length)
         }
 
-        // Create-button listener
+        // Value text changed listener
+        mEtValue.addTextChangedListener { value ->
+            // Set transaction value, 0 when blank
+            mTransaction.value = if (value.toString().isBlank()) 0 else value.toString().toLong()
+        }
+
+        // Description text changed listener
+        mEtDescription.addTextChangedListener { description ->
+            // Set description text
+            mTransaction.description = description.toString().trim()
+        }
+
+        // Create/Apply-button listener
         mFabCreateApply.setOnClickListener {
+            // Hide keyboard
             hideSoftKeyboard()
 
-            val moneyValue = mEtValue.text.toString()
+            // Payee
             val payee = mTvPayee.text.toString()
 
             // Add payee to data manager, if new
@@ -163,17 +231,10 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 mDataManager.payees.add(payee)
             }
 
-            // Create transaction
-            val transaction = Transaction(
-                if (moneyValue.isBlank()) 0 else moneyValue.toLong(),
-                mTvPayee.text.toString(),
-                mTvCategory.text.toString(),
-                mEtDescription.text.toString().trim(),
-                datePicker.selection!!
-            )
-
-            // Save transaction
-            mDataManager.transactions.add(transaction)
+            // Save transaction, when not existing
+            if (mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid } == null) {
+                mDataManager.transactions.add(mTransaction)
+            }
 
             // Close activity
             finish()
@@ -204,20 +265,22 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Fragment result listeners
-        // Set payee text on payee fragment result
+        // Set payee on payee fragment result
         supportFragmentManager
             .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
                 val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
-                mTvPayee.text = payee
-                checkCreateEnabled()
+                mTransaction.payee = payee ?: mTransaction.payee
+                updateUi()
+                checkCreateApplyEnabled()
             }
 
-        // Set category text on category fragment result
+        // Set category on category fragment result
         supportFragmentManager
             .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
                 val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
-                mTvCategory.text = category
-                checkCreateEnabled()
+                mTransaction.category = category ?: mTransaction.category
+                updateUi()
+                checkCreateApplyEnabled()
             }
 
         // Focus value text
@@ -228,11 +291,31 @@ class AddEditTransactionActivity : AppCompatActivity() {
     }
 
     /**
+     * Change texts to fit editing context
+     */
+    private fun updateUiToEditMode() {
+        mToolbar.title = getString(R.string.activity_add_edit_transaction_edit_transaction)
+        mFabCreateApply.text = getString(R.string.activity_add_edit_transaction_apply)
+    }
+
+    /**
+     * Update ui from transaction
+     */
+    private fun updateUi() {
+        mEtValue.setText(mTransaction.value.toString())
+        mTvPayee.text = mTransaction.payee
+        mTvCategory.text = mTransaction.category
+        mTvDate.text =
+            if (mTransaction.utcTimestamp != -1L) Utils.convertUtcToString(mTransaction.utcTimestamp) else ""
+        mEtDescription.setText(mTransaction.description)
+    }
+
+    /**
      * Update if create/apply btn should be enabled
      */
-    private fun checkCreateEnabled() {
+    private fun checkCreateApplyEnabled() {
         mFabCreateApply.isEnabled =
-            mTvPayee.text.isNotBlank() && mTvCategory.text.isNotBlank() && mTvDate.text.isNotBlank()
+            mTransaction.payee.isNotBlank() && mTransaction.category.isNotBlank() && mTvDate.text.isNotBlank()
     }
 
     /**
