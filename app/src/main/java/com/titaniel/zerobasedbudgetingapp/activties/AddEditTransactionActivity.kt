@@ -112,11 +112,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var mTransaction: Transaction
 
-    /**
-     * Edit or create transaction mode
-     */
-    private var mEditMode = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -138,6 +133,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delete -> {
+                    // Delete transaction, if existing
+                    val delTransaction =
+                        mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid }
+                    mDataManager.transactions.remove(delTransaction)
+
                     // Hide keyboard and close activity
                     hideSoftKeyboard()
                     finish()
@@ -157,7 +157,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
             if (editTransaction != null) { // Edit existing transaction
                 // Set editTransaction as transaction data
                 mTransaction = editTransaction
-                mEditMode = true
+
+                // Change texts for edit mode
+                updateUiToEditMode()
 
                 // Update ui
                 updateUi()
@@ -229,8 +231,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 mDataManager.payees.add(payee)
             }
 
-            // Save transaction, when not in edit mode
-            if (!mEditMode) {
+            // Save transaction, when not existing
+            if (mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid } == null) {
                 mDataManager.transactions.add(mTransaction)
             }
 
@@ -286,6 +288,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Show keyboard
         showSoftKeyboard()
+    }
+
+    private fun updateUiToEditMode() {
+        mToolbar.title = getString(R.string.activity_add_edit_transaction_edit_transaction)
+        mFabCreateApply.text = getString(R.string.activity_add_edit_transaction_apply)
     }
 
     /**
