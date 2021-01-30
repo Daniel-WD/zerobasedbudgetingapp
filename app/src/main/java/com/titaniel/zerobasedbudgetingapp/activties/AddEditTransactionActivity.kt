@@ -290,6 +290,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         showSoftKeyboard()
     }
 
+    /**
+     * Change texts to fit editing context
+     */
     private fun updateUiToEditMode() {
         mToolbar.title = getString(R.string.activity_add_edit_transaction_edit_transaction)
         mFabCreateApply.text = getString(R.string.activity_add_edit_transaction_apply)

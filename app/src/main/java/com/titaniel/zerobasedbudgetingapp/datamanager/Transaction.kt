@@ -17,5 +17,6 @@ data class Transaction(
     var description: String,
     var utcTimestamp: Long
 ) {
+    // Uuid, randomly generated
     val uuid = UUID.randomUUID().toString()
 }

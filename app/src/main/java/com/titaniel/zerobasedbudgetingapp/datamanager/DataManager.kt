@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken
  * Helper class to load and save data to shared preferences
  * @param mContext Context
  * @param lifecycle Lifecycle of client
+ * @param mLoadedCallback Callback, called after data has been laoded
  */
 class DataManager(
     private val mContext: Context,
@@ -88,7 +89,8 @@ class DataManager(
         val gson = Gson()
 
         // Get shared preferences
-        val preferences = mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+        val preferences =
+            mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         // Get saved serielized data
         val serializedPayees = preferences.getString(PAYEES_KEY, "[]")
@@ -132,7 +134,8 @@ class DataManager(
         val gson = Gson()
 
         // Get shared preferences
-        val preferences = mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+        val preferences =
+            mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
 
         // Serialize data
         val serializedPayees = gson.toJson(payees)

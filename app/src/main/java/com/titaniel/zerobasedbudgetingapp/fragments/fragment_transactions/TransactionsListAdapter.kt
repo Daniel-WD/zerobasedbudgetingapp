@@ -86,7 +86,7 @@ class TransactionsListAdapter(
         // Set date text
         holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)
 
-        // Set click listener
+        // Set click listener, item click callback
         holder.itemView.setOnClickListener {
             mTransactionClickedListener(transaction)
         }
