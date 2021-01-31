@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Transaction entry for transactions fragment -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/fragment_budget_category_margin"
+        android:includeFontPadding="false"
+        android:textSize="16sp"
+        tools:text="Category 1" />
+
+    <TextView
+        android:id="@+id/tvBudgeted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="@dimen/fragment_budget_budgeted_margin"
+        android:includeFontPadding="false"
+        android:textSize="16sp"
+        tools:text="100€" />
+
+    <TextView
+        android:id="@+id/tvAvailable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="@dimen/fragment_budget_available_margin"
+        android:includeFontPadding="false"
+        android:textSize="16sp"
+        tools:text="20€" />
+
+</FrameLayout>
