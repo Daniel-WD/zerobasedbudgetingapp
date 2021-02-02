@@ -21,6 +21,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/fragment_budget_menu"
             app:navigationIcon="@drawable/ic_baseline_menu_24"
             app:title="September" />
 
@@ -32,7 +33,7 @@
             android:fontFamily="sans-serif-medium"
             android:includeFontPadding="false"
             android:textSize="36sp"
-            tools:text="5000€ Available" />
+            android:text="5000€ Available" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -75,13 +76,13 @@
 
     <!-- List of transaction items -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/transactionsList"
+        android:id="@+id/listBudgeting"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-        tools:listitem="@layout/item_category" />
+        tools:listitem="@layout/item_budget" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

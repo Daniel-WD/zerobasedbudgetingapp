@@ -1,9 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.activties
 
-import android.content.Context
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,6 +15,8 @@ import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
+import com.titaniel.zerobasedbudgetingapp.forceHideSoftKeyboard
+import com.titaniel.zerobasedbudgetingapp.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
@@ -139,7 +138,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                     mDataManager.transactions.remove(delTransaction)
 
                     // Hide keyboard and close activity
-                    hideSoftKeyboard()
+                    forceHideSoftKeyboard()
                     finish()
                     true
                 }
@@ -221,7 +220,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Create/Apply-button listener
         mFabCreateApply.setOnClickListener {
             // Hide keyboard
-            hideSoftKeyboard()
+            forceHideSoftKeyboard()
 
             // Payee
             val payee = mTvPayee.text.toString()
@@ -243,7 +242,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Listeners for layout clicks
         // Open payee fragment on payee layout click
         mLlPayee.setOnClickListener {
-            hideSoftKeyboard()
+            forceHideSoftKeyboard()
             mEtDescription.clearFocus()
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
@@ -251,7 +250,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Open category on category layout click
         mLlCategory.setOnClickListener {
-            hideSoftKeyboard()
+            forceHideSoftKeyboard()
             mEtDescription.clearFocus()
             val selectCategoryFragment = SelectCategoryFragment()
             selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
@@ -259,7 +258,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Open date picker on date layout click
         mLlDate.setOnClickListener {
-            hideSoftKeyboard()
+            forceHideSoftKeyboard()
             mEtDescription.clearFocus()
             datePicker.show(supportFragmentManager, "DatePicker")
         }
@@ -287,7 +286,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mEtValue.requestFocus()
 
         // Show keyboard
-        showSoftKeyboard()
+        forceShowSoftKeyboard()
     }
 
     /**
@@ -316,27 +315,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private fun checkCreateApplyEnabled() {
         mFabCreateApply.isEnabled =
             mTransaction.payee.isNotBlank() && mTransaction.category.isNotBlank() && mTvDate.text.isNotBlank()
-    }
-
-    /**
-     * Show keyboard
-     */
-    private fun showSoftKeyboard() {
-        val inputMethodManager: InputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
-
-    /**
-     * Hide keyboard
-     */
-    private fun hideSoftKeyboard() {
-        val inputMethodManager: InputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(
-            findViewById<View>(android.R.id.content).windowToken,
-            0
-        )
     }
 
 }
