@@ -42,6 +42,11 @@ class DataManager(
          */
         const val CATEGORIES_KEY = "com.titaniel.zerobasedbudgetingapp.categories"
 
+        /**
+         * To be budgeted value key
+         */
+        const val TO_BE_BUDGETED_KEY = "com.titaniel.zerobasedbudgetingapp.categories"
+
     }
 
     /**
@@ -58,6 +63,11 @@ class DataManager(
      * Categories
      */
     val categories: MutableList<Category> = mutableListOf()
+
+    /**
+     * To be budgeted value
+     */
+    var toBeBudgeted: Long = 0
 
     /**
      * Payee list type token
@@ -96,6 +106,9 @@ class DataManager(
         val serializedPayees = preferences.getString(PAYEES_KEY, "[]")
         val serializedTransactions = preferences.getString(TRANSACTIONS_KEY, "[]")
         val serializedCategories = preferences.getString(CATEGORIES_KEY, "[]")
+
+        // Get saved primitive data
+        toBeBudgeted = preferences.getLong(TO_BE_BUDGETED_KEY, 0)
 
         // Empty data containers
         payees.clear()
@@ -142,11 +155,12 @@ class DataManager(
         val serializedTransactions = gson.toJson(transactions)
         val serializedCategories = gson.toJson(categories)
 
-        // Save serialized data
+        // Save serialized data and primitive data
         preferences.edit()
             .putString(PAYEES_KEY, serializedPayees)
             .putString(TRANSACTIONS_KEY, serializedTransactions)
             .putString(CATEGORIES_KEY, serializedCategories)
+            .putLong(TO_BE_BUDGETED_KEY, toBeBudgeted)
             .commit()
 
         // Empty data containers
