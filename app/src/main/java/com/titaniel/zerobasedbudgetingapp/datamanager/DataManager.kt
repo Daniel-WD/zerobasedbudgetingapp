@@ -45,7 +45,12 @@ class DataManager(
         /**
          * To be budgeted value key
          */
-        const val TO_BE_BUDGETED_KEY = "com.titaniel.zerobasedbudgetingapp.categories"
+        const val TO_BE_BUDGETED_KEY = "com.titaniel.zerobasedbudgetingapp.to_be_budgeted"
+
+        /**
+         * To be month value key
+         */
+        const val MONTH_KEY = "com.titaniel.zerobasedbudgetingapp.month"
 
     }
 
@@ -68,6 +73,11 @@ class DataManager(
      * To be budgeted value
      */
     var toBeBudgeted: Long = 0
+
+    /**
+     * UTC timestamp of first of selected month
+     */
+    var month: Long = -1
 
     /**
      * Payee list type token
@@ -109,6 +119,7 @@ class DataManager(
 
         // Get saved primitive data
         toBeBudgeted = preferences.getLong(TO_BE_BUDGETED_KEY, 0)
+        month = preferences.getLong(MONTH_KEY, 0)
 
         // Empty data containers
         payees.clear()
@@ -161,6 +172,7 @@ class DataManager(
             .putString(TRANSACTIONS_KEY, serializedTransactions)
             .putString(CATEGORIES_KEY, serializedCategories)
             .putLong(TO_BE_BUDGETED_KEY, toBeBudgeted)
+            .putLong(MONTH_KEY, month)
             .commit()
 
         // Empty data containers
