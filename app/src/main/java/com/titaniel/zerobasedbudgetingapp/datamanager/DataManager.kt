@@ -124,11 +124,11 @@ class DataManager(
         categories.clear()
         categories.addAll(
             mutableListOf(
-                Category(mapOf(1 to 2, 2 to 3), "Süßes"),
-                Category(emptyMap(), "Lebensmittel"),
-                Category(emptyMap(), "Autos"),
-                Category(emptyMap(), "Persönlich"),
-                Category(emptyMap(), "Sexspielzeuge")
+                Category(mapOf(1L to 2L, 2L to 3L), mapOf(1L to 2L, 2L to 3L), "Süßes"),
+                Category(emptyMap(), emptyMap(), "Lebensmittel"),
+                Category(emptyMap(), emptyMap(), "Autos"),
+                Category(emptyMap(), emptyMap(), "Persönlich"),
+                Category(emptyMap(), emptyMap(), "Sexspielzeuge")
             )
         )
 
