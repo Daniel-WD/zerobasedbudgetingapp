@@ -132,16 +132,16 @@ class DataManager(
         categories.addAll(gson.fromJson(serializedCategories, mCategoriesTypeToken))
 
         // TODO remove, when changeble through user
-        categories.clear()
+        /*categories.clear()
         categories.addAll(
             mutableListOf(
-                Category(mapOf(1L to 2L, 2L to 3L), mapOf(1L to 2L, 2L to 3L), "Süßes"),
-                Category(emptyMap(), emptyMap(), "Lebensmittel"),
-                Category(emptyMap(), emptyMap(), "Autos"),
-                Category(emptyMap(), emptyMap(), "Persönlich"),
-                Category(emptyMap(), emptyMap(), "Sexspielzeuge")
+                Category(mutableMapOf(), mutableMapOf(), "Süßes"),
+                Category(mutableMapOf(), mutableMapOf(), "Lebensmittel"),
+                Category(mutableMapOf(), mutableMapOf(), "Autos"),
+                Category(mutableMapOf(), mutableMapOf(), "Persönlich"),
+                Category(mutableMapOf(), mutableMapOf(), "Sexspielzeuge")
             )
-        )
+        )*/
 
         // Data loaded, notify callback
         this.mLoadedCallback()

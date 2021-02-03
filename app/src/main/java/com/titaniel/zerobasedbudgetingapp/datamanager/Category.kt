@@ -7,7 +7,7 @@ package com.titaniel.zerobasedbudgetingapp.datamanager
  * @param name Category name.
  */
 data class Category(
-    val manualBudgetedMoney: Map<Long, Long>,
-    val transactionSums: Map<Long, Long>,
+    val manualBudgetedMoney: MutableMap<Long, Long>,
+    val transactionSums: MutableMap<Long, Long>,
     val name: String
 )

@@ -111,6 +111,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var mTransaction: Transaction
 
+    /**
+     * Old transaction, transaction that should be edited
+     */
+    private lateinit var mOldTransaction: Transaction
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -133,9 +138,10 @@ class AddEditTransactionActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.delete -> {
                     // Delete transaction, if existing
-                    val delTransaction =
-                        mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid }
-                    mDataManager.transactions.remove(delTransaction)
+                    mDataManager.transactions.remove(mTransaction)
+
+                    // Remove transaction value from category
+                    Utils.updateTransactionSums(mTransaction, mDataManager, true)
 
                     // Hide keyboard and close activity
                     forceHideSoftKeyboard()
@@ -156,6 +162,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
             if (editTransaction != null) { // Edit existing transaction
                 // Set editTransaction as transaction data
                 mTransaction = editTransaction
+
+                // Save editTransaction data as old transaction
+                mOldTransaction = editTransaction.copy()
 
                 // Change texts for edit mode
                 updateUiToEditMode()
@@ -230,9 +239,15 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 mDataManager.payees.add(payee)
             }
 
-            // Save transaction, when not existing
+            // Check if transaction already exists
             if (mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid } == null) {
+                // New transaction, save, update category
                 mDataManager.transactions.add(mTransaction)
+                Utils.updateTransactionSums(mTransaction, mDataManager)
+            } else {
+                // Edited transaction, remove old transaction value from category, add new one
+                Utils.updateTransactionSums(mOldTransaction, mDataManager, true)
+                Utils.updateTransactionSums(mTransaction, mDataManager)
             }
 
             // Close activity
