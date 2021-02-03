@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.*
 
 /**
  * Helper class to load and save data to shared preferences
@@ -77,7 +78,12 @@ class DataManager(
     /**
      * UTC timestamp of first of selected month
      */
-    var month: Long = -1
+    val month: Long
+        get() {
+            val calendar = Calendar.getInstance()
+            calendar.set(2021, Calendar.FEBRUARY, 1)
+            return calendar.timeInMillis
+        }
 
     /**
      * Payee list type token
@@ -119,7 +125,7 @@ class DataManager(
 
         // Get saved primitive data
         toBeBudgeted = preferences.getLong(TO_BE_BUDGETED_KEY, 0)
-        month = preferences.getLong(MONTH_KEY, 0)
+        // FIXME month = preferences.getLong(MONTH_KEY, 0)
 
         // Empty data containers
         payees.clear()

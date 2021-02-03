@@ -73,7 +73,7 @@ class BudgetFragment : Fragment() {
         mListBudgeting.layoutManager = LinearLayoutManager(requireContext())
 
         // Add adapter
-        mListBudgeting.adapter = BudgetingListAdapter(mDataManager.categories, { categoryName -> // Category click
+        mListBudgeting.adapter = BudgetingListAdapter(mDataManager.categories, mDataManager.month, { categoryName -> // Category click
 
             // Create update budget fragment
             val updateBudgetFragment = UpdateBudgetFragment()
@@ -113,6 +113,13 @@ class BudgetFragment : Fragment() {
             }
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Reload budgeting list
+        mListBudgeting.adapter?.notifyDataSetChanged()
     }
 
 }

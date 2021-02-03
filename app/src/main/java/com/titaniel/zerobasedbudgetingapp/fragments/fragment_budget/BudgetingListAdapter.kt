@@ -12,11 +12,13 @@ import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 /**
  * Adapter for displaying a list of budgeting items.
  * @param mCategories Containing categories
+ * @param mMonthTimestamp Month timestamp
  * @param mItemClickedListener Callback for click event on item
  * @param mContext Context
  */
 class BudgetingListAdapter(
     private val mCategories: List<Category>,
+    private val mMonthTimestamp: Long,
     private val mItemClickedListener: (String) -> Unit,
     private val mContext: Context
 ) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
@@ -64,10 +66,10 @@ class BudgetingListAdapter(
         holder.tvCategory.text = category.name
 
         // Set budgeted value
-        holder.tvBudgeted.text = "0€"
+        holder.tvBudgeted.text = (category.manualBudgetedMoney[mMonthTimestamp] ?: 0).toString()
 
         // Set available value
-        holder.tvAvailable.text = "0€"
+        holder.tvAvailable.text = category.realBudgetedValue(mMonthTimestamp).toString()
     }
 
     override fun getItemCount(): Int {
