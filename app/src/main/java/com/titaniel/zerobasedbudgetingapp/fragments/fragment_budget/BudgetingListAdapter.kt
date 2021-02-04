@@ -19,7 +19,7 @@ import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 class BudgetingListAdapter(
     private val mCategories: List<Category>,
     private val mMonthTimestamp: Long,
-    private val mItemClickedListener: (String) -> Unit,
+    private val mItemClickedListener: (Category) -> Unit,
     private val mContext: Context
 ) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
 
@@ -49,14 +49,7 @@ class BudgetingListAdapter(
         val view = LayoutInflater.from(mContext).inflate(R.layout.item_budget, parent, false)
 
         // Create viewholder
-        val viewHolder = BudgetingItem(view)
-
-        // Entry click listener
-        view.setOnClickListener {
-            mItemClickedListener(viewHolder.tvCategory.text as String)
-        }
-
-        return viewHolder
+        return BudgetingItem(view)
     }
 
     override fun onBindViewHolder(holder: BudgetingItem, position: Int) {
@@ -70,6 +63,11 @@ class BudgetingListAdapter(
 
         // Set available value
         holder.tvAvailable.text = category.realBudgetedValue(mMonthTimestamp).toString()
+
+        // Entry click listener
+        holder.itemView.setOnClickListener {
+            mItemClickedListener(mCategories[position])
+        }
     }
 
     override fun getItemCount(): Int {

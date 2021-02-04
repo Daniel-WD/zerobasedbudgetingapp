@@ -94,6 +94,9 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         // Set budgeted value
         mEtBudgeted.setText(budgetedValue.toString())
 
+        // Select budgted text
+        mEtBudgeted.selectAll()
+
         // Focus budgeted edittext
         mEtBudgeted.requestFocus()
 

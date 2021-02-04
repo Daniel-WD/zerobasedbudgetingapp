@@ -73,19 +73,27 @@ class BudgetFragment : Fragment() {
         mListBudgeting.layoutManager = LinearLayoutManager(requireContext())
 
         // Add adapter
-        mListBudgeting.adapter = BudgetingListAdapter(mDataManager.categories, mDataManager.month, { categoryName -> // Category click
+        mListBudgeting.adapter = BudgetingListAdapter(
+            mDataManager.categories,
+            mDataManager.month,
+            { category -> // Category click
 
-            // Create update budget fragment
-            val updateBudgetFragment = UpdateBudgetFragment()
+                // Create update budget fragment
+                val updateBudgetFragment = UpdateBudgetFragment()
 
-            // Category name,  budgeted value as arguments
-            updateBudgetFragment.arguments =
-                bundleOf(UpdateBudgetFragment.CATEGORY_NAME_KEY to categoryName, UpdateBudgetFragment.BUDGETED_VALUE_KEY to 55L)
+                // Category name,  budgeted value as arguments
+                updateBudgetFragment.arguments =
+                    bundleOf(
+                        UpdateBudgetFragment.CATEGORY_NAME_KEY to category.name,
+                        UpdateBudgetFragment.BUDGETED_VALUE_KEY to category.manualBudgetedMoney[mDataManager.month]
+                    )
 
-            // Show update budget fragment
-            updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
+                // Show update budget fragment
+                updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
 
-        }, requireContext())
+            },
+            requireContext()
+        )
 
         // Add horizontal dividers
         mListBudgeting.addItemDecoration(
@@ -102,14 +110,18 @@ class BudgetFragment : Fragment() {
                 // New budgeted value
                 val newBudget = bundle.getLong(UpdateBudgetFragment.NEW_BUDGET_KEY)
 
+                val categoryName = bundle.getString(UpdateBudgetFragment.CATEGORY_NAME_KEY)
+
                 // Corresponding category
                 val category = mDataManager.categories.find { category ->
-                    category.name == bundle.getString(UpdateBudgetFragment.CATEGORY_NAME_KEY)
+                    category.name == categoryName
                 }
 
-                // TODO Save budgeted value
-                Log.d("TAg", "$newBudget $category")
+                // Save manual budgeted value
+                category!!.manualBudgetedMoney[mDataManager.month] = newBudget
 
+                // Reload budgeting list
+                mListBudgeting.adapter!!.notifyDataSetChanged()
             }
 
         return view

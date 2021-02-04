@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.time.Instant
 import java.util.*
 
 /**
@@ -78,12 +79,7 @@ class DataManager(
     /**
      * UTC timestamp of first of selected month
      */
-    val month: Long
-        get() {
-            val calendar = Calendar.getInstance()
-            calendar.set(2021, Calendar.FEBRUARY, 1)
-            return calendar.timeInMillis
-        }
+    val month: Long = 1612137600000 //February
 
     /**
      * Payee list type token
