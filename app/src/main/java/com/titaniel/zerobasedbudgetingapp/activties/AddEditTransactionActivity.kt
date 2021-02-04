@@ -137,11 +137,15 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delete -> {
-                    // Delete transaction, if existing
-                    mDataManager.transactions.remove(mTransaction)
 
-                    // Remove transaction value from category
-                    Utils.updateTransactionSums(mTransaction, mDataManager, true)
+                    // If transaction exists
+                    if(mDataManager.transactions.contains(mTransaction)) {
+                        // Delete transaction
+                        mDataManager.transactions.remove(mTransaction)
+
+                        // Remove transaction value from category
+                        Utils.updateTransactionSums(mTransaction, mDataManager, true)
+                    }
 
                     // Hide keyboard and close activity
                     forceHideSoftKeyboard()
@@ -217,7 +221,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Value text changed listener
         mEtValue.addTextChangedListener { value ->
             // Set transaction value, 0 when blank
-            mTransaction.value = if (value.toString().isBlank()) 0 else value.toString().toLong()
+            mTransaction.value = if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString().toLong()
         }
 
         // Description text changed listener
