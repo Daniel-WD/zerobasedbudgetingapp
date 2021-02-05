@@ -51,11 +51,11 @@ class DataManagerTests {
             )
 
         val fakeCategories = mutableListOf(
-            Category(mapOf(1 to 2, 2 to 3), "Süßes"),
-            Category(emptyMap(), "Lebensmittel"),
-            Category(emptyMap(), "Autos"),
-            Category(emptyMap(), "Persönlich"),
-            Category(emptyMap(), "Sexspielzeuge")
+            Category(mutableMapOf(), mutableMapOf(), "Süßes"),
+            Category(mutableMapOf(), mutableMapOf(), "Lebensmittel"),
+            Category(mutableMapOf(), mutableMapOf(), "Autos"),
+            Category(mutableMapOf(), mutableMapOf(), "Persönlich"),
+            Category(mutableMapOf(), mutableMapOf(), "Sexspielzeuge")
         )
 
         val fakeTransactions = mutableListOf(
