@@ -1,7 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.addition
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_update_budget.UpdateBudgetFragment
+import com.titaniel.zerobasedbudgetingapp.subtraction
 
 /**
  * Fragment to show a list of categories. Each item contains budgeting information, which can be edited.
@@ -63,7 +64,9 @@ class BudgetFragment : Fragment() {
         mListBudgeting = view.findViewById(R.id.listBudgeting)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager(requireContext(), lifecycle) {
+            updateToBeBudgeted()
+        }
 
         // Setup toolbar
         mToolbar.menu
@@ -122,9 +125,21 @@ class BudgetFragment : Fragment() {
 
                 // Reload budgeting list
                 mListBudgeting.adapter!!.notifyDataSetChanged()
+
+                updateToBeBudgeted()
             }
 
         return view
+    }
+
+    /**
+     * Updates "to be budgeted" value
+     */
+    private fun updateToBeBudgeted() {
+        mTvToBeBudgeted.text = mDataManager.categories
+            .map { category -> category.manualBudgetedMoney[mDataManager.month] ?: 0 }
+            .fold(mDataManager.toBeBudgeted, subtraction)
+            .toString()
     }
 
     override fun onResume() {
@@ -132,6 +147,11 @@ class BudgetFragment : Fragment() {
 
         // Reload budgeting list
         mListBudgeting.adapter?.notifyDataSetChanged()
+
+        // Update budgeted text, if data is available
+        if(mDataManager.state == DataManager.STATE_LOADED) {
+            updateToBeBudgeted()
+        }
     }
 
 }

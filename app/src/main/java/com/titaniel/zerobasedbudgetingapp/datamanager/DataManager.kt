@@ -54,6 +54,16 @@ class DataManager(
          */
         const val MONTH_KEY = "com.titaniel.zerobasedbudgetingapp.month"
 
+        /**
+         * State, where data is not loaded
+         */
+        const val STATE_NOT_LOADED = 0
+
+        /**
+         * State, where data is loaded
+         */
+        const val STATE_LOADED = 1
+
     }
 
     /**
@@ -95,6 +105,12 @@ class DataManager(
      * Category list type token
      */
     private val mCategoriesTypeToken = object : TypeToken<MutableList<Category>>() {}.type
+
+    /**
+     * State
+     */
+    var state = STATE_NOT_LOADED
+    private set
 
     init {
         // Hook to lifecycle events of client
@@ -145,6 +161,9 @@ class DataManager(
             )
         )*/
 
+        // Set state
+        state = STATE_LOADED
+
         // Data loaded, notify callback
         this.mLoadedCallback()
 
@@ -177,10 +196,14 @@ class DataManager(
             .putLong(MONTH_KEY, month)
             .commit()
 
-        // Empty data containers
+        // Empty data
         payees.clear()
         transactions.clear()
         categories.clear()
+        toBeBudgeted = 0
+
+        // Set state
+        state = STATE_NOT_LOADED
 
     }
 

@@ -1,5 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
+import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import java.text.SimpleDateFormat
@@ -21,7 +22,7 @@ object Utils {
     }
 
     /**
-     * Updates transaction sums in category
+     * Updates transaction sums in category, or to be budgeted value
      * @param transaction Transaction to update its category with
      * @param dataManager Data manager
      * @param remove If trnasaction should be removed
@@ -36,10 +37,16 @@ object Utils {
         calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val monthTimestmap = calendar.timeInMillis
-        val category =
-            dataManager.categories.find { category -> category.name == transaction.category }
 
         val value = if (remove) -transaction.value else transaction.value
+
+        if (transaction.category == Category.TO_BE_BUDGETED) {
+            dataManager.toBeBudgeted = dataManager.toBeBudgeted.plus(value)
+            return
+        }
+
+        val category =
+            dataManager.categories.find { category -> category.name == transaction.category }
 
         category!!.transactionSums[monthTimestmap] = category.transactionSums[monthTimestmap]?.plus(
             value

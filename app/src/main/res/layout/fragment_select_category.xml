@@ -23,6 +23,7 @@
 
     <!-- Select payee text -->
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -49,10 +50,33 @@
         android:id="@+id/listCategories"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="78dp"
+        android:paddingTop="126dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_bottom_sheet" />
+
+    <!-- To be budgeted text -->
+    <TextView
+        android:id="@+id/tvToBeBudgeted"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="@string/activity_add_edit_transaction_to_be_budgeted"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
+
+    <!-- Divider -->
+    <View
+        app:layout_constraintTop_toBottomOf="@id/tvToBeBudgeted"
+        android:id="@+id/vDivider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_add_edit_transaction"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
+import com.titaniel.zerobasedbudgetingapp.addition
+
 /**
  * Represents a budgeting category.
  * @param manualBudgetedMoney Map mapping a month identifying key to the budgeted value.
@@ -12,8 +14,16 @@ data class Category(
     val name: String
 ) {
 
+    companion object {
+
+        /**
+         * Budgeted key
+         */
+        const val TO_BE_BUDGETED = "com.titaniel.zerobasedbudgetingapp.to_be_budgeted"
+
+    }
+
     fun realBudgetedValue(monthTimestamp: Long): Long {
-        val addition = { a: Long, b: Long -> a.plus(b) }
         val allSums = transactionSums
             .filter { entry -> entry.key <= monthTimestamp }
             .map { entry -> entry.value }

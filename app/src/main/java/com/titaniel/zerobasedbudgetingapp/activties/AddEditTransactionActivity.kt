@@ -11,12 +11,13 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.forceHideSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.forceShowSoftKeyboard
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
@@ -139,7 +140,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 R.id.delete -> {
 
                     // If transaction exists
-                    if(mDataManager.transactions.contains(mTransaction)) {
+                    if (mDataManager.transactions.contains(mTransaction)) {
                         // Delete transaction
                         mDataManager.transactions.remove(mTransaction)
 
@@ -221,7 +222,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Value text changed listener
         mEtValue.addTextChangedListener { value ->
             // Set transaction value, 0 when blank
-            mTransaction.value = if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString().toLong()
+            mTransaction.value =
+                if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
+                    .toLong()
         }
 
         // Description text changed listener
@@ -322,7 +325,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private fun updateUi() {
         mEtValue.setText(mTransaction.value.toString())
         mTvPayee.text = mTransaction.payee
-        mTvCategory.text = mTransaction.category
+        mTvCategory.text =
+            if (mTransaction.category == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else mTransaction.category
         mTvDate.text =
             if (mTransaction.utcTimestamp != -1L) Utils.convertUtcToString(mTransaction.utcTimestamp) else ""
         mEtDescription.setText(mTransaction.description)

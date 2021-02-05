@@ -33,6 +33,8 @@
     <string name="activity_add_edit_transaction_cents">cents</string>
     <string name="activity_add_edit_transaction_zero">0</string>
 
+    <string name="activity_add_edit_transaction_to_be_budgeted">To be budgeted</string>
+
     <!-- Fragment budget -->
     <string name="fragment_budget_search_category">Search category</string>
 
