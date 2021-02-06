@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee
+package com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category
 
 import android.os.Bundle
 import android.view.LayoutInflater

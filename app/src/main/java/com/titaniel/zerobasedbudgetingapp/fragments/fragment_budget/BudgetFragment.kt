@@ -12,10 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.addition
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_update_budget.UpdateBudgetFragment
-import com.titaniel.zerobasedbudgetingapp.subtraction
 
 /**
  * Fragment to show a list of categories. Each item contains budgeting information, which can be edited.
@@ -120,8 +118,18 @@ class BudgetFragment : Fragment() {
                     category.name == categoryName
                 }
 
+                // Remove old budgeted value from "to be budgeted"
+                mDataManager.toBeBudgeted = mDataManager.toBeBudgeted.plus(
+                    category!!.manualBudgetedMoney[mDataManager.month] ?: 0
+                )
+
+                // Add new budgeted value to "to be budgted"
+                mDataManager.toBeBudgeted = mDataManager.toBeBudgeted.minus(
+                    newBudget
+                )
+
                 // Save manual budgeted value
-                category!!.manualBudgetedMoney[mDataManager.month] = newBudget
+                category.manualBudgetedMoney[mDataManager.month] = newBudget
 
                 // Reload budgeting list
                 mListBudgeting.adapter!!.notifyDataSetChanged()
@@ -136,10 +144,7 @@ class BudgetFragment : Fragment() {
      * Updates "to be budgeted" value
      */
     private fun updateToBeBudgeted() {
-        mTvToBeBudgeted.text = mDataManager.categories
-            .map { category -> category.manualBudgetedMoney[mDataManager.month] ?: 0 }
-            .fold(mDataManager.toBeBudgeted, subtraction)
-            .toString()
+        mTvToBeBudgeted.text = mDataManager.toBeBudgeted.toString()
     }
 
     override fun onResume() {
@@ -149,7 +154,7 @@ class BudgetFragment : Fragment() {
         mListBudgeting.adapter?.notifyDataSetChanged()
 
         // Update budgeted text, if data is available
-        if(mDataManager.state == DataManager.STATE_LOADED) {
+        if (mDataManager.state == DataManager.STATE_LOADED) {
             updateToBeBudgeted()
         }
     }

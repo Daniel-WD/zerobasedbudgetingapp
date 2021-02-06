@@ -16,7 +16,7 @@ import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import com.titaniel.zerobasedbudgetingapp.forceHideSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.forceShowSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectCategoryFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 

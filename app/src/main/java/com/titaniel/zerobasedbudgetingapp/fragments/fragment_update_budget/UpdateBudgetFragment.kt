@@ -107,7 +107,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         // Get dialog instance
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
-        // FIXME This is a workaround for wrong height of dialog when keyboard is shown
+        // FIXME This is a workaround for wrong height of dialog when keyboard is shown and its deprecated
         // Set soft input mode to SOFT_INPUT_ADJUST_RESIZE
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
