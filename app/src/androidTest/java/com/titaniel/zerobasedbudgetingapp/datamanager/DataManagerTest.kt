@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
 import androidx.test.core.app.ActivityScenario.launch
+import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 import org.junit.Assert.assertEquals
@@ -23,7 +24,7 @@ class DataManagerTests {
     fun setup() {
 
         // Create activity scenario
-        launch(MainActivity::class.java).use { scenario ->
+        launchActivity<MainActivity>().use { scenario ->
             // Wait until acitivity is created
             scenario.onActivity { activity ->
                 // Initialize data manager
@@ -33,11 +34,8 @@ class DataManagerTests {
 
     }
 
-    /**
-     * Test validity of saved and then loaded data
-     */
     @Test
-    fun loadSaveDataTest() {
+    fun loaded_and_saved_data_should_be_identical() {
 
         // Fake data
         val fakePayees =
