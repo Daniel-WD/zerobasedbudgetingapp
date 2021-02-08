@@ -1,6 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
-import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
@@ -9,16 +8,13 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Tests for DataManager
- */
 @RunWith(AndroidJUnit4::class)
-class DataManagerTests {
+class DataManagerInstrumentedTest {
 
     /**
      * DataManager to test
      */
-    private lateinit var dataManager: DataManager
+    private lateinit var mDataManager: DataManager
 
     @Before
     fun setup() {
@@ -28,7 +24,7 @@ class DataManagerTests {
             // Wait until acitivity is created
             scenario.onActivity { activity ->
                 // Initialize data manager
-                dataManager = DataManager(activity, activity.lifecycle)
+                mDataManager = DataManager(activity, activity.lifecycle)
             }
         }
 
@@ -64,22 +60,22 @@ class DataManagerTests {
         )
 
         // Prepare data manager
-        dataManager.payees.clear()
-        dataManager.payees.addAll(fakePayees)
+        mDataManager.payees.clear()
+        mDataManager.payees.addAll(fakePayees)
 
-        dataManager.categories.clear()
-        dataManager.categories.addAll(fakeCategories)
+        mDataManager.categories.clear()
+        mDataManager.categories.addAll(fakeCategories)
 
-        dataManager.transactions.clear()
-        dataManager.transactions.addAll(fakeTransactions)
+        mDataManager.transactions.clear()
+        mDataManager.transactions.addAll(fakeTransactions)
 
         // Save and load
-        dataManager.save()
-        dataManager.load()
+        mDataManager.save()
+        mDataManager.load()
 
         // Check validity
-        assertEquals(dataManager.payees, fakePayees)
-        assertEquals(dataManager.transactions, fakeTransactions)
-        assertEquals(dataManager.categories, fakeCategories)
+        assertEquals(mDataManager.payees, fakePayees)
+        assertEquals(mDataManager.transactions, fakeTransactions)
+        assertEquals(mDataManager.categories, fakeCategories)
     }
 }

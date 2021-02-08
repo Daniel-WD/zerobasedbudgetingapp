@@ -145,7 +145,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                         mDataManager.transactions.remove(mTransaction)
 
                         // Remove transaction value from category
-                        Utils.updateTransactionSums(mTransaction, mDataManager, true)
+                        mDataManager.updateCategoryTransactionSums(mTransaction, true)
                     }
 
                     // Hide keyboard and close activity
@@ -250,11 +250,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
             if (mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid } == null) {
                 // New transaction, save, update category
                 mDataManager.transactions.add(mTransaction)
-                Utils.updateTransactionSums(mTransaction, mDataManager)
+                mDataManager.updateCategoryTransactionSums(mTransaction)
             } else {
                 // Edited transaction, remove old transaction value from category, add new one
-                Utils.updateTransactionSums(mOldTransaction, mDataManager, true)
-                Utils.updateTransactionSums(mTransaction, mDataManager)
+                mDataManager.updateCategoryTransactionSums(mOldTransaction, true)
+                mDataManager.updateCategoryTransactionSums(mTransaction)
             }
 
             // Close activity

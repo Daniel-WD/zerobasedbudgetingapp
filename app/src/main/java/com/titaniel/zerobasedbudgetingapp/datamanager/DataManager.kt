@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.time.Instant
 import java.util.*
 
 /**
@@ -110,7 +109,16 @@ class DataManager(
      * State
      */
     var state = STATE_NOT_LOADED
-    private set
+        set(value) {
+            if (value == STATE_NOT_LOADED) {
+                // Empty data
+                payees.clear()
+                transactions.clear()
+                categories.clear()
+                toBeBudgeted = 0
+            }
+            field = value
+        }
 
     init {
         // Hook to lifecycle events of client
@@ -196,14 +204,51 @@ class DataManager(
             .putLong(MONTH_KEY, month)
             .commit()
 
-        // Empty data
-        payees.clear()
-        transactions.clear()
-        categories.clear()
-        toBeBudgeted = 0
-
         // Set state
         state = STATE_NOT_LOADED
+
+    }
+
+    /**
+     * Updates transaction sums in category, or to be budgeted value
+     * @param transaction Transaction to update its category with
+     * @param remove If transaction should be removed
+     */
+    fun updateCategoryTransactionSums(
+        transaction: Transaction,
+        remove: Boolean = false
+    ) {
+        if (state == STATE_NOT_LOADED) {
+            throw IllegalStateException()
+        }
+        // Find month timestamp
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = transaction.utcTimestamp
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+
+        // Set month timestamp
+        val monthTimestmap = calendar.timeInMillis
+
+        // Value operation
+        val value = if (remove) -transaction.value else transaction.value
+
+        // If category is TO_BE_BUDGETED, change to be budgeted value
+        if (transaction.category == Category.TO_BE_BUDGETED) {
+            toBeBudgeted = toBeBudgeted.plus(value)
+            return
+        }
+
+        // Find transaction category
+        val category =
+            categories.find { category -> category.name == transaction.category }
+
+        // Update transaction sums for month. Create key if necessary.
+        category!!.transactionSums[monthTimestmap] = category.transactionSums[monthTimestmap]?.plus(
+            value
+        ) ?: value
 
     }
 

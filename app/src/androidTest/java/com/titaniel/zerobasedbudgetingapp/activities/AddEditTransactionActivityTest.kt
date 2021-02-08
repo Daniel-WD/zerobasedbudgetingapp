@@ -14,6 +14,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +22,8 @@ import org.mockito.Mockito
 
 @RunWith(AndroidJUnit4::class)
 class AddEditTransactionActivityTest {
+
+
 
     @Test
     fun creates_add_edit_transaction_activity_correctly() {
