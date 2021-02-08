@@ -105,7 +105,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Date picker
      */
-    private lateinit var datePicker: MaterialDatePicker<Long>
+    private lateinit var mDatePicker: MaterialDatePicker<Long>
 
     /**
      * Transaction
@@ -196,10 +196,10 @@ class AddEditTransactionActivity : AppCompatActivity() {
             )
 
             // Builder date picker
-            datePicker = builder.build()
+            mDatePicker = builder.build()
 
             // Date confirmation listener
-            datePicker.addOnPositiveButtonClickListener { timestamp ->
+            mDatePicker.addOnPositiveButtonClickListener { timestamp ->
 
                 // Set transaction timestamp
                 mTransaction.utcTimestamp = timestamp
@@ -282,7 +282,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mLlDate.setOnClickListener {
             forceHideSoftKeyboard()
             mEtDescription.clearFocus()
-            datePicker.show(supportFragmentManager, "DatePicker")
+            mDatePicker.show(supportFragmentManager, "DatePicker")
         }
 
         // Fragment result listeners
