@@ -71,6 +71,8 @@ class DataManagerInstrumentedTest {
 
         mDataManager.state = DataManager.STATE_LOADED
 
+        mDataManager.alternativePreferencesKey = "testKey"
+
         // Save and load
         mDataManager.save()
         mDataManager.load()

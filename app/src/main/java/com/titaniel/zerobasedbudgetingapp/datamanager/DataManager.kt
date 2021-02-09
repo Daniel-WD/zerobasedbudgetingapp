@@ -13,7 +13,6 @@ import java.util.*
  * Helper class to load and save data to shared preferences
  * @param mContext Context
  * @param lifecycle Lifecycle of client
- * @param mLoadedCallback Callback, called after data has been laoded
  */
 class DataManager private constructor(
     private val mContext: Context,
@@ -22,6 +21,11 @@ class DataManager private constructor(
 
     companion object {
 
+        /**
+         * Create DataManager instance
+         * @param context Context
+         * @param lifecycle: Lifecycle of client
+         */
         fun create(context: Context, lifecycle: Lifecycle): DataManager {
             return DataManager(context, lifecycle)
         }
@@ -93,7 +97,15 @@ class DataManager private constructor(
      */
     val month: Long = 1612137600000 //February
 
+    /**
+     * Callback to call every time after data get laoded
+     */
     var loadedCallback: () -> Unit = {}
+
+    /**
+     * Preferences key to use instead of default key. (Testing, ...)
+     */
+    var alternativePreferencesKey: String? = null
 
     /**
      * Payee list type token
@@ -125,6 +137,15 @@ class DataManager private constructor(
             field = value
         }
 
+    /**
+     * Get the preferences key to use
+     */
+    private val prefrencesKey = fun(): String =
+        if (!alternativePreferencesKey.isNullOrBlank())
+            alternativePreferencesKey!!
+        else SHARED_PREFERENCES_KEY
+
+
     init {
         // Hook to lifecycle events of client
         lifecycle.addObserver(this)
@@ -145,8 +166,7 @@ class DataManager private constructor(
         val gson = Gson()
 
         // Get shared preferences
-        val preferences =
-            mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+        val preferences = mContext.getSharedPreferences(prefrencesKey(), Context.MODE_PRIVATE)
 
         // Get saved serielized data
         val serializedPayees = preferences.getString(PAYEES_KEY, "[]")
@@ -203,7 +223,7 @@ class DataManager private constructor(
 
         // Get shared preferences
         val preferences =
-            mContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
+            mContext.getSharedPreferences(prefrencesKey(), Context.MODE_PRIVATE)
 
         // Serialize data
         val serializedPayees = gson.toJson(payees)
