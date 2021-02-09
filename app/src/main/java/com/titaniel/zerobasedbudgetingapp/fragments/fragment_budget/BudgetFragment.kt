@@ -62,7 +62,14 @@ class BudgetFragment : Fragment() {
         mListBudgeting = view.findViewById(R.id.listBudgeting)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle) {
+        mDataManager = DataManager(requireContext(), lifecycle)
+
+        // Set loaded callback
+        mDataManager.loadedCallback = {
+
+            // Reload budgeting list
+            mListBudgeting.adapter?.notifyDataSetChanged()
+
             updateToBeBudgeted()
         }
 
@@ -145,18 +152,6 @@ class BudgetFragment : Fragment() {
      */
     private fun updateToBeBudgeted() {
         mTvToBeBudgeted.text = mDataManager.toBeBudgeted.toString()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // Reload budgeting list
-        mListBudgeting.adapter?.notifyDataSetChanged()
-
-        // Update budgeted text, if data is available
-        if (mDataManager.state == DataManager.STATE_LOADED) {
-            updateToBeBudgeted()
-        }
     }
 
 }

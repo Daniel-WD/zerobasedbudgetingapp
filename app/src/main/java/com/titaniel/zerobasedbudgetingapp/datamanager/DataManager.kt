@@ -17,8 +17,7 @@ import java.util.*
  */
 class DataManager(
     private val mContext: Context,
-    lifecycle: Lifecycle,
-    private val mLoadedCallback: (() -> Unit) = {}
+    lifecycle: Lifecycle
 ) : LifecycleObserver {
 
     companion object {
@@ -90,6 +89,8 @@ class DataManager(
      */
     val month: Long = 1612137600000 //February
 
+    var loadedCallback: () -> Unit = {}
+
     /**
      * Payee list type token
      */
@@ -123,6 +124,7 @@ class DataManager(
     init {
         // Hook to lifecycle events of client
         lifecycle.addObserver(this)
+
     }
 
     /**
@@ -130,6 +132,10 @@ class DataManager(
      */
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun load() {
+        // Return if already loaded
+        if(state == STATE_LOADED) {
+            return
+        }
 
         // Init gson parser
         val gson = Gson()
@@ -173,7 +179,7 @@ class DataManager(
         state = STATE_LOADED
 
         // Data loaded, notify callback
-        this.mLoadedCallback()
+        loadedCallback()
 
     }
 
@@ -183,6 +189,11 @@ class DataManager(
     @SuppressLint("ApplySharedPref")
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun save() {
+        // Return if already unloaded
+        if(state == STATE_NOT_LOADED) {
+            return
+        }
+
         // Init gson parser
         val gson = Gson()
 

@@ -40,6 +40,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
          * Edit transaction key
          */
         const val EDIT_TRANSACTION_UUID_KEY = "edit_transaction_key"
+
+        /**
+         * Invalid timestmap value
+         */
+        private const val INVALID_TIMESTAMP = -1L
     }
 
     /**
@@ -158,13 +163,17 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Init data manager
-        mDataManager = DataManager(this, lifecycle) {
+        mDataManager = DataManager(this, lifecycle)
+
+        mDataManager.loadedCallback = {
             // Find transaction to edit, if existing
             val transactionUuid = intent.extras?.get(EDIT_TRANSACTION_UUID_KEY)
-            val editTransaction =
-                mDataManager.transactions.find { transaction -> transaction.uuid == transactionUuid }
 
-            if (editTransaction != null) { // Edit existing transaction
+            // Check if should edit transaction
+            if (transactionUuid != null) { // Edit existing transaction
+                val editTransaction =
+                    mDataManager.transactions.find { transaction -> transaction.uuid == transactionUuid }!!
+
                 // Set editTransaction as transaction data
                 mTransaction = editTransaction
 
@@ -183,7 +192,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Update save btn enabled
                 checkCreateApplyEnabled()
             } else { // Create new transaction
-                mTransaction = Transaction(0, "", "", "", -1)
+                mTransaction = Transaction(0, "", "", "", INVALID_TIMESTAMP)
             }
 
             // Date picker setup
@@ -192,7 +201,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             // Set default date to transaction date(when editing transaction), today otherwise
             builder.setSelection(
-                if (mTransaction.utcTimestamp != -1L) mTransaction.utcTimestamp else MaterialDatePicker.todayInUtcMilliseconds()
+                if (mTransaction.utcTimestamp != INVALID_TIMESTAMP) mTransaction.utcTimestamp else MaterialDatePicker.todayInUtcMilliseconds()
             )
 
             // Builder date picker
@@ -328,7 +337,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mTvCategory.text =
             if (mTransaction.category == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else mTransaction.category
         mTvDate.text =
-            if (mTransaction.utcTimestamp != -1L) Utils.convertUtcToString(mTransaction.utcTimestamp) else ""
+            if (mTransaction.utcTimestamp != INVALID_TIMESTAMP) Utils.convertUtcToString(mTransaction.utcTimestamp) else ""
         mEtDescription.setText(mTransaction.description)
     }
 
