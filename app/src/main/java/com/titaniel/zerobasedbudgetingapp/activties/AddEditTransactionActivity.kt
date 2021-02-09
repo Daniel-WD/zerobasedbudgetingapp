@@ -163,7 +163,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Init data manager
-        mDataManager = DataManager(this, lifecycle)
+        mDataManager = DataManager.create(this, lifecycle)
 
         mDataManager.loadedCallback = {
             // Find transaction to edit, if existing

@@ -6,7 +6,6 @@ import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
@@ -21,10 +20,12 @@ class AddEditTransactionActivityTest {
 
     @Test
     fun creates_add_edit_transaction_activity_correctly() {
-        val dataManager = DataManager(
+        val dataManager = DataManager.create(
             Mockito.mock(Context::class.java),
             Mockito.mock(Lifecycle::class.java)
         )
+
+
         //PowerMockito.whenNew(DataManager::class.java).withAnyArguments().thenReturn(dataManager)
 
         launchActivity<AddEditTransactionActivity>().use { scenario ->

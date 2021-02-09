@@ -28,7 +28,7 @@ class DataManagerUnitTest {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
 
         // DataManager
-        mDataManager = DataManager(
+        mDataManager = DataManager.create(
             Mockito.mock(Context::class.java),
             Mockito.mock(Lifecycle::class.java)
         )

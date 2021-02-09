@@ -55,7 +55,7 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         mTvToBeBudgeted = view.findViewById(R.id.tvToBeBudgeted)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager.create(requireContext(), lifecycle)
 
         // Category list init
         // Set layout manager

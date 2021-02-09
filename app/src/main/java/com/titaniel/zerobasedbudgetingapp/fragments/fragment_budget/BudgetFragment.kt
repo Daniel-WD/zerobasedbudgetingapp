@@ -62,7 +62,7 @@ class BudgetFragment : Fragment() {
         mListBudgeting = view.findViewById(R.id.listBudgeting)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager.create(requireContext(), lifecycle)
 
         // Set loaded callback
         mDataManager.loadedCallback = {

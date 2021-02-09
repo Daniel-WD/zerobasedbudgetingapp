@@ -24,7 +24,7 @@ class DataManagerInstrumentedTest {
             // Wait until acitivity is created
             scenario.onActivity { activity ->
                 // Initialize data manager
-                mDataManager = DataManager(activity, activity.lifecycle)
+                mDataManager = DataManager.create(activity, activity.lifecycle)
             }
         }
 
@@ -68,6 +68,8 @@ class DataManagerInstrumentedTest {
 
         mDataManager.transactions.clear()
         mDataManager.transactions.addAll(fakeTransactions)
+
+        mDataManager.state = DataManager.STATE_LOADED
 
         // Save and load
         mDataManager.save()

@@ -15,12 +15,16 @@ import java.util.*
  * @param lifecycle Lifecycle of client
  * @param mLoadedCallback Callback, called after data has been laoded
  */
-class DataManager(
+class DataManager private constructor(
     private val mContext: Context,
     lifecycle: Lifecycle
 ) : LifecycleObserver {
 
     companion object {
+
+        fun create(context: Context, lifecycle: Lifecycle): DataManager {
+            return DataManager(context, lifecycle)
+        }
 
         /**
          * Key, shared preferences file
@@ -133,7 +137,7 @@ class DataManager(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun load() {
         // Return if already loaded
-        if(state == STATE_LOADED) {
+        if (state == STATE_LOADED) {
             return
         }
 
@@ -190,7 +194,7 @@ class DataManager(
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun save() {
         // Return if already unloaded
-        if(state == STATE_NOT_LOADED) {
+        if (state == STATE_NOT_LOADED) {
             return
         }
 
