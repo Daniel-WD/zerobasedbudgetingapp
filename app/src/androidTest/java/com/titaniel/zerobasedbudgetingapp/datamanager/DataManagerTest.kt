@@ -59,6 +59,10 @@ class DataManagerInstrumentedTest {
             Transaction(-235, "Autohaus", "Autos", "", 3464593)
         )
 
+        val fakeToBeBudgeted = 100L
+
+        // TODO Add month
+
         // Prepare data manager
         mDataManager.payees.clear()
         mDataManager.payees.addAll(fakePayees)
@@ -68,6 +72,8 @@ class DataManagerInstrumentedTest {
 
         mDataManager.transactions.clear()
         mDataManager.transactions.addAll(fakeTransactions)
+
+        mDataManager.toBeBudgeted = fakeToBeBudgeted
 
         mDataManager.state = DataManager.STATE_LOADED
 
@@ -81,5 +87,6 @@ class DataManagerInstrumentedTest {
         assertEquals(mDataManager.payees, fakePayees)
         assertEquals(mDataManager.transactions, fakeTransactions)
         assertEquals(mDataManager.categories, fakeCategories)
+        assertEquals(mDataManager.toBeBudgeted, fakeToBeBudgeted)
     }
 }
