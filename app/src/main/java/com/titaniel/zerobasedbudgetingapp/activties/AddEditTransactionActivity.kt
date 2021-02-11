@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
@@ -105,7 +106,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Data manager
      */
-    private lateinit var mDataManager: DataManager
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val mDataManager: DataManager = DataManager.create(this, lifecycle)
 
     /**
      * Date picker
@@ -161,9 +163,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        // Init data manager
-        mDataManager = DataManager.create(this, lifecycle)
 
         mDataManager.loadedCallback = {
             // Find transaction to edit, if existing
@@ -317,7 +316,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mEtValue.requestFocus()
 
         // Show keyboard
-        forceShowSoftKeyboard()
+        //forceShowSoftKeyboard()
     }
 
     /**

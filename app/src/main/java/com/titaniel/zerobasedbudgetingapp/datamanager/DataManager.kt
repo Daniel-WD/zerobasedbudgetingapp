@@ -16,7 +16,7 @@ import java.util.*
  */
 class DataManager private constructor(
     private val mContext: Context,
-    lifecycle: Lifecycle
+    private val lifecycle: Lifecycle
 ) : LifecycleObserver {
 
     companion object {
@@ -149,7 +149,14 @@ class DataManager private constructor(
     init {
         // Hook to lifecycle events of client
         lifecycle.addObserver(this)
+    }
 
+    /**
+     * Detach from lifecycle
+     */
+    fun detach() {
+        // Remove lifecycle hook
+        lifecycle.removeObserver(this)
     }
 
     /**
