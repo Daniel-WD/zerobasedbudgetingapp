@@ -107,7 +107,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
      * Data manager
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    lateinit var mDataManager: DataManager
+    var mDataManager: DataManager = DataManager.create(this, lifecycle)
 
     /**
      * Date picker
@@ -117,7 +117,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Transaction
      */
-    private lateinit var mTransaction: Transaction
+    private var mTransaction: Transaction = Transaction(0, "", "", "", INVALID_TIMESTAMP)
 
     /**
      * Old transaction, transaction that should be edited
@@ -164,9 +164,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
         }
 
-        // Init data manager
-        mDataManager = DataManager.create(this, lifecycle)
-
         // Set data loaded callback
         mDataManager.loadedCallback = {
             // Find transaction to edit, if existing
@@ -195,7 +192,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Update save btn enabled
                 checkCreateApplyEnabled()
             } else { // Create new transaction
-                mTransaction = Transaction(0, "", "", "", INVALID_TIMESTAMP)
+                //mTransaction = Transaction(0, "", "", "", INVALID_TIMESTAMP)
             }
 
             // Date picker setup

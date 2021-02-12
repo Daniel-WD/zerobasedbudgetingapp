@@ -39,7 +39,7 @@ class AddEditTransactionActivityTest {
         scenario.onActivity { activity ->
             activity.mDataManager.detach()
             activity.mDataManager.state = DataManager.STATE_NOT_LOADED
-            activity.mDataManager.state = DataManager.STATE_LOADED
+            activity.mDataManager.state = DataManager.STATE_LOADED // TODO is this needed?
         }
     }
 
