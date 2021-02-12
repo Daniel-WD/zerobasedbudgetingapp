@@ -1,8 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import com.titaniel.zerobasedbudgetingapp.datamanager.Category
-import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
-import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import java.text.SimpleDateFormat
 import java.util.*
 

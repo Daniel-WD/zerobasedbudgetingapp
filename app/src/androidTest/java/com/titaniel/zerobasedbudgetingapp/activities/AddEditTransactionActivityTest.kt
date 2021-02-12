@@ -31,11 +31,18 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class AddEditTransactionActivityTest {
 
+    /**
+     * Activity scenario
+     */
     private lateinit var scenario: ActivityScenario<AddEditTransactionActivity>
 
     @Before
     fun setup() {
+
+        // Launch scenario
         scenario = launchActivity()
+
+        // Setup data manager
         scenario.onActivity { activity ->
             activity.mDataManager.detach()
             activity.mDataManager.state = DataManager.STATE_NOT_LOADED
@@ -45,6 +52,7 @@ class AddEditTransactionActivityTest {
 
     @After
     fun tearDown() {
+        // Close scenario
         scenario.close()
     }
 
@@ -71,10 +79,14 @@ class AddEditTransactionActivityTest {
     @Test
     fun handles_delete_click_correctly_on_new_transaction_mode() {
 
+        // Click delete
         onView(withId(R.id.delete)).perform(click())
 
         scenario.onActivity { activity ->
+            // Finishes
             assertThat(activity.isFinishing).isTrue()
+
+            // Data is empty
             assertThat(activity.mDataManager.payees.size).isEqualTo(0)
             assertThat(activity.mDataManager.transactions.size).isEqualTo(0)
             assertThat(activity.mDataManager.categories.size).isEqualTo(0)
@@ -86,9 +98,13 @@ class AddEditTransactionActivityTest {
     @Test
     fun displays_correct_date_after_it_has_been_set_with_date_picker() {
 
+        // Click date layout
         onView(withId(R.id.layoutDate)).perform(click())
+
+        // Click ok on date picker
         onView(withId(R.id.confirm_button)).perform(click())
 
+        // Check if correct date is selected, and is correctly formatted
         val calender = Calendar.getInstance()
         val dateString = Utils.convertUtcToString(calender.timeInMillis)
         onView(withId(R.id.tvDate)).check(matches(withText(dateString)))
@@ -101,12 +117,14 @@ class AddEditTransactionActivityTest {
         val expectedPayee = "aPayee"
 
         scenario.onActivity { activity ->
+            // Fake fragment result from payee picker
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.PAYEE_REQUEST_KEY,
                 bundleOf(SelectPayeeFragment.PAYEE_KEY to expectedPayee)
             )
         }
 
+        // Check correct payee
         onView(withId(R.id.tvPayee)).check(matches(withText(expectedPayee)))
 
     }
@@ -115,21 +133,25 @@ class AddEditTransactionActivityTest {
     fun displays_correct_payee_on_invalid_fragment_result() {
 
         scenario.onActivity { activity ->
+            // Fake fragment result from payee picker, invalid
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.PAYEE_REQUEST_KEY,
                 bundleOf(SelectPayeeFragment.PAYEE_KEY to null)
             )
         }
 
+        // Payee text empty
         onView(withId(R.id.tvPayee)).check(matches(withText("")))
 
         scenario.onActivity { activity ->
+            // Fake fragment result from payee picker, empty
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.PAYEE_REQUEST_KEY,
                 bundleOf(SelectPayeeFragment.PAYEE_KEY to "")
             )
         }
 
+        // Payee text empty
         onView(withId(R.id.tvPayee)).check(matches(withText("")))
 
     }
@@ -140,12 +162,14 @@ class AddEditTransactionActivityTest {
         val expectedCategory = "aCategory"
 
         scenario.onActivity { activity ->
+            // Fake fragment result from category picker
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
                 bundleOf(SelectCategoryFragment.CATEGORY_KEY to expectedCategory)
             )
         }
 
+        // Correct category text
         onView(withId(R.id.tvCategory)).check(matches(withText(expectedCategory)))
 
     }
@@ -154,21 +178,25 @@ class AddEditTransactionActivityTest {
     fun displays_correct_category_on_invalid_fragment_result() {
 
         scenario.onActivity { activity ->
+            // Fake fragment result from category picker, invalid
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
                 bundleOf(SelectCategoryFragment.CATEGORY_KEY to null)
             )
         }
 
+        // Category text empty
         onView(withId(R.id.tvCategory)).check(matches(withText("")))
 
         scenario.onActivity { activity ->
+            // Fake fragment result from category picker, invalid
             activity.supportFragmentManager.setFragmentResult(
                 AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
                 bundleOf(SelectCategoryFragment.CATEGORY_KEY to "")
             )
         }
 
+        // Category text empty
         onView(withId(R.id.tvCategory)).check(matches(withText("")))
 
     }
@@ -176,7 +204,10 @@ class AddEditTransactionActivityTest {
     @Test
     fun opens_payee_picker_on_payee_layout_click() {
 
+        // Click payee layout
         onView(withId(R.id.layoutPayee)).perform(click())
+
+        // Payee picker opens
         onView(withId(R.id.listPayees)).check(matches(isDisplayed()))
 
     }
@@ -184,7 +215,10 @@ class AddEditTransactionActivityTest {
     @Test
     fun opens_category_picker_on_category_layout_click() {
 
+        // Click category layout
         onView(withId(R.id.layoutCategory)).perform(click())
+
+        // Category picker opens
         onView(withId(R.id.listCategories)).check(matches(isDisplayed()))
 
     }
