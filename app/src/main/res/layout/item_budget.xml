@@ -1,9 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Transaction entry for transactions fragment -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Item representing a category and its budget data -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="55dp">
 
+    <!-- Category value text -->
     <TextView
         android:id="@+id/tvCategory"
         android:layout_width="wrap_content"
@@ -14,6 +16,7 @@
         android:textSize="16sp"
         tools:text="Category 1" />
 
+    <!-- Budgeted value text -->
     <TextView
         android:id="@+id/tvBudgeted"
         android:layout_width="wrap_content"
@@ -24,6 +27,7 @@
         android:textSize="16sp"
         tools:text="100€" />
 
+    <!-- Available value text -->
     <TextView
         android:id="@+id/tvAvailable"
         android:layout_width="wrap_content"
