@@ -107,7 +107,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
      * Data manager
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val mDataManager: DataManager = DataManager.create(this, lifecycle)
+    lateinit var mDataManager: DataManager
 
     /**
      * Date picker
@@ -164,6 +164,10 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
         }
 
+        // Init data manager
+        mDataManager = DataManager.create(this, lifecycle)
+
+        // Set data loaded callback
         mDataManager.loadedCallback = {
             // Find transaction to edit, if existing
             val transactionUuid = intent.extras?.get(EDIT_TRANSACTION_UUID_KEY)
@@ -238,7 +242,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Description text changed listener
         mEtDescription.addTextChangedListener { description ->
             // Set description text
-            mTransaction.description = description.toString().trim()
+            mTransaction.description = description.toString()
         }
 
         // Create/Apply-button listener
@@ -253,6 +257,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
             if (!mDataManager.payees.contains(payee)) {
                 mDataManager.payees.add(payee)
             }
+
+            // Trim description
+            mTransaction.description = mTransaction.description.trim()
 
             // Check if transaction already exists
             if (mDataManager.transactions.find { transaction -> transaction.uuid == mTransaction.uuid } == null) {
@@ -316,7 +323,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mEtValue.requestFocus()
 
         // Show keyboard
-        //forceShowSoftKeyboard()
+        forceShowSoftKeyboard()
     }
 
     /**
