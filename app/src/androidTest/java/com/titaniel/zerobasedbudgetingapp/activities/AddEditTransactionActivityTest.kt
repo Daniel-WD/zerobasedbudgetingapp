@@ -320,7 +320,8 @@ class AddEditTransactionActivityTest {
         calendar.set(Calendar.MILLISECOND, 0)
         val dateTimestamp = calendar.timeInMillis
 
-        val expectedTransaction = Transaction(value, payee, category, description.trim(), dateTimestamp)
+        val expectedTransaction =
+            Transaction(value, payee, category, description.trim(), dateTimestamp)
 
         // Setup spy data manager
         scenario.onActivity { activity ->

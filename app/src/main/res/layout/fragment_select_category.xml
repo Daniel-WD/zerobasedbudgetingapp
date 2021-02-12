@@ -71,12 +71,12 @@
 
     <!-- Divider -->
     <View
-        app:layout_constraintTop_toBottomOf="@id/tvToBeBudgeted"
         android:id="@+id/vDivider2"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@drawable/divider_add_edit_transaction"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvToBeBudgeted" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

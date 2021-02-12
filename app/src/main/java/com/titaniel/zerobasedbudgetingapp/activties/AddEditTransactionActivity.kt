@@ -340,7 +340,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         mTvCategory.text =
             if (mTransaction.category == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else mTransaction.category
         mTvDate.text =
-            if (mTransaction.utcTimestamp != INVALID_TIMESTAMP) Utils.convertUtcToString(mTransaction.utcTimestamp) else ""
+            if (mTransaction.utcTimestamp != INVALID_TIMESTAMP) Utils.convertUtcToString(
+                mTransaction.utcTimestamp
+            ) else ""
         mEtDescription.setText(mTransaction.description)
     }
 

@@ -1,16 +1,9 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import android.content.Context
-import androidx.lifecycle.Lifecycle
 import com.google.common.truth.Truth.assertThat
-import com.titaniel.zerobasedbudgetingapp.datamanager.Category
-import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
-import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.NullPointerException
 import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
