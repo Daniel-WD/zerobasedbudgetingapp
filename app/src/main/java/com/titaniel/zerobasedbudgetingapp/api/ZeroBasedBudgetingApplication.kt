@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp
+package com.titaniel.zerobasedbudgetingapp.api
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

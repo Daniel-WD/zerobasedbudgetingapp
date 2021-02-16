@@ -1,12 +1,11 @@
-package com.titaniel.zerobasedbudgetingapp.database.daos
+package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Update
-import com.titaniel.zerobasedbudgetingapp.database.entities.Budget
-import com.titaniel.zerobasedbudgetingapp.database.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

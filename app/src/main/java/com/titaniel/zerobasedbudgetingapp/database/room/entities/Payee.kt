@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.database.entities
+package com.titaniel.zerobasedbudgetingapp.database.room.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

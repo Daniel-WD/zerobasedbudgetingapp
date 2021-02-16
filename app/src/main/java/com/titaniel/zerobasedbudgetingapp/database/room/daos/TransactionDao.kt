@@ -1,8 +1,8 @@
-package com.titaniel.zerobasedbudgetingapp.database.daos
+package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import com.titaniel.zerobasedbudgetingapp.database.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,9 +1,9 @@
-package com.titaniel.zerobasedbudgetingapp.repositories
+package com.titaniel.zerobasedbudgetingapp.database.repositories
 
-import com.titaniel.zerobasedbudgetingapp.database.daos.CategoryDao
-import com.titaniel.zerobasedbudgetingapp.database.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.relations.BudgetsOfCategory
-import com.titaniel.zerobasedbudgetingapp.database.relations.TransactionsOfCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

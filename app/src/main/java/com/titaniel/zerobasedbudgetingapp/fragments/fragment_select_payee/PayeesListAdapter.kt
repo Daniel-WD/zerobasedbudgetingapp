@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.database.entities.Payee
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 
 /**
  * Adapter for displaying a list of payees.

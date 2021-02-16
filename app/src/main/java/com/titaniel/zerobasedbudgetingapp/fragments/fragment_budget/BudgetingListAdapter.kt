@@ -7,11 +7,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.database.entities.Budget
-import com.titaniel.zerobasedbudgetingapp.database.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
  * Adapter for displaying a list of budgeting items.
