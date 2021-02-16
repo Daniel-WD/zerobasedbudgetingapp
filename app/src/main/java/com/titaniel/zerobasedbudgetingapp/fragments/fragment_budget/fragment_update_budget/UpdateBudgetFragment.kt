@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragments.fragment_update_budget
+package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget
 
 import android.app.Dialog
 import android.os.Bundle
@@ -18,7 +18,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

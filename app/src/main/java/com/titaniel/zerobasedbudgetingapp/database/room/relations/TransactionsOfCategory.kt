@@ -1,9 +1,9 @@
-package com.titaniel.zerobasedbudgetingapp.database.relations
+package com.titaniel.zerobasedbudgetingapp.database.room.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.titaniel.zerobasedbudgetingapp.database.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 
 data class TransactionsOfCategory(
     @Embedded val category: Category,

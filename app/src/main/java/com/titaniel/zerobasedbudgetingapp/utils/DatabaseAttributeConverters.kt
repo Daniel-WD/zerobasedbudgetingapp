@@ -1,9 +1,9 @@
-package com.titaniel.zerobasedbudgetingapp.database
+package com.titaniel.zerobasedbudgetingapp.utils
 
 import androidx.room.TypeConverter
 import java.time.LocalDate
 
-class Converters {
+class DatabaseAttributeConverters {
 
     @TypeConverter
     fun epochDayToDate(value: Long): LocalDate {

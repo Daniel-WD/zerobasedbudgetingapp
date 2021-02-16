@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.repositories.PayeeRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

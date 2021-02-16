@@ -1,13 +1,13 @@
-package com.titaniel.zerobasedbudgetingapp.database.daos
+package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
-import com.titaniel.zerobasedbudgetingapp.database.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.relations.BudgetsOfCategory
-import com.titaniel.zerobasedbudgetingapp.database.relations.TransactionsOfCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao

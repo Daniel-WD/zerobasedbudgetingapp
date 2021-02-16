@@ -1,21 +1,18 @@
-package com.titaniel.zerobasedbudgetingapp.database
+package com.titaniel.zerobasedbudgetingapp.api
 
 import android.content.Context
 import androidx.room.Room
-import com.titaniel.zerobasedbudgetingapp.database.daos.BudgetDao
-import com.titaniel.zerobasedbudgetingapp.database.daos.CategoryDao
-import com.titaniel.zerobasedbudgetingapp.database.daos.PayeeDao
-import com.titaniel.zerobasedbudgetingapp.database.daos.TransactionDao
-import com.titaniel.zerobasedbudgetingapp.database.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.Database
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.BudgetDao
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.PayeeDao
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Singleton
-import kotlin.concurrent.thread
 
 @InstallIn(SingletonComponent::class)
 @Module
