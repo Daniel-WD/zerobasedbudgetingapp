@@ -8,10 +8,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Base activity where the application starts.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

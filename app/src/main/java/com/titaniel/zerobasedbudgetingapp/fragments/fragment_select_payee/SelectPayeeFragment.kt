@@ -8,16 +8,32 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
+import com.titaniel.zerobasedbudgetingapp.repositories.PayeeRepository
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class SelectPayeeViewModel @Inject constructor(
+    payeeRepository: PayeeRepository
+) : ViewModel() {
+
+    val payees = payeeRepository.getAllPayees().asLiveData()
+
+}
 
 /**
  * Bottom sheet dialog fragment for payee selection
  */
+@AndroidEntryPoint
 class SelectPayeeFragment : BottomSheetDialogFragment() {
 
     companion object {
@@ -43,9 +59,9 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     private lateinit var mListPayees: RecyclerView
 
     /**
-     * Data manager
+     * View model
      */
-    private lateinit var mDataManager: DataManager
+    private val mViewModel: SelectPayeeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,9 +70,6 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     ): View? {
         // Create root view
         val view = inflater.inflate(R.layout.fragment_select_payee, container, false)
-
-        // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
 
         // Initialize views
         mIvAddPayee = view.findViewById(R.id.ivAddPayee)
@@ -82,11 +95,12 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         mListPayees.adapter = PayeesListAdapter(
-            mDataManager.payees,
+            mViewModel.payees,
             { payee -> // Payee click callback
-                selectPayee(payee)
+                selectPayee(payee.name)
             },
-            requireContext()
+            requireContext(),
+            viewLifecycleOwner
         )
 
         return view

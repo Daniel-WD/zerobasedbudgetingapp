@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Transaction entry for transactions fragment -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/fragment_budget_category_margin"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textSize="16sp"
+        tools:text="Category 1" />
+
+    <EditText
+        android:id="@+id/etBudgeted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="@dimen/fragment_budget_budgeted_margin"
+        android:hint="0"
+        android:imeOptions="actionDone"
+        android:includeFontPadding="false"
+        android:inputType="numberSigned"
+        android:textSize="16sp"
+        tools:text="100" />
+
+    <ImageView
+        android:id="@+id/ivDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_baseline_done_24" />
+
+</FrameLayout>

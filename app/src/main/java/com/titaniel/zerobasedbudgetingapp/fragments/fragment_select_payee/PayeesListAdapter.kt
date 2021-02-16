@@ -5,20 +5,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.entities.Payee
 
 /**
  * Adapter for displaying a list of payees.
  * @param mPayees Containing payees
  * @param mPayeeClickedListener Callback for click event on payee
  * @param mContext Context
+ * @param lifecycleOwner LifecycleOwner
  */
 class PayeesListAdapter(
-    private val mPayees: List<String>,
-    private val mPayeeClickedListener: (String) -> Unit,
-    private val mContext: Context
+    private val mPayees: LiveData<List<Payee>>,
+    private val mPayeeClickedListener: (Payee) -> Unit,
+    private val mContext: Context,
+    lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
+
+    init {
+        // Observe payees
+        mPayees.observe(lifecycleOwner) {
+
+            // Reload list
+            notifyDataSetChanged()
+        }
+    }
 
     /**
      * Holder class that contains data for a specific payee entry.
@@ -36,24 +50,30 @@ class PayeesListAdapter(
         // Inflate view
         val view = LayoutInflater.from(mContext).inflate(R.layout.item_bottom_sheet, parent, false)
 
-        // Create viewholder
-        val viewHolder = PayeeItem(view)
-
-        // Entry click listener
-        view.setOnClickListener {
-            mPayeeClickedListener(viewHolder.tvPayee.text as String)
-        }
-        return viewHolder
+        // Return viewholder
+        return PayeeItem(view)
     }
 
     override fun onBindViewHolder(holder: PayeeItem, position: Int) {
-        // Set payee text
-        holder.tvPayee.text = mPayees[position]
+        // Payees available?
+        mPayees.value?.let {
+
+            // Get payee
+            val payee = it[position]
+
+            // Set payee text
+            holder.tvPayee.text = payee.name
+
+            // Entry click listener
+            holder.itemView.setOnClickListener {
+                mPayeeClickedListener(payee)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
         // Return number of payees
-        return mPayees.size
+        return mPayees.value?.size ?: 0
     }
 
 }
