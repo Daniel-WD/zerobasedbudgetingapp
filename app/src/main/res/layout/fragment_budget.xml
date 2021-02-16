@@ -32,8 +32,8 @@
             android:layout_marginStart="16dp"
             android:fontFamily="sans-serif-medium"
             android:includeFontPadding="false"
-            android:text="5000€ Available"
-            android:textSize="36sp" />
+            android:textSize="36sp"
+            tools:text="5000€ Available" />
 
         <FrameLayout
             android:layout_width="match_parent"

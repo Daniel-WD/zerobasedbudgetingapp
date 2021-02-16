@@ -60,7 +60,7 @@ class AddEditTransactionActivityTest {
     fun starts_correctly() {
 
         // Value empty
-        onView(withId(R.id.etValue)).check(matches(withText(isEmptyString())))
+        onView(withId(R.id.etPay)).check(matches(withText(isEmptyString())))
 
         // Payee empty
         onView(withId(R.id.tvPayee)).check(matches(withText(isEmptyString())))
@@ -106,7 +106,7 @@ class AddEditTransactionActivityTest {
 
         // Check if correct date is selected, and is correctly formatted
         val calender = Calendar.getInstance()
-        val dateString = Utils.convertUtcToString(calender.timeInMillis)
+        val dateString = Utils.convertLocalDateToString(calender.timeInMillis)
         onView(withId(R.id.tvDate)).check(matches(withText(dateString)))
 
     }
@@ -255,7 +255,7 @@ class AddEditTransactionActivityTest {
         }
 
         // Type value
-        onView(withId(R.id.etValue)).perform(typeText(value.toString()))
+        onView(withId(R.id.etPay)).perform(typeText(value.toString()))
 
         // Create btn not enabled
         onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
@@ -334,7 +334,7 @@ class AddEditTransactionActivityTest {
         }
 
         // Type value
-        onView(withId(R.id.etValue)).perform(typeText(value.toString()))
+        onView(withId(R.id.etPay)).perform(typeText(value.toString()))
 
         // Create btn not enabled
         onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))

@@ -10,31 +10,56 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
+import com.titaniel.zerobasedbudgetingapp.repositories.BudgetRepository
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@HiltViewModel
+class UpdateBudgetViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val budgetRepository: BudgetRepository
+) : ViewModel() {
 
+    /**
+     * Category name
+     */
+    val budget =
+        budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+            .asLiveData()
+
+    fun updateBudget(budgeted: Long) {
+
+        val bud = budget.value!!
+
+        bud.budgeted = budgeted
+        viewModelScope.launch {
+            budgetRepository.updateBudget(bud)
+        }
+
+    }
+
+}
+
+@AndroidEntryPoint
 class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
     companion object {
-        /**
-         * Update budget key
-         */
-        const val NEW_BUDGET_KEY = "new_budget_key"
 
         /**
-         * Category name key
+         * Budget id key
          */
-        const val CATEGORY_NAME_KEY = "category_name_key"
+        const val BUDGET_ID_KEY = "budget_id_key"
 
-        /**
-         * Category name key
-         */
-        const val BUDGETED_VALUE_KEY = "budgeted_value_key"
     }
 
     /**
@@ -53,9 +78,9 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     private lateinit var mIvDone: ImageView
 
     /**
-     * Category name
+     * View model
      */
-    private lateinit var mCategoryName: String
+    private val mViewModel: UpdateBudgetViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,39 +91,39 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         // Create root view
         val view = inflater.inflate(R.layout.fragment_update_budget, container, false)
 
-        // Load category name and previously budgeted value
-        mCategoryName = requireArguments().getString(CATEGORY_NAME_KEY)!!
-        val budgetedValue = requireArguments().getLong(BUDGETED_VALUE_KEY)
-
         // Initialize views
         mTvCategory = view.findViewById(R.id.tvCategory)
         mEtBudgeted = view.findViewById(R.id.etBudgeted)
         mIvDone = view.findViewById(R.id.ivDone)
 
-        // Set category name
-        mTvCategory.text = mCategoryName
+        // Budget observer
+        mViewModel.budget.observe(viewLifecycleOwner) {
+
+            // Set category name
+            mTvCategory.text = it.categoryName
+
+            // Set budgeted value
+            mEtBudgeted.setText(it.budgeted.toString())
+
+            // Select budget text
+            mEtBudgeted.selectAll()
+
+            // Focus budgeted edittext
+            mEtBudgeted.requestFocus()
+        }
 
         // Setup done listener
         mIvDone.setOnClickListener {
-            returnBudgetedValue()
+            updateBudget()
         }
 
         // Keyboard done action click listener
         mEtBudgeted.setOnEditorActionListener { _, action, _ ->
             if (action == EditorInfo.IME_ACTION_DONE) {
-                returnBudgetedValue()
+                updateBudget()
             }
             false
         }
-
-        // Set budgeted value
-        mEtBudgeted.setText(budgetedValue.toString())
-
-        // Select budgted text
-        mEtBudgeted.selectAll()
-
-        // Focus budgeted edittext
-        mEtBudgeted.requestFocus()
 
         return view
     }
@@ -115,19 +140,16 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Returns budgeted value to budget fragment and dismiss dialog
+     * Updates budget and dismiss dialog
      */
-    private fun returnBudgetedValue() {
+    private fun updateBudget() {
+        // TODO ENTWERDER SO ODER WIE IN ADD EDIT TRANSACTION ACTIVITY
 
         // Budgeted value
         val budgeted =
             if (mEtBudgeted.text.isBlank()) 0 else mEtBudgeted.text.toString().toLong()
 
-        // Return fragment result
-        setFragmentResult(
-            BudgetFragment.BUDGETED_VALUE_REQUEST_KEY,
-            bundleOf(NEW_BUDGET_KEY to budgeted, CATEGORY_NAME_KEY to mCategoryName)
-        )
+        mViewModel.updateBudget(budgeted)
 
         // Close fragment
         dismiss()
