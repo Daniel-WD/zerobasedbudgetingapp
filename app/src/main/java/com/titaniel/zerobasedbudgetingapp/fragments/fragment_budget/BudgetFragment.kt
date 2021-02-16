@@ -68,12 +68,12 @@ class BudgetViewModel @Inject constructor(
     /**
      * Budgets by categories
      */
-    val budgetsOfCategories = categoryRepository.getBudgetsOfCategories().asLiveData()
+    private val mBudgetsOfCategories = categoryRepository.getBudgetsOfCategories().asLiveData()
 
     /**
      * Transactions by categories
      */
-    val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
+    private val mTransactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * Available money per category
@@ -123,8 +123,8 @@ class BudgetViewModel @Inject constructor(
 
     init {
         categories.observeForever(mCategoriesObserver)
-        budgetsOfCategories.observeForever(mBudgetsOfCategoriesObserver)
-        transactionsOfCategories.observeForever(mTransactionsOfCategoriesObserver)
+        mBudgetsOfCategories.observeForever(mBudgetsOfCategoriesObserver)
+        mTransactionsOfCategories.observeForever(mTransactionsOfCategoriesObserver)
         transactions.observeForever(mTransactionsObserver)
         budgets.observeForever(mBudgetsObserver)
     }
@@ -132,8 +132,8 @@ class BudgetViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         categories.removeObserver(mCategoriesObserver)
-        budgetsOfCategories.removeObserver(mBudgetsOfCategoriesObserver)
-        transactionsOfCategories.removeObserver(mTransactionsOfCategoriesObserver)
+        mBudgetsOfCategories.removeObserver(mBudgetsOfCategoriesObserver)
+        mTransactionsOfCategories.removeObserver(mTransactionsOfCategoriesObserver)
         transactions.removeObserver(mTransactionsObserver)
         budgets.removeObserver(mBudgetsObserver)
     }
@@ -143,8 +143,8 @@ class BudgetViewModel @Inject constructor(
      */
     private fun updateAvailableMoney() {
         val cats = categories.value
-        val transOfCats = transactionsOfCategories.value
-        val budsOfCats = budgetsOfCategories.value
+        val transOfCats = mTransactionsOfCategories.value
+        val budsOfCats = mBudgetsOfCategories.value
 
         if (cats != null && transOfCats != null && budsOfCats != null) {
             // Update available money per category
