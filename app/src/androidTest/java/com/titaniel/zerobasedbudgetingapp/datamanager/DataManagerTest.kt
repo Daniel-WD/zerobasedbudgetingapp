@@ -1,6 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.datamanager
 
-import androidx.test.core.app.ActivityScenario.launch
+import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.titaniel.zerobasedbudgetingapp.activties.MainActivity
 import org.junit.Assert.assertEquals
@@ -8,36 +8,30 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Tests for DataManager
- */
 @RunWith(AndroidJUnit4::class)
-class DataManagerTests {
+class DataManagerInstrumentedTest {
 
     /**
      * DataManager to test
      */
-    private lateinit var dataManager: DataManager
+    private lateinit var mDataManager: DataManager
 
     @Before
     fun setup() {
 
         // Create activity scenario
-        launch(MainActivity::class.java).use { scenario ->
+        launchActivity<MainActivity>().use { scenario ->
             // Wait until acitivity is created
             scenario.onActivity { activity ->
                 // Initialize data manager
-                dataManager = DataManager(activity, activity.lifecycle)
+                mDataManager = DataManager.create(activity, activity.lifecycle)
             }
         }
 
     }
 
-    /**
-     * Test validity of saved and then loaded data
-     */
     @Test
-    fun loadSaveDataTest() {
+    fun loaded_and_saved_data_should_be_identical() {
 
         // Fake data
         val fakePayees =
@@ -51,11 +45,11 @@ class DataManagerTests {
             )
 
         val fakeCategories = mutableListOf(
-            Category(mapOf(1 to 2, 2 to 3), "Süßes"),
-            Category(emptyMap(), "Lebensmittel"),
-            Category(emptyMap(), "Autos"),
-            Category(emptyMap(), "Persönlich"),
-            Category(emptyMap(), "Sexspielzeuge")
+            Category(mutableMapOf(), mutableMapOf(), "Süßes"),
+            Category(mutableMapOf(), mutableMapOf(), "Lebensmittel"),
+            Category(mutableMapOf(), mutableMapOf(), "Autos"),
+            Category(mutableMapOf(), mutableMapOf(), "Persönlich"),
+            Category(mutableMapOf(), mutableMapOf(), "Sexspielzeuge")
         )
 
         val fakeTransactions = mutableListOf(
@@ -65,23 +59,34 @@ class DataManagerTests {
             Transaction(-235, "Autohaus", "Autos", "", 3464593)
         )
 
+        val fakeToBeBudgeted = 100L
+
+        // TODO Add month
+
         // Prepare data manager
-        dataManager.payees.clear()
-        dataManager.payees.addAll(fakePayees)
+        mDataManager.payees.clear()
+        mDataManager.payees.addAll(fakePayees)
 
-        dataManager.categories.clear()
-        dataManager.categories.addAll(fakeCategories)
+        mDataManager.categories.clear()
+        mDataManager.categories.addAll(fakeCategories)
 
-        dataManager.transactions.clear()
-        dataManager.transactions.addAll(fakeTransactions)
+        mDataManager.transactions.clear()
+        mDataManager.transactions.addAll(fakeTransactions)
+
+        mDataManager.toBeBudgeted = fakeToBeBudgeted
+
+        mDataManager.state = DataManager.STATE_LOADED
+
+        mDataManager.alternativePreferencesKey = "testKey"
 
         // Save and load
-        dataManager.save()
-        dataManager.load()
+        mDataManager.save()
+        mDataManager.load()
 
         // Check validity
-        assertEquals(dataManager.payees, fakePayees)
-        assertEquals(dataManager.transactions, fakeTransactions)
-        assertEquals(dataManager.categories, fakeCategories)
+        assertEquals(mDataManager.payees, fakePayees)
+        assertEquals(mDataManager.transactions, fakeTransactions)
+        assertEquals(mDataManager.categories, fakeCategories)
+        assertEquals(mDataManager.toBeBudgeted, fakeToBeBudgeted)
     }
 }

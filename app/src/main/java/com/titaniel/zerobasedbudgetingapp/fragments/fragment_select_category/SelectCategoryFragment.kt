@@ -1,9 +1,10 @@
-package com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee
+package com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.datamanager.Category
 import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
 
 /**
@@ -31,6 +33,11 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     private lateinit var mListCategories: RecyclerView
 
     /**
+     * To be budgeted text
+     */
+    private lateinit var mTvToBeBudgeted: TextView
+
+    /**
      * Data manager
      */
     private lateinit var mDataManager: DataManager
@@ -45,9 +52,10 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // Initialize views
         mListCategories = view.findViewById(R.id.listCategories)
+        mTvToBeBudgeted = view.findViewById(R.id.tvToBeBudgeted)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager.create(requireContext(), lifecycle)
 
         // Category list init
         // Set layout manager
@@ -60,19 +68,28 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         mListCategories.adapter = CategoriesListAdapter(
             mDataManager.categories,
             { categoryName -> // Category click callback
-                // Return fragment result
-                setFragmentResult(
-                    AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                    bundleOf(CATEGORY_KEY to categoryName)
-                )
-
-                // Close fragment
-                dismiss()
+                returnResult(categoryName)
             },
             requireContext()
         )
 
+        // To be budgeted text click listener
+        mTvToBeBudgeted.setOnClickListener {
+            returnResult(Category.TO_BE_BUDGETED)
+        }
+
         return view
+    }
+
+    private fun returnResult(result: String) {
+        // Return fragment result
+        setFragmentResult(
+            AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
+            bundleOf(CATEGORY_KEY to result)
+        )
+
+        // Close fragment
+        dismiss()
     }
 
 }

@@ -48,7 +48,14 @@ class TransactionsFragment : Fragment() {
         mTransactionsList = view.findViewById(R.id.transactionsList)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager.create(requireContext(), lifecycle)
+
+        // Set loaded callback
+        mDataManager.loadedCallback = {
+
+            // Reload transactions list
+            mTransactionsList.adapter?.notifyDataSetChanged()
+        }
 
         // Init transactionList
         // Set layout manager
@@ -81,13 +88,6 @@ class TransactionsFragment : Fragment() {
         )
 
         return view
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // Reload transactions list
-        mTransactionsList.adapter?.notifyDataSetChanged()
     }
 
 }

@@ -56,7 +56,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         val view = inflater.inflate(R.layout.fragment_select_payee, container, false)
 
         // Init data manager
-        mDataManager = DataManager(requireContext(), lifecycle)
+        mDataManager = DataManager.create(requireContext(), lifecycle)
 
         // Initialize views
         mIvAddPayee = view.findViewById(R.id.ivAddPayee)
