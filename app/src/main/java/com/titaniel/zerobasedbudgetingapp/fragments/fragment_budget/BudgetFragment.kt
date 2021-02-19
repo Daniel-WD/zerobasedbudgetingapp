@@ -200,7 +200,7 @@ class BudgetViewModel @Inject constructor(
  * Fragment to show a list of categories. Each item contains budgeting information, which can be edited.
  */
 @AndroidEntryPoint
-class BudgetFragment : Fragment() {
+class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
     /**
      * Toolbar
@@ -222,18 +222,13 @@ class BudgetFragment : Fragment() {
      */
     private val mViewModel: BudgetViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        val view = inflater.inflate(R.layout.fragment_budget, container, false)
+    override fun onStart() {
+        super.onStart()
 
         // Init
-        mToolbar = view.findViewById(R.id.toolbar)
-        mTvToBeBudgeted = view.findViewById(R.id.tvToBeBudgeted)
-        mListBudgeting = view.findViewById(R.id.listBudgeting)
+        mToolbar = requireView().findViewById(R.id.toolbar)
+        mTvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
+        mListBudgeting = requireView().findViewById(R.id.listBudgeting)
 
         // Setup toolbar
         mToolbar.menu
@@ -280,8 +275,6 @@ class BudgetFragment : Fragment() {
             // Update to be budgeted text
             mTvToBeBudgeted.text = it.toString()
         }
-
-        return view
     }
 
 }

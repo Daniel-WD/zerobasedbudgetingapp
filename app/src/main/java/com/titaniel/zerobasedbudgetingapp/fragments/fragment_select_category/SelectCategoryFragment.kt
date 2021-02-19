@@ -67,11 +67,15 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Create root view
-        val view = inflater.inflate(R.layout.fragment_select_category, container, false)
+        return inflater.inflate(R.layout.fragment_select_category, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         // Initialize views
-        mListCategories = view.findViewById(R.id.listCategories)
-        mTvToBeBudgeted = view.findViewById(R.id.tvToBeBudgeted)
+        mListCategories = requireView().findViewById(R.id.listCategories)
+        mTvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
 
         // Category list init
         // Set layout manager
@@ -94,8 +98,6 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         mTvToBeBudgeted.setOnClickListener {
             returnResult(Category.TO_BE_BUDGETED)
         }
-
-        return view
     }
 
     private fun returnResult(result: String) {

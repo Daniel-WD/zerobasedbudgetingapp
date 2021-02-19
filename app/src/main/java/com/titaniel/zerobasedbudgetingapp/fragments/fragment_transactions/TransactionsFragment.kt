@@ -36,7 +36,7 @@ class TransactionsViewModel @Inject constructor(
  * Fragment to display list of transactions
  */
 @AndroidEntryPoint
-class TransactionsFragment : Fragment() {
+class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
 
     /**
      * Toolbar
@@ -53,18 +53,12 @@ class TransactionsFragment : Fragment() {
      */
     private val viewModel: TransactionsViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        // Inflate view
-        val view = inflater.inflate(R.layout.fragment_transactions, container, false)
+    override fun onStart() {
+        super.onStart()
 
         // Init views
         mToolbar = requireView().findViewById(R.id.toolbar)
-        mTransactionsList = view.findViewById(R.id.transactionsList)
+        mTransactionsList = requireView().findViewById(R.id.transactionsList)
 
         // Init transactionList
         // Set layout manager
@@ -96,8 +90,6 @@ class TransactionsFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
-
-        return view
     }
 
 }

@@ -69,12 +69,16 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Create root view
-        val view = inflater.inflate(R.layout.fragment_select_payee, container, false)
+        return inflater.inflate(R.layout.fragment_select_payee, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         // Initialize views
-        mIvAddPayee = view.findViewById(R.id.ivAddPayee)
-        mListPayees = view.findViewById(R.id.listPayees)
-        mEtNewPayee = view.findViewById(R.id.etNewPayee)
+        mIvAddPayee = requireView().findViewById(R.id.ivAddPayee)
+        mListPayees = requireView().findViewById(R.id.listPayees)
+        mEtNewPayee = requireView().findViewById(R.id.etNewPayee)
 
         // Add payee listener
         mIvAddPayee.setOnClickListener {
@@ -103,7 +107,6 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
             viewLifecycleOwner
         )
 
-        return view
     }
 
     /**

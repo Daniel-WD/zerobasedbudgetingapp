@@ -87,14 +87,17 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         // Create root view
-        val view = inflater.inflate(R.layout.fragment_update_budget, container, false)
+        return inflater.inflate(R.layout.fragment_update_budget, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         // Initialize views
-        mTvCategory = view.findViewById(R.id.tvCategory)
-        mEtBudgeted = view.findViewById(R.id.etBudgeted)
-        mIvDone = view.findViewById(R.id.ivDone)
+        mTvCategory = requireView().findViewById(R.id.tvCategory)
+        mEtBudgeted = requireView().findViewById(R.id.etBudgeted)
+        mIvDone = requireView().findViewById(R.id.ivDone)
 
         // Budget observer
         mViewModel.budget.observe(viewLifecycleOwner) {
@@ -124,8 +127,6 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
             }
             false
         }
-
-        return view
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
