@@ -63,7 +63,7 @@ class TransactionsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_transactions, container, false)
 
         // Init views
-        mToolbar = view!!.findViewById(R.id.toolbar)
+        mToolbar = requireView().findViewById(R.id.toolbar)
         mTransactionsList = view.findViewById(R.id.transactionsList)
 
         // Init transactionList
