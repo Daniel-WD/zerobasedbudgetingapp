@@ -14,49 +14,56 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Hilt module to provide the database and daos
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 class DatabaseModule {
 
+    /**
+     * Provide transaction dao
+     */
     @Provides
     fun provideTransactionDao(database: Database): TransactionDao {
         return database.transactionDao()
     }
 
+    /**
+     * Provide payee dao
+     */
     @Provides
     fun providePayeeDao(database: Database): PayeeDao {
         return database.payeeDao()
     }
 
+    /**
+     * Provide category dao
+     */
     @Provides
     fun provideCategoryDao(database: Database): CategoryDao {
         return database.categoryDao()
     }
 
+    /**
+     * Provide budget dao
+     */
     @Provides
     fun provideBudgetDao(database: Database): BudgetDao {
         return database.budgetDao()
     }
 
+    /**
+     * Provide database
+     */
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): Database {
-        val db = Room.databaseBuilder(
+        return Room.databaseBuilder(
             context,
             Database::class.java,
             "Database"
         ).build()
-//        GlobalScope.launch {
-//            db.clearAllTables()
-//            db.categoryDao().add(Category("Lebensmittel"))
-//            db.categoryDao().add(Category("Bücher"))
-//            db.categoryDao().add(Category("Protein"))
-//            db.categoryDao().add(Category("Sex"))
-//            db.categoryDao().add(Category("Freizeit"))
-//            db.categoryDao().add(Category("Freundin"))
-//            db.categoryDao().add(Category("Mensa"))
-//        }
-        return db
     }
 
 }
