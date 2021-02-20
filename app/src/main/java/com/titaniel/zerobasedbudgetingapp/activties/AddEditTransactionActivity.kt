@@ -36,6 +36,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
+/**
+ * View model for [AddEditTransactionActivity] with [savedStateHandle], [transactionRepository] and [payeeRepository]
+ */
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -43,17 +46,41 @@ class AddEditTransactionViewModel @Inject constructor(
     private val payeeRepository: PayeeRepository
 ) : ViewModel() {
 
-    //TODO lazy?
+    /**
+     * [pay] of transaction
+     */
     val pay = MutableLiveData(0L)
+
+    /**
+     * [payee] of transaction
+     */
     val payee = MutableLiveData("")
+
+    /**
+     * [category] of transaction
+     */
     val category = MutableLiveData("")
+
+    /**
+     * [description] of transaction
+     */
     val description = MutableLiveData("")
+
+    /**
+     * [date] of transaction
+     */
     val date: MutableLiveData<LocalDate> = MutableLiveData()
 
+    /**
+     * Contains [editTransaction]. Presence indicates that [editTransaction] should be edited
+     */
     val editTransaction = transactionRepository.getTransactionById(
         savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
     ).asLiveData()
 
+    /**
+     * Deletes [editTransaction]
+     */
     fun deleteEditTransaction() {
         editTransaction.value?.let {
             viewModelScope.launch {
@@ -62,6 +89,9 @@ class AddEditTransactionViewModel @Inject constructor(
         }
     }
 
+    /**
+     * When [editTransaction] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
+     */
     fun applyData() {
         // Check if should edit transaction
         if (editTransaction.value != null) { // Edit transaction
