@@ -5,6 +5,9 @@ import androidx.room.Relation
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 
+/**
+ * [TransactionsOfCategory] relation, mapping [transactions] to a [category]
+ */
 data class TransactionsOfCategory(
     @Embedded val category: Category,
     @Relation(
