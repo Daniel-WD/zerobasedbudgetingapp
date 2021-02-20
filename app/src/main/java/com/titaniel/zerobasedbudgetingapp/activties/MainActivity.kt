@@ -46,9 +46,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Loads fragment into fragment container.
-     * @param fragment Fragment to load.
-     * @return If transaction could successfully be done.
+     * Loads [fragment] into fragment container. Returns if fragment is not null.
      */
     private fun loadFragment(fragment: Fragment?): Boolean = if (fragment != null) {
         supportFragmentManager
