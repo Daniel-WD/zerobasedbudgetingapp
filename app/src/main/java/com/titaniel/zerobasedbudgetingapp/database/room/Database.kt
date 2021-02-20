@@ -10,6 +10,9 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.DatabaseAttributeConverters
 
+/**
+ * Room database
+ */
 @Database(
     entities = [Transaction::class, Category::class, Payee::class, Budget::class],
     version = 1,

@@ -10,19 +10,35 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCateg
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data access object for everything concerning categories
+ */
 @Dao
 interface CategoryDao {
 
+    /**
+     * Add category
+     * @param category Category to add
+     */
     @Insert(onConflict = REPLACE)
     suspend fun add(category: Category)
 
+    /**
+     * Get all categories
+     */
     @Query("SELECT * FROM category")
     fun getAll(): Flow<List<Category>>
 
+    /**
+     * Get all TransactionsOfCategories
+     */
     @Transaction
     @Query("SELECT * FROM category")
     fun getTransactionsOfCategories(): Flow<List<TransactionsOfCategory>>
 
+    /**
+     * Get all BudgetsOfCategories
+     */
     @Transaction
     @Query("SELECT * FROM category")
     fun getBudgetsOfCategories(): Flow<List<BudgetsOfCategory>>
