@@ -12,10 +12,10 @@ class PayeeRepository @Inject constructor(
 ) {
 
     /**
-     * Add [payee]
+     * Add [payees]
      */
-    suspend fun addPayee(payee: Payee) {
-        payeeDao.add(payee)
+    suspend fun addPayees(vararg payees: Payee) {
+        payeeDao.add(*payees)
     }
 
     /**

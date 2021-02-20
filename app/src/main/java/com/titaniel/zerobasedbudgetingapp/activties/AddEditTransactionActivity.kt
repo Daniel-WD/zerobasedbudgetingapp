@@ -84,7 +84,7 @@ class AddEditTransactionViewModel @Inject constructor(
     fun deleteEditTransaction() {
         editTransaction.value?.let {
             viewModelScope.launch {
-                transactionRepository.deleteTransaction(it)
+                transactionRepository.deleteTransactions(it)
             }
         }
     }
@@ -105,17 +105,17 @@ class AddEditTransactionViewModel @Inject constructor(
 
             // Update transaction
             viewModelScope.launch {
-                transactionRepository.updateTransaction(editTransaction.value!!)
+                transactionRepository.updateTransactions(editTransaction.value!!)
             }
 
         } else { // Create new transaction
 
             viewModelScope.launch {
                 // Add payee if new
-                payeeRepository.addPayee(Payee(payee.value!!))
+                payeeRepository.addPayees(Payee(payee.value!!))
 
                 // Save new transaction
-                transactionRepository.addTransaction(
+                transactionRepository.addTransactions(
                     Transaction(
                         pay.value!!,
                         payee.value!!,

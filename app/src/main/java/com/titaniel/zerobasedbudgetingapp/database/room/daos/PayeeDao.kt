@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.Flow
 interface PayeeDao {
 
     /**
-     * Add [payee]
+     * Add [payees]
      */
     @Insert(onConflict = REPLACE)
-    suspend fun add(payee: Payee)
+    suspend fun add(vararg payees: Payee)
 
     /**
      * Get all payees

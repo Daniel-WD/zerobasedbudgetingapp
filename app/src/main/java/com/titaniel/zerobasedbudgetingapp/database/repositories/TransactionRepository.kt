@@ -12,24 +12,24 @@ class TransactionRepository @Inject constructor(
 ) {
 
     /**
-     * Add [transaction]
+     * Add [transactions]
      */
-    suspend fun addTransaction(transaction: Transaction) {
-        transactionDao.add(transaction)
+    suspend fun addTransactions(vararg transactions: Transaction) {
+        transactionDao.add(*transactions)
     }
 
     /**
-     * Delete [transaction]
+     * Delete [transactions]
      */
-    suspend fun deleteTransaction(transaction: Transaction) {
-        transactionDao.delete(transaction)
+    suspend fun deleteTransactions(vararg transactions: Transaction) {
+        transactionDao.delete(*transactions)
     }
 
     /**
-     * Update [transaction]
+     * Update [transactions]
      */
-    suspend fun updateTransaction(transaction: Transaction) {
-        transactionDao.update(transaction)
+    suspend fun updateTransactions(vararg transactions: Transaction) {
+        transactionDao.update(*transactions)
     }
 
     /**

@@ -52,7 +52,7 @@ class UpdateBudgetViewModel @Inject constructor(
         bud.budgeted = budgeted
         viewModelScope.launch {
             // Update budget in repo
-            budgetRepository.updateBudget(bud)
+            budgetRepository.updateBudgets(bud)
         }
 
     }

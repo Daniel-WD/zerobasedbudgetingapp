@@ -11,21 +11,21 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    /** Add [transaction] */
+    /** Add [transactions] */
     @Insert(onConflict = REPLACE)
-    suspend fun add(transaction: Transaction)
+    suspend fun add(vararg transactions: Transaction)
 
     /**
-     * Delete [transaction]
+     * Delete [transactions]
      */
     @Delete
-    suspend fun delete(transaction: Transaction)
+    suspend fun delete(vararg transactions: Transaction)
 
     /**
-     * Update [transaction]
+     * Update [transactions]
      */
     @Update
-    suspend fun update(transaction: Transaction)
+    suspend fun update(vararg transactions: Transaction)
 
     /**
      * Get transaction with [transactionId]

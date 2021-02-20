@@ -21,10 +21,10 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
-     * Updates [budget] in database
+     * Updates [budgets] in database
      */
-    suspend fun updateBudget(budget: Budget) {
-        budgetDao.update(budget)
+    suspend fun updateBudgets(vararg budgets: Budget) {
+        budgetDao.update(*budgets)
     }
 
     /**

@@ -22,10 +22,10 @@ interface BudgetDao {
     suspend fun add(vararg budgets: Budget)
 
     /**
-     * Update [budget]
+     * Update [budgets]
      */
     @Update
-    suspend fun update(budget: Budget)
+    suspend fun update(vararg budgets: Budget)
 
     /**
      * Get budget with [id]
