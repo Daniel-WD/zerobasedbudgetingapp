@@ -16,36 +16,31 @@ import java.time.LocalDate
 interface BudgetDao {
 
     /**
-     * Add budget
-     * @param budgets Budgets to add
+     * Add [budgets]
      */
     @Insert(onConflict = REPLACE)
     suspend fun add(vararg budgets: Budget)
 
     /**
-     * Update budget
-     * @param budget Budget to update
+     * Update [budget]
      */
     @Update
     suspend fun update(budget: Budget)
 
     /**
-     * Get budget by id
-     * @param id Budget id
+     * Get budget with [id]
      */
     @Query("SELECT * FROM budget WHERE id = :id")
     fun getBudgetById(id: Long) : Flow<Budget>
 
     /**
-     * Get budgets by category
-     * @param categoryName Name of category
+     * Get budgets with [categoryName]
      */
     @Query("SELECT * FROM budget WHERE categoryName = :categoryName")
     fun getBudgetsByCategory(categoryName: String): Flow<List<Budget>>
 
     /**
-     * Get budgets by month
-     * @param month Month
+     * Get budgets with [month]
      */
     @Query("SELECT * FROM budget WHERE month = :month")
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>>

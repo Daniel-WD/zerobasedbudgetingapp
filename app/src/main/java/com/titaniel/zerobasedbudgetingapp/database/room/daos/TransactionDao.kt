@@ -16,29 +16,25 @@ interface TransactionDao {
     suspend fun add(transaction: Transaction)
 
     /**
-     * Delete transaction
-     * @param transaction Transaction to delete
+     * Delete [transaction]
      */
     @Delete
     suspend fun delete(transaction: Transaction)
 
     /**
-     * Update transaction
-     * @param transaction Transaction to update
+     * Update [transaction]
      */
     @Update
     suspend fun update(transaction: Transaction)
 
     /**
-     * Get transaction by id
-     * @param transactionId Id of transaction to get
+     * Get transaction with [transactionId]
      */
     @Query("SELECT * FROM `transaction` WHERE id = :transactionId")
     fun getById(transactionId: Long): Flow<Transaction>
 
     /**
-     * Get all transactions of category
-     * @param categoryName Category name of transactions to get
+     * Get all transactions with [categoryName]
      */
     @Query("SELECT * FROM `transaction` WHERE categoryName = :categoryName")
     fun getByCategory(categoryName: String): Flow<List<Transaction>>

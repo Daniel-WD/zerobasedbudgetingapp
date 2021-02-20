@@ -14,8 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface PayeeDao {
 
     /**
-     * Add payee
-     * @param payee Payee to add
+     * Add [payee]
      */
     @Insert(onConflict = REPLACE)
     suspend fun add(payee: Payee)
