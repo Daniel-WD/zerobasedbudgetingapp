@@ -20,8 +20,24 @@ import com.titaniel.zerobasedbudgetingapp.utils.DatabaseAttributeConverters
 )
 @TypeConverters(DatabaseAttributeConverters::class)
 abstract class Database : RoomDatabase() {
+
+    /**
+     * Accessor for [TransactionDao]
+     */
     abstract fun transactionDao(): TransactionDao
+
+    /**
+     * Accessor for [BudgetDao]
+     */
     abstract fun budgetDao(): BudgetDao
+
+    /**
+     * Accessor for [CategoryDao]
+     */
     abstract fun categoryDao(): CategoryDao
+
+    /**
+     * Accessor for [PayeeDao]
+     */
     abstract fun payeeDao(): PayeeDao
 }
