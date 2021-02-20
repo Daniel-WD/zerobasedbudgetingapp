@@ -6,23 +6,38 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCateg
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-
+/**
+ * Repository to interact with category data
+ */
 class CategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao
 ) {
 
+    /**
+     * Add category
+     * @param category Category to add
+     */
     suspend fun addCategory(category: Category) {
         categoryDao.add(category)
     }
 
+    /**
+     * Get all categories
+     */
     fun getAllCategories(): Flow<List<Category>> {
         return categoryDao.getAll()
     }
 
+    /**
+     * Get all TransactionsOfCategory relations
+     */
     fun getTransactionsOfCategories(): Flow<List<TransactionsOfCategory>> {
         return categoryDao.getTransactionsOfCategories()
     }
 
+    /**
+     * Get all BudgetsOfCategory relations
+     */
     fun getBudgetsOfCategories(): Flow<List<BudgetsOfCategory>> {
         return categoryDao.getBudgetsOfCategories()
     }
