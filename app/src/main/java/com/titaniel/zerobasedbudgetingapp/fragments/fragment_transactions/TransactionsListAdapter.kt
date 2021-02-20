@@ -43,7 +43,7 @@ class TransactionsListAdapter(
         /**
          * Description available image
          */
-        val imgDescrAvailable: ImageView = itemView.findViewById(R.id.imgDescrAvailable)
+        val imgDescriptionAvailable: ImageView = itemView.findViewById(R.id.imgDescriptionAvailable)
 
         /**
          * Value text
@@ -72,7 +72,7 @@ class TransactionsListAdapter(
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false)
 
-        // Create viewholder
+        // Create ViewHolder
         return TransactionItem(view)
     }
 
@@ -84,7 +84,7 @@ class TransactionsListAdapter(
             val transaction = it[position]
 
             // Set image description available visibility
-            holder.imgDescrAvailable.visibility =
+            holder.imgDescriptionAvailable.visibility =
                 if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
 
             // Set value text

@@ -1,7 +1,6 @@
-package com.titaniel.zerobasedbudgetingapp.activties
+package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,16 +17,16 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
+import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -165,27 +164,27 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
 
     /**
-     * Money value edittext
+     * Money value EditText
      */
     private lateinit var etPay: EditText
 
     /**
-     * Payee textview
+     * Payee TextView
      */
     private lateinit var tvPayee: TextView
 
     /**
-     * Category textview
+     * Category TextView
      */
     private lateinit var tvCategory: TextView
 
     /**
-     * Date textview
+     * Date TextView
      */
     private lateinit var tvDate: TextView
 
     /**
-     * Description edittext
+     * Description EditText
      */
     private lateinit var etDescription: EditText
 

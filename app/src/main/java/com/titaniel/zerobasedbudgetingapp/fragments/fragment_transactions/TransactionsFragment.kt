@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +51,7 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
     private lateinit var transactionsList: RecyclerView
 
     /**
-     * Viewmodel
+     * ViewModel
      */
     private val viewModel: TransactionsViewModel by viewModels()
 

@@ -123,7 +123,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
             // Select budget text
             etBudgeted.selectAll()
 
-            // Focus budgeted edittext
+            // Focus budgeted EditText
             etBudgeted.requestFocus()
         }
 

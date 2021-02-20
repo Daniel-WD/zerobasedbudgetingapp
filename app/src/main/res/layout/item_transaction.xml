@@ -23,7 +23,7 @@
 
     <!-- Description image -->
     <ImageView
-        android:id="@+id/imgDescrAvailable"
+        android:id="@+id/imgDescriptionAvailable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -62,9 +62,9 @@
         android:id="@+id/cpPayee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/imgDescrAvailable"
+        app:layout_constraintBottom_toBottomOf="@+id/imgDescriptionAvailable"
         app:layout_constraintStart_toStartOf="@+id/tvPay"
-        app:layout_constraintTop_toTopOf="@+id/imgDescrAvailable"
+        app:layout_constraintTop_toTopOf="@+id/imgDescriptionAvailable"
         tools:text="Amazon" />
 
     <!-- Chip representing the category -->
@@ -76,6 +76,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/cpPayee"
         app:layout_constraintStart_toEndOf="@+id/cpPayee"
         app:layout_constraintTop_toTopOf="@+id/cpPayee"
-        tools:text="Lebensmittel" />
+        tools:text="Groceries" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -66,7 +66,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_bottom_sheet" />
 
-    <!-- New payee input (At the bottom so its ontop of recycler view) -->
+    <!-- New payee input (At the bottom so its on top of recycler view) -->
     <EditText
         android:id="@+id/etNewPayee"
         android:layout_width="0dp"
@@ -80,9 +80,10 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/ivAddPayee"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
+        app:layout_constraintTop_toBottomOf="@+id/vDivider"
+        android:importantForAutofill="no" />
 
-    <!-- Image view add payee (At the bottom so its ontop of recycler view) -->
+    <!-- Image view add payee (At the bottom so its on top of recycler view) -->
     <ImageView
         android:id="@+id/ivAddPayee"
         android:layout_width="24dp"

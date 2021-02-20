@@ -49,7 +49,7 @@ class BudgetingListAdapter(
         val tvBudgeted: TextView = itemView.findViewById(R.id.tvBudgeted)
 
         /**
-         * Avaialable amount text
+         * Available amount text
          */
         val tvAvailable: TextView = itemView.findViewById(R.id.tvAvailable)
     }
@@ -58,7 +58,7 @@ class BudgetingListAdapter(
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_budget, parent, false)
 
-        // Create viewholder
+        // Create ViewHolder
         return BudgetingItem(view)
     }
 

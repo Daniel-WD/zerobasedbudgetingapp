@@ -45,7 +45,7 @@ class CategoriesListAdapter(
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
 
-        // Return viewholder
+        // Return ViewHolder
         return CategoryItem(view)
     }
 

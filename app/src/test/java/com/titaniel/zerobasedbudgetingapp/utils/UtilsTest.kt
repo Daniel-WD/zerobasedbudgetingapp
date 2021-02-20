@@ -1,6 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner

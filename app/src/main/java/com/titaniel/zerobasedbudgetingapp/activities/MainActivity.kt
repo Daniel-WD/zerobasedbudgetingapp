@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.activties
+package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     false
                 }
                 R.id.page_transactions -> {
-                    // Load tranasctions fragment
+                    // Load transactions fragment
                     loadFragment(TransactionsFragment())
                 }
                 else -> false

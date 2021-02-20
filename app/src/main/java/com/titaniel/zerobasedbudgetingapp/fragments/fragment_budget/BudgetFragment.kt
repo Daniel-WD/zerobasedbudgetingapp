@@ -80,7 +80,7 @@ class BudgetViewModel @Inject constructor(
     val availableMoney: MutableLiveData<Map<Budget, Long>> = MutableLiveData(emptyMap())
 
     /**
-     * Viewmodel observer for categories
+     * ViewModel observer for categories
      */
     private val categoriesObserver: Observer<List<Category>> =
         Observer {
@@ -88,7 +88,7 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * Viewmodel observer for budgetsOfCategories
+     * ViewModel observer for budgetsOfCategories
      */
     private val budgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
         Observer {
@@ -96,7 +96,7 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * Viewmodel observer for transactionsOfCategories
+     * ViewModel observer for transactionsOfCategories
      */
     private val transactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
         Observer {
@@ -104,7 +104,7 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * Viewmodel observer for transactions
+     * ViewModel observer for transactions
      */
     private val transactionsObserver: Observer<List<Transaction>> =
         Observer {
@@ -112,7 +112,7 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * Viewmodel observer for budgets
+     * ViewModel observer for budgets
      */
     private val budgetsObserver: Observer<List<Budget>> =
         Observer {

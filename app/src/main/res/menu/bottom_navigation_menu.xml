@@ -17,7 +17,7 @@
         android:icon="@drawable/ic_baseline_add_24"
         android:title="@string/navigation_tab_add_transaction" />
 
-    <!-- Trnasactions page -->
+    <!-- Transactions page -->
     <item
         android:id="@+id/page_transactions"
         android:enabled="true"
