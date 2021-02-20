@@ -8,16 +8,38 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+/**
+ * [SelectPayeeViewModel] with [payeeRepository].
+ */
+@HiltViewModel
+class SelectPayeeViewModel @Inject constructor(
+        payeeRepository: PayeeRepository
+) : ViewModel() {
+
+    /**
+     * All payees
+     */
+    val payees = payeeRepository.getAllPayees().asLiveData()
+
+}
 
 /**
  * Bottom sheet dialog fragment for payee selection
  */
+@AndroidEntryPoint
 class SelectPayeeFragment : BottomSheetDialogFragment() {
 
     companion object {
@@ -30,88 +52,85 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     /**
      * Add payee image
      */
-    private lateinit var mIvAddPayee: ImageView
+    private lateinit var ivAddPayee: ImageView
 
     /**
      * New payee text
      */
-    private lateinit var mEtNewPayee: EditText
+    private lateinit var etNewPayee: EditText
 
     /**
      * Payees list
      */
-    private lateinit var mListPayees: RecyclerView
+    private lateinit var listPayees: RecyclerView
 
     /**
-     * Data manager
+     * View model
      */
-    private lateinit var mDataManager: DataManager
+    private val viewModel: SelectPayeeViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Create root view
-        val view = inflater.inflate(R.layout.fragment_select_payee, container, false)
+        return inflater.inflate(R.layout.fragment_select_payee, container, false)
+    }
 
-        // Init data manager
-        mDataManager = DataManager.create(requireContext(), lifecycle)
+    override fun onStart() {
+        super.onStart()
 
         // Initialize views
-        mIvAddPayee = view.findViewById(R.id.ivAddPayee)
-        mListPayees = view.findViewById(R.id.listPayees)
-        mEtNewPayee = view.findViewById(R.id.etNewPayee)
+        ivAddPayee = requireView().findViewById(R.id.ivAddPayee)
+        listPayees = requireView().findViewById(R.id.listPayees)
+        etNewPayee = requireView().findViewById(R.id.etNewPayee)
 
         // Add payee listener
-        mIvAddPayee.setOnClickListener {
-            selectPayee(mEtNewPayee.text.toString())
+        ivAddPayee.setOnClickListener {
+            returnPayee(etNewPayee.text.toString())
         }
         // Keyboard 'OK' click listener
-        mEtNewPayee.setOnEditorActionListener { _, _, _ ->
-            selectPayee(mEtNewPayee.text.toString())
+        etNewPayee.setOnEditorActionListener { _, _, _ ->
+            returnPayee(etNewPayee.text.toString())
             true
         }
 
         // Payee list init
         // Set layout manager
-        mListPayees.layoutManager = LinearLayoutManager(requireContext())
+        listPayees.layoutManager = LinearLayoutManager(requireContext())
 
         // Fix size
-        mListPayees.setHasFixedSize(true)
+        listPayees.setHasFixedSize(true)
 
         // Set adapter
-        mListPayees.adapter = PayeesListAdapter(
-            mDataManager.payees,
-            { payee -> // Payee click callback
-                selectPayee(payee)
-            },
-            requireContext()
+        listPayees.adapter = PayeesListAdapter(
+                viewModel.payees,
+                { payee -> // Payee click callback
+                    returnPayee(payee.name)
+                },
+                requireContext(),
+                viewLifecycleOwner
         )
 
-        return view
     }
 
     /**
-     * Validate and return payee to parent
-     * @param payee Payee
-     * @return If payee is valid
+     * Returns [payeeName] to [AddEditTransactionActivity] and dismisses dialog, if [payeeName] is not blank.
      */
-    private fun selectPayee(payee: String): Boolean {
+    private fun returnPayee(payeeName: String) {
         // Payee string not blank?
-        if (payee.isNotBlank()) {
+        if (payeeName.isNotBlank()) {
 
             // Return fragment result
             setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(PAYEE_KEY to payee)
+                    AddEditTransactionActivity.PAYEE_REQUEST_KEY,
+                    bundleOf(PAYEE_KEY to payeeName)
             )
 
             // Close fragment
             dismiss()
-            return true
         }
-        return false
     }
 
 }

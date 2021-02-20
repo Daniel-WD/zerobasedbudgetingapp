@@ -26,7 +26,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/actitvity_add_edit_menu"
+                app:menu="@menu/activity_add_edit_menu"
                 app:title="@string/activity_add_edit_transaction_create_transaction" />
 
             <!-- Layout for transaction value -->
@@ -36,21 +36,22 @@
 
                 <!-- EditText for entering transaction value. -->
                 <EditText
-                    android:id="@+id/etValue"
+                    android:id="@+id/etPay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:cursorVisible="false"
                     android:fontFamily="sans-serif-medium"
-                    android:hint="0"
+                    android:hint="@string/zero"
                     android:imeOptions="actionDone"
+                    android:importantForAutofill="no"
                     android:inputType="numberSigned"
                     android:paddingStart="16dp"
                     android:paddingEnd="8dp"
                     android:textSize="36sp"
                     tools:text="599" />
 
-                <!-- Textview cents text -->
+                <!-- TextView cents text -->
                 <TextView
                     android:id="@+id/tvCents"
                     android:layout_width="match_parent"
@@ -200,6 +201,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/activity_add_edit_transaction_description_hint"
+                android:importantForAutofill="no"
                 android:inputType="text"
                 android:singleLine="true"
                 android:textSize="16sp"

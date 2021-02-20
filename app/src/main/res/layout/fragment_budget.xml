@@ -25,6 +25,7 @@
             app:navigationIcon="@drawable/ic_baseline_menu_24"
             app:title="September" />
 
+        <!-- To be budgeted value -->
         <TextView
             android:id="@+id/tvToBeBudgeted"
             android:layout_width="wrap_content"
@@ -32,15 +33,17 @@
             android:layout_marginStart="16dp"
             android:fontFamily="sans-serif-medium"
             android:includeFontPadding="false"
-            android:text="5000€ Available"
-            android:textSize="36sp" />
+            android:textSize="36sp"
+            tools:text="5000€ Available" />
 
+        <!-- Headers container -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="5dp">
 
+            <!-- Category header -->
             <TextView
                 android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
@@ -50,6 +53,7 @@
                 android:text="@string/fragment_budget_category"
                 android:textSize="14sp" />
 
+            <!-- Budgeted header -->
             <TextView
                 android:id="@+id/tvBudgeted"
                 android:layout_width="wrap_content"
@@ -60,6 +64,7 @@
                 android:text="@string/fragment_budget_budgeted"
                 android:textSize="14sp" />
 
+            <!-- Available header -->
             <TextView
                 android:id="@+id/tvAvailable"
                 android:layout_width="wrap_content"

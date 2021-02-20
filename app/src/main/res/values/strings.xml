@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Zero Based Budgeting App</string>
 
+    <!-- Zero -->
+    <string name="zero">0</string>
+
     <!-- Bottom navigation bar -->
     <string name="navigation_tab_budget">Budget</string>
     <string name="navigation_tab_add_transaction">Add transaction</string>
@@ -31,7 +34,6 @@
     <string name="activity_add_edit_transaction_add_payee_hint">New payee</string>
 
     <string name="activity_add_edit_transaction_cents">cents</string>
-    <string name="activity_add_edit_transaction_zero">0</string>
 
     <string name="activity_add_edit_transaction_to_be_budgeted">To be budgeted</string>
 

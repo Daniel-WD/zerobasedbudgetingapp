@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Transaction entry for transactions fragment -->
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Transaction entry for transactions fragment -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -21,7 +23,7 @@
 
     <!-- Description image -->
     <ImageView
-        android:id="@+id/imgDescrAvailable"
+        android:id="@+id/imgDescriptionAvailable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -32,7 +34,7 @@
 
     <!-- TextView for transaction value -->
     <TextView
-        android:id="@+id/tvValue"
+        android:id="@+id/tvPay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -60,9 +62,9 @@
         android:id="@+id/cpPayee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/imgDescrAvailable"
-        app:layout_constraintStart_toStartOf="@+id/tvValue"
-        app:layout_constraintTop_toTopOf="@+id/imgDescrAvailable"
+        app:layout_constraintBottom_toBottomOf="@+id/imgDescriptionAvailable"
+        app:layout_constraintStart_toStartOf="@+id/tvPay"
+        app:layout_constraintTop_toTopOf="@+id/imgDescriptionAvailable"
         tools:text="Amazon" />
 
     <!-- Chip representing the category -->
@@ -74,6 +76,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/cpPayee"
         app:layout_constraintStart_toEndOf="@+id/cpPayee"
         app:layout_constraintTop_toTopOf="@+id/cpPayee"
-        tools:text="Lebensmittel" />
+        tools:text="Groceries" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

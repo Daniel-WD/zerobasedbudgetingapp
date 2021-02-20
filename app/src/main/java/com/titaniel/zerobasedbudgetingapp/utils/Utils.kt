@@ -1,7 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Object for utility methods
@@ -9,13 +10,10 @@ import java.util.*
 object Utils {
 
     /**
-     * Convert utc timestamp to date string
+     * Convert [localDate] to its string representation
      */
-    fun convertUtcToString(utcTimestamp: Long): String {
-        val timezone = Calendar.getInstance().timeZone
-        val dateFormat = SimpleDateFormat.getDateInstance()
-        dateFormat.timeZone = timezone
-        return dateFormat.format(utcTimestamp)
+    fun convertLocalDateToString(localDate: LocalDate): String {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).format(localDate)
     }
 
 }

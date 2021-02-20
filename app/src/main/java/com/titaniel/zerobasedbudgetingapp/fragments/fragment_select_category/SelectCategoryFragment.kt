@@ -7,17 +7,39 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activties.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.datamanager.Category
-import com.titaniel.zerobasedbudgetingapp.datamanager.DataManager
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /**
- * Bottom sheet dialog fragment for category selection
+ * [SelectCategoryViewModel] with [categoryRepository].
  */
+@HiltViewModel
+class SelectCategoryViewModel @Inject constructor(
+        categoryRepository: CategoryRepository
+) : ViewModel() {
+
+    /**
+     * All categories
+     */
+    val categories = categoryRepository.getAllCategories().asLiveData()
+
+}
+
+/**
+ * [SelectCategoryFragment] for category selection
+ */
+@AndroidEntryPoint
 class SelectCategoryFragment : BottomSheetDialogFragment() {
 
     companion object {
@@ -30,62 +52,65 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     /**
      * Categories list
      */
-    private lateinit var mListCategories: RecyclerView
+    private lateinit var listCategories: RecyclerView
 
     /**
      * To be budgeted text
      */
-    private lateinit var mTvToBeBudgeted: TextView
+    private lateinit var tvToBeBudgeted: TextView
 
     /**
-     * Data manager
+     * View model
      */
-    private lateinit var mDataManager: DataManager
+    private val viewModel: SelectCategoryViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Create root view
-        val view = inflater.inflate(R.layout.fragment_select_category, container, false)
+        return inflater.inflate(R.layout.fragment_select_category, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         // Initialize views
-        mListCategories = view.findViewById(R.id.listCategories)
-        mTvToBeBudgeted = view.findViewById(R.id.tvToBeBudgeted)
-
-        // Init data manager
-        mDataManager = DataManager.create(requireContext(), lifecycle)
+        listCategories = requireView().findViewById(R.id.listCategories)
+        tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
 
         // Category list init
         // Set layout manager
-        mListCategories.layoutManager = LinearLayoutManager(requireContext())
+        listCategories.layoutManager = LinearLayoutManager(requireContext())
 
         // Fix size
-        mListCategories.setHasFixedSize(true)
+        listCategories.setHasFixedSize(true)
 
         // Set adapter
-        mListCategories.adapter = CategoriesListAdapter(
-            mDataManager.categories,
-            { categoryName -> // Category click callback
-                returnResult(categoryName)
-            },
-            requireContext()
+        listCategories.adapter = CategoriesListAdapter(
+                viewModel.categories,
+                { category -> // Category click callback
+                    returnCategory(category.name)
+                },
+                requireContext(),
+                viewLifecycleOwner
         )
 
         // To be budgeted text click listener
-        mTvToBeBudgeted.setOnClickListener {
-            returnResult(Category.TO_BE_BUDGETED)
+        tvToBeBudgeted.setOnClickListener {
+            returnCategory(Category.TO_BE_BUDGETED)
         }
-
-        return view
     }
 
-    private fun returnResult(result: String) {
+    /**
+     * Return [categoryName] to [AddEditTransactionActivity].
+     */
+    private fun returnCategory(categoryName: String) {
         // Return fragment result
         setFragmentResult(
-            AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-            bundleOf(CATEGORY_KEY to result)
+                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
+                bundleOf(CATEGORY_KEY to categoryName)
         )
 
         // Close fragment

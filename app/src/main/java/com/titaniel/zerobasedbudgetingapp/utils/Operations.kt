@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp
+package com.titaniel.zerobasedbudgetingapp.utils
 
 /**
  * Addition operation
@@ -6,6 +6,6 @@ package com.titaniel.zerobasedbudgetingapp
 val addition = { a: Long, b: Long -> a.plus(b) }
 
 /**
- * Suptraction operation
+ * Subtraction operation
  */
 val subtraction = { a: Long, b: Long -> a.minus(b) }

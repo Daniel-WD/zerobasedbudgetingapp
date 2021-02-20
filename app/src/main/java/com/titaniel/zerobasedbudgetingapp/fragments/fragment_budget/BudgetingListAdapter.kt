@@ -5,23 +5,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.datamanager.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 
 /**
- * Adapter for displaying a list of budgeting items.
- * @param mCategories Containing categories
- * @param mMonthTimestamp Month timestamp
- * @param mItemClickedListener Callback for click event on item
- * @param mContext Context
+ * [BudgetingListAdapter] in [context] for displaying [budgetsOfMonth] with the respective [availableMoney]. Notifies [itemClickedListener] when item is clicked.
+ * Needs [lifecycleOwner].
  */
 class BudgetingListAdapter(
-    private val mCategories: List<Category>,
-    private val mMonthTimestamp: Long,
-    private val mItemClickedListener: (Category) -> Unit,
-    private val mContext: Context
+        private val budgetsOfMonth: LiveData<List<Budget>>,
+        private val availableMoney: LiveData<Map<Budget, Long>>,
+        private val itemClickedListener: (Budget) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
+
+    init {
+        // Setup observers
+        budgetsOfMonth.observe(lifecycleOwner) {
+            notifyDataSetChanged()
+        }
+        availableMoney.observe(lifecycleOwner) {
+            notifyDataSetChanged()
+        }
+    }
 
     /**
      * Holder class that contains data for a specific category entry.
@@ -39,40 +49,49 @@ class BudgetingListAdapter(
         val tvBudgeted: TextView = itemView.findViewById(R.id.tvBudgeted)
 
         /**
-         * Avaialable amount text
+         * Available amount text
          */
         val tvAvailable: TextView = itemView.findViewById(R.id.tvAvailable)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetingItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_budget, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_budget, parent, false)
 
-        // Create viewholder
+        // Create ViewHolder
         return BudgetingItem(view)
     }
 
     override fun onBindViewHolder(holder: BudgetingItem, position: Int) {
-        val category = mCategories[position]
+        val budgets = budgetsOfMonth.value
+        val availableMoney = availableMoney.value
 
-        // Set category text to name
-        holder.tvCategory.text = category.name
+        // Categories and budgets present?
+        if (budgets != null && availableMoney != null && budgets.size == availableMoney.size) {
 
-        // Set budgeted value
-        holder.tvBudgeted.text = (category.manualBudgetedMoney[mMonthTimestamp] ?: 0).toString()
+            // Get category
+            val b = budgets[position]
 
-        // Set available value
-        holder.tvAvailable.text = category.realBudgetedValue(mMonthTimestamp).toString()
+            // Set category text to name
+            holder.tvCategory.text = b.categoryName
 
-        // Entry click listener
-        holder.itemView.setOnClickListener {
-            mItemClickedListener(mCategories[position])
+            // Find budget
+            holder.tvBudgeted.text = (b.budgeted).toString()
+
+            // Set available value
+            holder.tvAvailable.text = availableMoney[b].toString()
+
+            // Entry click listener
+            holder.itemView.setOnClickListener {
+                itemClickedListener(b)
+            }
         }
+
     }
 
     override fun getItemCount(): Int {
         // Return number of entries
-        return mCategories.size
+        return budgetsOfMonth.value?.size ?: 0
     }
 
 }

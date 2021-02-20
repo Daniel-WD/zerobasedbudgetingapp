@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.activties
+package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +8,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Base activity where the application starts.
+ * [MainActivity] where the application starts.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     false
                 }
                 R.id.page_transactions -> {
-                    // Load tranasctions fragment
+                    // Load transactions fragment
                     loadFragment(TransactionsFragment())
                 }
                 else -> false
@@ -44,15 +46,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Loads fragment into fragment container.
-     * @param fragment Fragment to load.
-     * @return If transaction could successfully be done.
+     * Loads [fragment] into fragment container. Returns if fragment is not null.
      */
     private fun loadFragment(fragment: Fragment?): Boolean = if (fragment != null) {
         supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit()
         true
     } else false
 

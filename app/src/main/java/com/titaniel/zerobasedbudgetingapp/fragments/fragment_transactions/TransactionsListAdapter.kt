@@ -8,23 +8,32 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.datamanager.Category
-import com.titaniel.zerobasedbudgetingapp.datamanager.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
- * Adapter for displaying list of transactions.
- * @param mTransactions Containing transactions
- * @param mContext Context
+ * [TransactionsListAdapter] in [context] for displaying a list of [transactions].
+ * Needs [lifecycleOwner].
  */
 class TransactionsListAdapter(
-    private val mTransactions: List<Transaction>,
-    private val mTransactionClickedListener: (Transaction) -> Unit,
-    private val mContext: Context
+        private val transactions: LiveData<List<Transaction>>,
+        private val transactionClickedListener: (Transaction) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
+
+    init {
+        // Set observers
+        transactions.observe(lifecycleOwner) {
+            notifyDataSetChanged()
+        }
+    }
 
     /**
      * Holder class that contains data for a specific transaction entry.
@@ -34,12 +43,12 @@ class TransactionsListAdapter(
         /**
          * Description available image
          */
-        val imgDescrAvailable: ImageView = itemView.findViewById(R.id.imgDescrAvailable)
+        val imgDescriptionAvailable: ImageView = itemView.findViewById(R.id.imgDescriptionAvailable)
 
         /**
          * Value text
          */
-        val tvValue: TextView = itemView.findViewById(R.id.tvValue)
+        val tvPay: TextView = itemView.findViewById(R.id.tvPay)
 
         /**
          * Date text
@@ -61,43 +70,47 @@ class TransactionsListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_transaction, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false)
 
-        // Create viewholder
+        // Create ViewHolder
         return TransactionItem(view)
     }
 
     override fun onBindViewHolder(holder: TransactionItem, position: Int) {
-        // Transaction
-        val transaction = mTransactions[position]
+        // Transactions available?
+        transactions.value?.let {
 
-        // Set image description available visibility
-        holder.imgDescrAvailable.visibility =
-            if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
+            // Transaction
+            val transaction = it[position]
 
-        // Set value text
-        holder.tvValue.text = transaction.value.toString()
+            // Set image description available visibility
+            holder.imgDescriptionAvailable.visibility =
+                    if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
 
-        // Set payee text
-        holder.cpPayee.text = transaction.payee
+            // Set value text
+            holder.tvPay.text = transaction.pay.toString()
 
-        // Set category text
-        holder.cpCategory.text =
-            if (transaction.category == Category.TO_BE_BUDGETED) mContext.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.category
+            // Set payee text
+            holder.cpPayee.text = transaction.payeeName
 
-        // Set date text
-        holder.tvDate.text = Utils.convertUtcToString(transaction.utcTimestamp)
+            // Set category text
+            holder.cpCategory.text =
+                    if (transaction.categoryName == Category.TO_BE_BUDGETED) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
 
-        // Set click listener, item click callback
-        holder.itemView.setOnClickListener {
-            mTransactionClickedListener(transaction)
+            // Set date text
+            holder.tvDate.text = Utils.convertLocalDateToString(transaction.date)
+
+            // Set click listener, item click callback
+            holder.itemView.setOnClickListener {
+                transactionClickedListener(transaction)
+            }
         }
 
     }
 
     override fun getItemCount(): Int {
         // Return number transactions
-        return mTransactions.size
+        return transactions.value?.size ?: 0
     }
 
 }
