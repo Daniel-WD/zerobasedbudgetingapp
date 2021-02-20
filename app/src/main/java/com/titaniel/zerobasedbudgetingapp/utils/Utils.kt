@@ -10,7 +10,7 @@ import java.time.format.FormatStyle
 object Utils {
 
     /**
-     * Convert local date to date string
+     * Convert [localDate] to its string representation
      */
     fun convertLocalDateToString(localDate: LocalDate): String {
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).format(localDate)

@@ -1,6 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp
 
 import com.google.common.truth.Truth.assertThat
+import com.titaniel.zerobasedbudgetingapp.utils.addition
+import com.titaniel.zerobasedbudgetingapp.utils.subtraction
 import org.junit.Test
 
 class OperationsTest {

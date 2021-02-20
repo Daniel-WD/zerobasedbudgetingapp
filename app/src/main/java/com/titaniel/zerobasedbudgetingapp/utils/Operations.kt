@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp
+package com.titaniel.zerobasedbudgetingapp.utils
 
 /**
  * Addition operation

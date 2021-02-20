@@ -3,6 +3,9 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import androidx.room.TypeConverter
 import java.time.LocalDate
 
+/**
+ * [DatabaseAttributeConverters].
+ */
 class DatabaseAttributeConverters {
 
     @TypeConverter
