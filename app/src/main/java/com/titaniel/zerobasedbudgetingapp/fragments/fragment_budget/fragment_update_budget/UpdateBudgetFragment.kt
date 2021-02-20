@@ -24,6 +24,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * [UpdateBudgetViewModel] with [savedStateHandle] and [budgetRepository]
+ */
 @HiltViewModel
 class UpdateBudgetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -31,18 +34,24 @@ class UpdateBudgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
-     * Category name
+     * Budget to edit
      */
     val budget =
         budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
             .asLiveData()
 
+    /**
+     * Update budget with [budgeted] value
+     */
     fun updateBudget(budgeted: Long) {
 
+        // Get budget, check non-null
         val bud = budget.value!!
 
+        // Set budget
         bud.budgeted = budgeted
         viewModelScope.launch {
+            // Update budget in repo
             budgetRepository.updateBudget(bud)
         }
 
@@ -141,7 +150,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Updates budget and dismiss dialog
+     * Update budget and dismiss dialog
      */
     private fun updateBudget() {
         // TODO ENTWERDER SO ODER WIE IN ADD EDIT TRANSACTION ACTIVITY
