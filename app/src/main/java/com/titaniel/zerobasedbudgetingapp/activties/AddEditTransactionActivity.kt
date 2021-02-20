@@ -239,7 +239,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Transaction observer
         viewModel.editTransaction.observe(this, {
             // Show transaction
-            Log.d("sdfasdf", "onCreate: $it")
 
             it?.let {
                 // Change texts for edit mode

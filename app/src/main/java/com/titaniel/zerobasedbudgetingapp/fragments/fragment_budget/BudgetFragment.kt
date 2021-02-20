@@ -155,12 +155,12 @@ class BudgetViewModel @Inject constructor(
                 budget to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
-                            ?.filter { transaction -> month.value!!.let { transaction.date.year <= it.year && transaction.date.month <= it.month } }
+                            ?.filter { transaction -> transaction.date <= month.value!! }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
                         budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
-                            .filter { bud -> month.value!!.let { bud.month.year <= it.year && bud.month.month <= it.month } }
+                            .filter { bud -> bud.month <= month.value!! }
                             .fold(0L, { acc, bud -> acc + bud.budgeted })
 
             }.toMap()
