@@ -11,7 +11,7 @@ import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.Transa
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Base activity where the application starts.
+ * [MainActivity] where the application starts.
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {

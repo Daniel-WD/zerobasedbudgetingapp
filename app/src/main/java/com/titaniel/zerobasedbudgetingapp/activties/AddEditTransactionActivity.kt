@@ -37,7 +37,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 /**
- * View model for [AddEditTransactionActivity] with [savedStateHandle], [transactionRepository] and [payeeRepository]
+ * [AddEditTransactionViewModel] for [AddEditTransactionActivity] with [savedStateHandle], [transactionRepository] and [payeeRepository]
  */
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(

@@ -59,6 +59,9 @@ class UpdateBudgetViewModel @Inject constructor(
 
 }
 
+/**
+ * [UpdateBudgetFragment] to change budgeted value of a [Budget]
+ */
 @AndroidEntryPoint
 class UpdateBudgetFragment : BottomSheetDialogFragment() {
 

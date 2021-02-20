@@ -33,6 +33,9 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
+/**
+ * [BudgetViewModel] with [categoryRepository], [transactionsRepository] and [mBudgetRepository]
+ */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     categoryRepository: CategoryRepository,
@@ -122,6 +125,7 @@ class BudgetViewModel @Inject constructor(
         }
 
     init {
+        // Register all observers
         categories.observeForever(mCategoriesObserver)
         mBudgetsOfCategories.observeForever(mBudgetsOfCategoriesObserver)
         mTransactionsOfCategories.observeForever(mTransactionsOfCategoriesObserver)
@@ -131,6 +135,8 @@ class BudgetViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+
+        // Remove all observers
         categories.removeObserver(mCategoriesObserver)
         mBudgetsOfCategories.removeObserver(mBudgetsOfCategoriesObserver)
         mTransactionsOfCategories.removeObserver(mTransactionsOfCategoriesObserver)
@@ -139,7 +145,7 @@ class BudgetViewModel @Inject constructor(
     }
 
     /**
-     * Updates available money per category
+     * Updates [availableMoney]
      */
     private fun updateAvailableMoney() {
         val cats = categories.value
@@ -166,7 +172,7 @@ class BudgetViewModel @Inject constructor(
     }
 
     /**
-     * Update to be budgeted value
+     * Update [toBeBudgeted]
      */
     private fun updateToBeBudgeted() {
         val transactions = transactions.value
@@ -180,6 +186,9 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
+     */
     private fun checkBudgets() {
         val cats = categories.value
         val buds = budgets.value
@@ -197,7 +206,7 @@ class BudgetViewModel @Inject constructor(
 }
 
 /**
- * Fragment to show a list of categories. Each item contains budgeting information, which can be edited.
+ * [BudgetFragment] to show a list of categories. Each item contains budgeting information, which can be edited.
  */
 @AndroidEntryPoint
 class BudgetFragment : Fragment(R.layout.fragment_budget) {
