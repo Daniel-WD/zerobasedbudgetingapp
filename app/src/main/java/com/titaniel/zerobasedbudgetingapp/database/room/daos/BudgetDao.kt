@@ -34,21 +34,9 @@ interface BudgetDao {
     fun getBudgetById(id: Long) : Flow<Budget>
 
     /**
-     * Get budgets with [categoryName]
-     */
-    @Query("SELECT * FROM budget WHERE categoryName = :categoryName")
-    fun getBudgetsByCategory(categoryName: String): Flow<List<Budget>>
-
-    /**
      * Get budgets with [month]
      */
     @Query("SELECT * FROM budget WHERE month = :month")
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>>
-
-    /**
-     * Get all budgets
-     */
-    @Query("SELECT * FROM budget")
-    fun getAll(): Flow<List<Budget>>
 
 }

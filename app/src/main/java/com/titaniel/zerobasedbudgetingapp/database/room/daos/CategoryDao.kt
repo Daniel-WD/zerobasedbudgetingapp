@@ -17,12 +17,6 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
 
     /**
-     * Add [category]
-     */
-    @Insert(onConflict = REPLACE)
-    suspend fun add(category: Category)
-
-    /**
      * Get all categories
      */
     @Query("SELECT * FROM category")

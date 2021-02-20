@@ -34,12 +34,6 @@ interface TransactionDao {
     fun getById(transactionId: Long): Flow<Transaction>
 
     /**
-     * Get all transactions with [categoryName]
-     */
-    @Query("SELECT * FROM `transaction` WHERE categoryName = :categoryName")
-    fun getByCategory(categoryName: String): Flow<List<Transaction>>
-
-    /**
      * Get all transactions
      */
     @Query("SELECT * FROM `transaction`")

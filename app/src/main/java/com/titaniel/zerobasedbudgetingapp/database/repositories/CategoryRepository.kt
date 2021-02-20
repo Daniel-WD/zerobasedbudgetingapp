@@ -14,13 +14,6 @@ class CategoryRepository @Inject constructor(
 ) {
 
     /**
-     * Add [category]
-     */
-    suspend fun addCategory(category: Category) {
-        categoryDao.add(category)
-    }
-
-    /**
      * Get all categories
      */
     fun getAllCategories(): Flow<List<Category>> {

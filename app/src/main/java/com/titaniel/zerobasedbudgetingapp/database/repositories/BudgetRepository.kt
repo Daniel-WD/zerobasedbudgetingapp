@@ -35,24 +35,10 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
-     * Get budgets with [categoryName]
-     */
-    fun getBudgetsByCategory(categoryName: String): Flow<List<Budget>> {
-        return budgetDao.getBudgetsByCategory(categoryName)
-    }
-
-    /**
      * Get budgets with [month]
      */
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>> {
         return budgetDao.getBudgetsByMonth(month)
-    }
-
-    /**
-     * Get all budgets
-     */
-    fun getAllBudgets(): Flow<List<Budget>> {
-        return budgetDao.getAll()
     }
 
 }

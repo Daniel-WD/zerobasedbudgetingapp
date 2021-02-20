@@ -40,13 +40,6 @@ class TransactionRepository @Inject constructor(
     }
 
     /**
-     * Get transactions with [categoryName]
-     */
-    fun getTransactionsByCategory(categoryName: String): Flow<List<Transaction>> {
-        return transactionDao.getByCategory(categoryName)
-    }
-
-    /**
      * Get all transactions
      */
     fun getAllTransactions(): Flow<List<Transaction>> {
