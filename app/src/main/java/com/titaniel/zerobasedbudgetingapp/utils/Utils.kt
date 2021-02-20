@@ -13,7 +13,7 @@ object Utils {
      * Convert [localDate] to its string representation
      */
     fun convertLocalDateToString(localDate: LocalDate): String {
-        return DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).format(localDate)
+        return DateTimeFormatter.ofPattern("dd.MM.yyyy").format(localDate)
     }
 
 }

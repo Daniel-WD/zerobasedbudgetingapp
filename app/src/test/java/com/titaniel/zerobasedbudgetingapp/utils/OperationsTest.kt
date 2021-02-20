@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp
+package com.titaniel.zerobasedbudgetingapp.utils
 
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.utils.addition
