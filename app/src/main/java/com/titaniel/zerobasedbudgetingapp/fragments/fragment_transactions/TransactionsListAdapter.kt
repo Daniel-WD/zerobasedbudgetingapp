@@ -15,23 +15,22 @@ import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.PayeesListAdapter
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
- * [TransactionsListAdapter] in [mContext] for displaying a list of [mTransactions].
+ * [TransactionsListAdapter] in [context] for displaying a list of [transactions].
  * Needs [lifecycleOwner].
  */
 class TransactionsListAdapter(
-    private val mTransactions: LiveData<List<Transaction>>,
-    private val mTransactionClickedListener: (Transaction) -> Unit,
-    private val mContext: Context,
-    lifecycleOwner: LifecycleOwner
+        private val transactions: LiveData<List<Transaction>>,
+        private val transactionClickedListener: (Transaction) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     init {
         // Set observers
-        mTransactions.observe(lifecycleOwner) {
+        transactions.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
     }
@@ -71,7 +70,7 @@ class TransactionsListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_transaction, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false)
 
         // Create viewholder
         return TransactionItem(view)
@@ -79,7 +78,7 @@ class TransactionsListAdapter(
 
     override fun onBindViewHolder(holder: TransactionItem, position: Int) {
         // Transactions available?
-        mTransactions.value?.let {
+        transactions.value?.let {
 
             // Transaction
             val transaction = it[position]
@@ -96,14 +95,14 @@ class TransactionsListAdapter(
 
             // Set category text
             holder.cpCategory.text =
-                if (transaction.categoryName == Category.TO_BE_BUDGETED) mContext.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
+                if (transaction.categoryName == Category.TO_BE_BUDGETED) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
 
             // Set date text
             holder.tvDate.text = Utils.convertLocalDateToString(transaction.date)
 
             // Set click listener, item click callback
             holder.itemView.setOnClickListener {
-                mTransactionClickedListener(transaction)
+                transactionClickedListener(transaction)
             }
         }
 
@@ -111,7 +110,7 @@ class TransactionsListAdapter(
 
     override fun getItemCount(): Int {
         // Return number transactions
-        return mTransactions.value?.size ?: 0
+        return transactions.value?.size ?: 0
     }
 
 }

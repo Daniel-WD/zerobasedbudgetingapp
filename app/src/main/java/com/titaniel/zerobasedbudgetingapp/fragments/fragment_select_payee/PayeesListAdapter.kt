@@ -10,23 +10,22 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.CategoriesListAdapter
 
 
 /**
- * [PayeesListAdapter] in [mContext] for displaying a list of [mPayees].
+ * [PayeesListAdapter] in [context] for displaying a list of [payees].
  * Needs [lifecycleOwner].
  */
 class PayeesListAdapter(
-    private val mPayees: LiveData<List<Payee>>,
-    private val mPayeeClickedListener: (Payee) -> Unit,
-    private val mContext: Context,
-    lifecycleOwner: LifecycleOwner
+        private val payees: LiveData<List<Payee>>,
+        private val payeeClickedListener: (Payee) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
 
     init {
         // Setup observers
-        mPayees.observe(lifecycleOwner) {
+        payees.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
     }
@@ -45,7 +44,7 @@ class PayeesListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PayeeItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_bottom_sheet, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
 
         // Return viewholder
         return PayeeItem(view)
@@ -53,7 +52,7 @@ class PayeesListAdapter(
 
     override fun onBindViewHolder(holder: PayeeItem, position: Int) {
         // Payees available?
-        mPayees.value?.let {
+        payees.value?.let {
 
             // Get payee
             val payee = it[position]
@@ -63,14 +62,14 @@ class PayeesListAdapter(
 
             // Entry click listener
             holder.itemView.setOnClickListener {
-                mPayeeClickedListener(payee)
+                payeeClickedListener(payee)
             }
         }
     }
 
     override fun getItemCount(): Int {
         // Return number of payees
-        return mPayees.value?.size ?: 0
+        return payees.value?.size ?: 0
     }
 
 }

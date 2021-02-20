@@ -1,10 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions
 
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -47,12 +43,12 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
     /**
      * Toolbar
      */
-    private lateinit var mToolbar: MaterialToolbar
+    private lateinit var toolbar: MaterialToolbar
 
     /**
      * List of all transactions
      */
-    private lateinit var mTransactionsList: RecyclerView
+    private lateinit var transactionsList: RecyclerView
 
     /**
      * Viewmodel
@@ -63,18 +59,18 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
         super.onStart()
 
         // Init views
-        mToolbar = requireView().findViewById(R.id.toolbar)
-        mTransactionsList = requireView().findViewById(R.id.transactionsList)
+        toolbar = requireView().findViewById(R.id.toolbar)
+        transactionsList = requireView().findViewById(R.id.transactionsList)
 
         // Init transactionList
         // Set layout manager
-        mTransactionsList.layoutManager = LinearLayoutManager(context)
+        transactionsList.layoutManager = LinearLayoutManager(context)
 
         // Fix size
-        mTransactionsList.setHasFixedSize(true)
+        transactionsList.setHasFixedSize(true)
 
         // Set adapter
-        mTransactionsList.adapter = TransactionsListAdapter(
+        transactionsList.adapter = TransactionsListAdapter(
             viewModel.transactions,
             { transaction ->
                 // Start add/edit transaction activity and transmit transaction uuid
@@ -90,7 +86,7 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
         )
 
         // Add horizontal dividers
-        mTransactionsList.addItemDecoration(
+        transactionsList.addItemDecoration(
             DividerItemDecoration(
                 context,
                 DividerItemDecoration.VERTICAL

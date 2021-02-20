@@ -12,19 +12,19 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
- * [CategoriesListAdapter] in [mContext] for displaying a list of [mCategories].
+ * [CategoriesListAdapter] in [context] for displaying a list of [categories].
  * Needs [lifecycleOwner].
  */
 class CategoriesListAdapter(
-    private val mCategories: LiveData<List<Category>>,
-    private val mCategoryClickedListener: (Category) -> Unit,
-    private val mContext: Context,
-    lifecycleOwner: LifecycleOwner
+        private val categories: LiveData<List<Category>>,
+        private val categoryClickedListener: (Category) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<CategoriesListAdapter.CategoryItem>() {
 
     init {
         // Setup observer
-        mCategories.observe(lifecycleOwner) {
+        categories.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
     }
@@ -43,7 +43,7 @@ class CategoriesListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_bottom_sheet, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_bottom_sheet, parent, false)
 
         // Return viewholder
         return CategoryItem(view)
@@ -51,7 +51,7 @@ class CategoriesListAdapter(
 
     override fun onBindViewHolder(holder: CategoryItem, position: Int) {
         // Categories available?
-        mCategories.value?.let {
+        categories.value?.let {
 
             // Get category
             val category = it[position]
@@ -61,14 +61,14 @@ class CategoriesListAdapter(
 
             // Entry click listener
             holder.itemView.setOnClickListener {
-                mCategoryClickedListener(category)
+                categoryClickedListener(category)
             }
         }
     }
 
     override fun getItemCount(): Int {
         // Return number of categories
-        return mCategories.value?.size ?: 0
+        return categories.value?.size ?: 0
     }
 
 }

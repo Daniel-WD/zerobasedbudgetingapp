@@ -30,19 +30,34 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 /**
- * [BudgetViewModel] with [categoryRepository], [transactionsRepository] and [mBudgetRepository]
+ * [BudgetViewModel] with [categoryRepository], [transactionsRepository] and [budgetRepository]
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
-    private val mBudgetRepository: BudgetRepository
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
      * Month
      */
-    val month = MutableLiveData(LocalDate.of(2021, 2, 1))
+    private val month = MutableLiveData(LocalDate.of(2021, 2, 1))
+
+    /**
+     * All categories
+     */
+    private val categories = categoryRepository.getAllCategories().asLiveData()
+
+    /**
+     * Budgets by categories
+     */
+    private val budgetsOfCategories = categoryRepository.getBudgetsOfCategories().asLiveData()
+
+    /**
+     * Transactions by categories
+     */
+    private val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * To be budgeted
@@ -52,27 +67,12 @@ class BudgetViewModel @Inject constructor(
     /**
      * All budgets of selected month
      */
-    val budgets = mBudgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
-
-    /**
-     * All categories
-     */
-    val categories = categoryRepository.getAllCategories().asLiveData()
+    val budgets = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
 
     /**
      * All transactions
      */
     val transactions = transactionRepository.getAllTransactions().asLiveData()
-
-    /**
-     * Budgets by categories
-     */
-    private val mBudgetsOfCategories = categoryRepository.getBudgetsOfCategories().asLiveData()
-
-    /**
-     * Transactions by categories
-     */
-    private val mTransactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * Available money per category
@@ -82,16 +82,15 @@ class BudgetViewModel @Inject constructor(
     /**
      * Viewmodel observer for categories
      */
-    private val mCategoriesObserver: Observer<List<Category>> =
+    private val categoriesObserver: Observer<List<Category>> =
         Observer {
             checkBudgets()
-            updateAvailableMoney()
         }
 
     /**
      * Viewmodel observer for budgetsOfCategories
      */
-    private val mBudgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
+    private val budgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
         Observer {
             updateAvailableMoney()
         }
@@ -99,7 +98,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Viewmodel observer for transactionsOfCategories
      */
-    private val mTransactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
+    private val transactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
         Observer {
             updateAvailableMoney()
         }
@@ -107,7 +106,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Viewmodel observer for transactions
      */
-    private val mTransactionsObserver: Observer<List<Transaction>> =
+    private val transactionsObserver: Observer<List<Transaction>> =
         Observer {
             updateToBeBudgeted()
         }
@@ -115,29 +114,31 @@ class BudgetViewModel @Inject constructor(
     /**
      * Viewmodel observer for budgets
      */
-    private val mBudgetsObserver: Observer<List<Budget>> =
+    private val budgetsObserver: Observer<List<Budget>> =
         Observer {
             updateToBeBudgeted()
+            checkBudgets()
+            updateAvailableMoney()
         }
 
     init {
         // Register all observers
-        categories.observeForever(mCategoriesObserver)
-        mBudgetsOfCategories.observeForever(mBudgetsOfCategoriesObserver)
-        mTransactionsOfCategories.observeForever(mTransactionsOfCategoriesObserver)
-        transactions.observeForever(mTransactionsObserver)
-        budgets.observeForever(mBudgetsObserver)
+        categories.observeForever(categoriesObserver)
+        budgetsOfCategories.observeForever(budgetsOfCategoriesObserver)
+        transactionsOfCategories.observeForever(transactionsOfCategoriesObserver)
+        transactions.observeForever(transactionsObserver)
+        budgets.observeForever(budgetsObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
 
         // Remove all observers
-        categories.removeObserver(mCategoriesObserver)
-        mBudgetsOfCategories.removeObserver(mBudgetsOfCategoriesObserver)
-        mTransactionsOfCategories.removeObserver(mTransactionsOfCategoriesObserver)
-        transactions.removeObserver(mTransactionsObserver)
-        budgets.removeObserver(mBudgetsObserver)
+        categories.removeObserver(categoriesObserver)
+        budgetsOfCategories.removeObserver(budgetsOfCategoriesObserver)
+        transactionsOfCategories.removeObserver(transactionsOfCategoriesObserver)
+        transactions.removeObserver(transactionsObserver)
+        budgets.removeObserver(budgetsObserver)
     }
 
     /**
@@ -145,8 +146,8 @@ class BudgetViewModel @Inject constructor(
      */
     private fun updateAvailableMoney() {
         val buds = budgets.value
-        val transOfCats = mTransactionsOfCategories.value
-        val budsOfCats = mBudgetsOfCategories.value
+        val transOfCats = transactionsOfCategories.value
+        val budsOfCats = budgetsOfCategories.value
 
         if (buds != null && transOfCats != null && budsOfCats != null) {
             // Update available money per category
@@ -194,7 +195,7 @@ class BudgetViewModel @Inject constructor(
                     .map { category -> Budget(category.name, month.value!!, 0) }
                     .toTypedArray()
             viewModelScope.launch {
-                mBudgetRepository.addBudgets(*missingBudgets)
+                budgetRepository.addBudgets(*missingBudgets)
             }
         }
     }
@@ -210,48 +211,48 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     /**
      * Toolbar
      */
-    private lateinit var mToolbar: MaterialToolbar
+    private lateinit var toolbar: MaterialToolbar
 
     /**
      * "To be budgeted" Text
      */
-    private lateinit var mTvToBeBudgeted: TextView
+    private lateinit var tvToBeBudgeted: TextView
 
     /**
      * Budgeting list
      */
-    private lateinit var mListBudgeting: RecyclerView
+    private lateinit var listBudgeting: RecyclerView
 
     /**
      * View model
      */
-    private val mViewModel: BudgetViewModel by viewModels()
+    private val viewModel: BudgetViewModel by viewModels()
 
     override fun onStart() {
         super.onStart()
 
         // Init
-        mToolbar = requireView().findViewById(R.id.toolbar)
-        mTvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
-        mListBudgeting = requireView().findViewById(R.id.listBudgeting)
+        toolbar = requireView().findViewById(R.id.toolbar)
+        tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
+        listBudgeting = requireView().findViewById(R.id.listBudgeting)
 
         // Setup toolbar
-        mToolbar.menu
+        toolbar.menu
 
         // Init list categories
         // Set layout manager
-        mListBudgeting.layoutManager = LinearLayoutManager(requireContext())
+        listBudgeting.layoutManager = LinearLayoutManager(requireContext())
 
         // Add adapter
-        mListBudgeting.adapter = BudgetingListAdapter(
-            mViewModel.budgets,
-            mViewModel.availableMoney,
-            { budget -> // Category click
+        listBudgeting.adapter = BudgetingListAdapter(
+            viewModel.budgets,
+            viewModel.availableMoney,
+            { budget -> // budget click
 
                 // Create update budget fragment
                 val updateBudgetFragment = UpdateBudgetFragment()
 
-                // Category name,  budgeted value as arguments
+                // Budget id as argument
                 updateBudgetFragment.arguments =
                     bundleOf(
                         UpdateBudgetFragment.BUDGET_ID_KEY to budget.id
@@ -266,7 +267,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         )
 
         // Add horizontal dividers
-        mListBudgeting.addItemDecoration(
+        listBudgeting.addItemDecoration(
             DividerItemDecoration(
                 context,
                 DividerItemDecoration.VERTICAL
@@ -274,10 +275,10 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         )
 
         // Observe to be budgeted value
-        mViewModel.toBeBudgeted.observe(viewLifecycleOwner) {
+        viewModel.toBeBudgeted.observe(viewLifecycleOwner) {
 
             // Update to be budgeted text
-            mTvToBeBudgeted.text = it.toString()
+            tvToBeBudgeted.text = it.toString()
         }
     }
 

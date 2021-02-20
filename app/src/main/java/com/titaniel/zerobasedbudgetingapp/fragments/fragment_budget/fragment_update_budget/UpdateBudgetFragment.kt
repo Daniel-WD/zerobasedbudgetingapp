@@ -77,22 +77,22 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     /**
      * Category text
      */
-    private lateinit var mTvCategory: TextView
+    private lateinit var tvCategory: TextView
 
     /**
      * Budgeted value edit text
      */
-    private lateinit var mEtBudgeted: EditText
+    private lateinit var etBudgeted: EditText
 
     /**
      * Done button
      */
-    private lateinit var mIvDone: ImageView
+    private lateinit var ivDone: ImageView
 
     /**
      * View model
      */
-    private val mViewModel: UpdateBudgetViewModel by viewModels()
+    private val viewModel: UpdateBudgetViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -107,33 +107,33 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         super.onStart()
 
         // Initialize views
-        mTvCategory = requireView().findViewById(R.id.tvCategory)
-        mEtBudgeted = requireView().findViewById(R.id.etBudgeted)
-        mIvDone = requireView().findViewById(R.id.ivDone)
+        tvCategory = requireView().findViewById(R.id.tvCategory)
+        etBudgeted = requireView().findViewById(R.id.etBudgeted)
+        ivDone = requireView().findViewById(R.id.ivDone)
 
         // Budget observer
-        mViewModel.budget.observe(viewLifecycleOwner) {
+        viewModel.budget.observe(viewLifecycleOwner) {
 
             // Set category name
-            mTvCategory.text = it.categoryName
+            tvCategory.text = it.categoryName
 
             // Set budgeted value
-            mEtBudgeted.setText(it.budgeted.toString())
+            etBudgeted.setText(it.budgeted.toString())
 
             // Select budget text
-            mEtBudgeted.selectAll()
+            etBudgeted.selectAll()
 
             // Focus budgeted edittext
-            mEtBudgeted.requestFocus()
+            etBudgeted.requestFocus()
         }
 
         // Setup done listener
-        mIvDone.setOnClickListener {
+        ivDone.setOnClickListener {
             updateBudget()
         }
 
         // Keyboard done action click listener
-        mEtBudgeted.setOnEditorActionListener { _, action, _ ->
+        etBudgeted.setOnEditorActionListener { _, action, _ ->
             if (action == EditorInfo.IME_ACTION_DONE) {
                 updateBudget()
             }
@@ -160,9 +160,9 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budgeted value
         val budgeted =
-            if (mEtBudgeted.text.isBlank()) 0 else mEtBudgeted.text.toString().toLong()
+            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
 
-        mViewModel.updateBudget(budgeted)
+        viewModel.updateBudget(budgeted)
 
         // Close fragment
         dismiss()

@@ -52,22 +52,22 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     /**
      * Add payee image
      */
-    private lateinit var mIvAddPayee: ImageView
+    private lateinit var ivAddPayee: ImageView
 
     /**
      * New payee text
      */
-    private lateinit var mEtNewPayee: EditText
+    private lateinit var etNewPayee: EditText
 
     /**
      * Payees list
      */
-    private lateinit var mListPayees: RecyclerView
+    private lateinit var listPayees: RecyclerView
 
     /**
      * View model
      */
-    private val mViewModel: SelectPayeeViewModel by viewModels()
+    private val viewModel: SelectPayeeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,30 +82,30 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         super.onStart()
 
         // Initialize views
-        mIvAddPayee = requireView().findViewById(R.id.ivAddPayee)
-        mListPayees = requireView().findViewById(R.id.listPayees)
-        mEtNewPayee = requireView().findViewById(R.id.etNewPayee)
+        ivAddPayee = requireView().findViewById(R.id.ivAddPayee)
+        listPayees = requireView().findViewById(R.id.listPayees)
+        etNewPayee = requireView().findViewById(R.id.etNewPayee)
 
         // Add payee listener
-        mIvAddPayee.setOnClickListener {
-            returnPayee(mEtNewPayee.text.toString())
+        ivAddPayee.setOnClickListener {
+            returnPayee(etNewPayee.text.toString())
         }
         // Keyboard 'OK' click listener
-        mEtNewPayee.setOnEditorActionListener { _, _, _ ->
-            returnPayee(mEtNewPayee.text.toString())
+        etNewPayee.setOnEditorActionListener { _, _, _ ->
+            returnPayee(etNewPayee.text.toString())
             true
         }
 
         // Payee list init
         // Set layout manager
-        mListPayees.layoutManager = LinearLayoutManager(requireContext())
+        listPayees.layoutManager = LinearLayoutManager(requireContext())
 
         // Fix size
-        mListPayees.setHasFixedSize(true)
+        listPayees.setHasFixedSize(true)
 
         // Set adapter
-        mListPayees.adapter = PayeesListAdapter(
-            mViewModel.payees,
+        listPayees.adapter = PayeesListAdapter(
+            viewModel.payees,
             { payee -> // Payee click callback
                 returnPayee(payee.name)
             },

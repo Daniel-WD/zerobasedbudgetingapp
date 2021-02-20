@@ -162,79 +162,79 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Toolbar
      */
-    private lateinit var mToolbar: MaterialToolbar
+    private lateinit var toolbar: MaterialToolbar
 
     /**
      * Money value edittext
      */
-    private lateinit var mEtPay: EditText
+    private lateinit var etPay: EditText
 
     /**
      * Payee textview
      */
-    private lateinit var mTvPayee: TextView
+    private lateinit var tvPayee: TextView
 
     /**
      * Category textview
      */
-    private lateinit var mTvCategory: TextView
+    private lateinit var tvCategory: TextView
 
     /**
      * Date textview
      */
-    private lateinit var mTvDate: TextView
+    private lateinit var tvDate: TextView
 
     /**
      * Description edittext
      */
-    private lateinit var mEtDescription: EditText
+    private lateinit var etDescription: EditText
 
     /**
      * Create/apply transaction button
      */
-    private lateinit var mFabCreateApply: ExtendedFloatingActionButton
+    private lateinit var fabCreateApply: ExtendedFloatingActionButton
 
     /**
      * Payee layout
      */
-    private lateinit var mLlPayee: LinearLayout
+    private lateinit var lPayee: LinearLayout
 
     /**
      * Category layout
      */
-    private lateinit var mLlCategory: LinearLayout
+    private lateinit var lCategory: LinearLayout
 
     /**
      * Date layout
      */
-    private lateinit var mLlDate: LinearLayout
+    private lateinit var lDate: LinearLayout
 
     /**
      * Description layout
      */
-    private lateinit var mLlDescription: ConstraintLayout
+    private lateinit var lDescription: ConstraintLayout
 
     /**
      * Date picker
      */
-    private lateinit var mDatePicker: MaterialDatePicker<Long>
+    private lateinit var datePicker: MaterialDatePicker<Long>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
 
         // View initialization
-        mToolbar = findViewById(R.id.toolbar)
-        mEtPay = findViewById(R.id.etPay)
-        mTvPayee = findViewById(R.id.tvPayee)
-        mTvCategory = findViewById(R.id.tvCategory)
-        mTvDate = findViewById(R.id.tvDate)
-        mEtDescription = findViewById(R.id.etDescription)
-        mFabCreateApply = findViewById(R.id.fabCreateApply)
-        mLlPayee = findViewById(R.id.layoutPayee)
-        mLlCategory = findViewById(R.id.layoutCategory)
-        mLlDate = findViewById(R.id.layoutDate)
-        mLlDescription = findViewById(R.id.layoutDescription)
+        toolbar = findViewById(R.id.toolbar)
+        etPay = findViewById(R.id.etPay)
+        tvPayee = findViewById(R.id.tvPayee)
+        tvCategory = findViewById(R.id.tvCategory)
+        tvDate = findViewById(R.id.tvDate)
+        etDescription = findViewById(R.id.etDescription)
+        fabCreateApply = findViewById(R.id.fabCreateApply)
+        lPayee = findViewById(R.id.layoutPayee)
+        lCategory = findViewById(R.id.layoutCategory)
+        lDate = findViewById(R.id.layoutDate)
+        lDescription = findViewById(R.id.layoutDescription)
 
         // Transaction observer
         viewModel.editTransaction.observe(this, {
@@ -245,20 +245,20 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
-                mEtPay.setText(it.pay.toString())
+                etPay.setText(it.pay.toString())
 
                 // Set value text cursor to end
-                mEtPay.setSelection(mEtPay.text.length)
+                etPay.setSelection(etPay.text.length)
 
 
-                mEtDescription.setText(it.description)
+                etDescription.setText(it.description)
 
                 viewModel.payee.value = it.payeeName
                 viewModel.category.value = it.categoryName
                 viewModel.date.value = it.date
 
                 // Set value text cursor to end
-                mEtPay.setSelection(mEtPay.text.length)
+                etPay.setSelection(etPay.text.length)
 
                 // Update save btn enabled
                 checkCreateApplyEnabled()
@@ -276,10 +276,10 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 } ?: MaterialDatePicker.todayInUtcMilliseconds())
 
             // Builder date picker
-            mDatePicker = builder.build()
+            datePicker = builder.build()
 
             // Date confirmation listener
-            mDatePicker.addOnPositiveButtonClickListener { timestamp ->
+            datePicker.addOnPositiveButtonClickListener { timestamp ->
 
                 // Set transaction timestamp
                 viewModel.date.value =
@@ -292,7 +292,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         })
 
         // Toolbar menu listener
-        mToolbar.setOnMenuItemClickListener { menuItem ->
+        toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.delete -> {
 
@@ -310,30 +310,30 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Set payee observer
         viewModel.payee.observe(this) {
-            mTvPayee.text = it
+            tvPayee.text = it
         }
 
         // Set model observer
         viewModel.category.observe(this) {
-            mTvCategory.text =
+            tvCategory.text =
                 if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it
         }
 
         // Set date observer
         viewModel.date.observe(this) {
             it?.let {
-                mTvDate.text = Utils.convertLocalDateToString(it)
+                tvDate.text = Utils.convertLocalDateToString(it)
             }
         }
 
         // Value text clicked listener
-        mEtPay.setOnClickListener {
+        etPay.setOnClickListener {
             // Cursor position to end
-            mEtPay.setSelection(mEtPay.text.length)
+            etPay.setSelection(etPay.text.length)
         }
 
         // Value text changed listener
-        mEtPay.addTextChangedListener { value ->
+        etPay.addTextChangedListener { value ->
             // Set transaction value, 0 when blank
             viewModel.pay.value =
                 if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
@@ -341,13 +341,13 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Description text changed listener
-        mEtDescription.addTextChangedListener { description ->
+        etDescription.addTextChangedListener { description ->
             // Set description text
             viewModel.description.value = description.toString()
         }
 
         // Create/Apply-button listener
-        mFabCreateApply.setOnClickListener {
+        fabCreateApply.setOnClickListener {
             // Hide keyboard
             forceHideSoftKeyboard()
 
@@ -360,26 +360,26 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Listeners for layout clicks
         // Open payee fragment on payee layout click
-        mLlPayee.setOnClickListener {
+        lPayee.setOnClickListener {
             forceHideSoftKeyboard()
-            mEtDescription.clearFocus()
+            etDescription.clearFocus()
             val selectPayeeFragment = SelectPayeeFragment()
             selectPayeeFragment.show(supportFragmentManager, "SelectPayeeFragment")
         }
 
         // Open category on category layout click
-        mLlCategory.setOnClickListener {
+        lCategory.setOnClickListener {
             forceHideSoftKeyboard()
-            mEtDescription.clearFocus()
+            etDescription.clearFocus()
             val selectCategoryFragment = SelectCategoryFragment()
             selectCategoryFragment.show(supportFragmentManager, "SelectCategoryFragment")
         }
 
         // Open date picker on date layout click
-        mLlDate.setOnClickListener {
+        lDate.setOnClickListener {
             forceHideSoftKeyboard()
-            mEtDescription.clearFocus()
-            mDatePicker.show(supportFragmentManager, "DatePicker")
+            etDescription.clearFocus()
+            datePicker.show(supportFragmentManager, "DatePicker")
         }
 
         // Fragment result listeners
@@ -400,7 +400,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
             }
 
         // Focus value text
-        mEtPay.requestFocus()
+        etPay.requestFocus()
 
         // Show keyboard
         forceShowSoftKeyboard()
@@ -410,15 +410,15 @@ class AddEditTransactionActivity : AppCompatActivity() {
      * Change texts to fit editing context
      */
     private fun updateUiToEditMode() {
-        mToolbar.title = getString(R.string.activity_add_edit_transaction_edit_transaction)
-        mFabCreateApply.text = getString(R.string.activity_add_edit_transaction_apply)
+        toolbar.title = getString(R.string.activity_add_edit_transaction_edit_transaction)
+        fabCreateApply.text = getString(R.string.activity_add_edit_transaction_apply)
     }
 
     /**
      * Update if create/apply btn should be enabled
      */
     private fun checkCreateApplyEnabled() {
-        mFabCreateApply.isEnabled =
+        fabCreateApply.isEnabled =
             viewModel.payee.value?.isNotBlank() == true && viewModel.category.value?.isNotBlank() == true && viewModel.date.value != null
     }
 

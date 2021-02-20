@@ -12,23 +12,23 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 
 /**
- * [BudgetingListAdapter] in [mContext] for displaying [mBudgetsOfMonth] with the respective [mAvailableMoney]. Notifies [mItemClickedListener] when item is clicked.
+ * [BudgetingListAdapter] in [context] for displaying [budgetsOfMonth] with the respective [availableMoney]. Notifies [itemClickedListener] when item is clicked.
  * Needs [lifecycleOwner].
  */
 class BudgetingListAdapter(
-    private val mBudgetsOfMonth: LiveData<List<Budget>>,
-    private val mAvailableMoney: LiveData<Map<Budget, Long>>,
-    private val mItemClickedListener: (Budget) -> Unit,
-    private val mContext: Context,
-    lifecycleOwner: LifecycleOwner
+        private val budgetsOfMonth: LiveData<List<Budget>>,
+        private val availableMoney: LiveData<Map<Budget, Long>>,
+        private val itemClickedListener: (Budget) -> Unit,
+        private val context: Context,
+        lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
 
     init {
         // Setup observers
-        mBudgetsOfMonth.observe(lifecycleOwner) {
+        budgetsOfMonth.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
-        mAvailableMoney.observe(lifecycleOwner) {
+        availableMoney.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
     }
@@ -56,15 +56,15 @@ class BudgetingListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetingItem {
         // Inflate view
-        val view = LayoutInflater.from(mContext).inflate(R.layout.item_budget, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.item_budget, parent, false)
 
         // Create viewholder
         return BudgetingItem(view)
     }
 
     override fun onBindViewHolder(holder: BudgetingItem, position: Int) {
-        val budgets = mBudgetsOfMonth.value
-        val availableMoney = mAvailableMoney.value
+        val budgets = budgetsOfMonth.value
+        val availableMoney = availableMoney.value
 
         // Categories and budgets present?
         if(budgets != null && availableMoney != null && budgets.size == availableMoney.size) {
@@ -83,7 +83,7 @@ class BudgetingListAdapter(
 
             // Entry click listener
             holder.itemView.setOnClickListener {
-                mItemClickedListener(b)
+                itemClickedListener(b)
             }
         }
 
@@ -91,7 +91,7 @@ class BudgetingListAdapter(
 
     override fun getItemCount(): Int {
         // Return number of entries
-        return mBudgetsOfMonth.value?.size ?: 0
+        return budgetsOfMonth.value?.size ?: 0
     }
 
 }

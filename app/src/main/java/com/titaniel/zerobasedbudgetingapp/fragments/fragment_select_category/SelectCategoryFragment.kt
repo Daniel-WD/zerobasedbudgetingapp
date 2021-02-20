@@ -52,17 +52,17 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     /**
      * Categories list
      */
-    private lateinit var mListCategories: RecyclerView
+    private lateinit var listCategories: RecyclerView
 
     /**
      * To be budgeted text
      */
-    private lateinit var mTvToBeBudgeted: TextView
+    private lateinit var tvToBeBudgeted: TextView
 
     /**
      * View model
      */
-    private val mViewModel: SelectCategoryViewModel by viewModels()
+    private val viewModel: SelectCategoryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,19 +77,19 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         super.onStart()
 
         // Initialize views
-        mListCategories = requireView().findViewById(R.id.listCategories)
-        mTvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
+        listCategories = requireView().findViewById(R.id.listCategories)
+        tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
 
         // Category list init
         // Set layout manager
-        mListCategories.layoutManager = LinearLayoutManager(requireContext())
+        listCategories.layoutManager = LinearLayoutManager(requireContext())
 
         // Fix size
-        mListCategories.setHasFixedSize(true)
+        listCategories.setHasFixedSize(true)
 
         // Set adapter
-        mListCategories.adapter = CategoriesListAdapter(
-            mViewModel.categories,
+        listCategories.adapter = CategoriesListAdapter(
+            viewModel.categories,
             { category -> // Category click callback
                 returnCategory(category.name)
             },
@@ -98,7 +98,7 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         )
 
         // To be budgeted text click listener
-        mTvToBeBudgeted.setOnClickListener {
+        tvToBeBudgeted.setOnClickListener {
             returnCategory(Category.TO_BE_BUDGETED)
         }
     }
