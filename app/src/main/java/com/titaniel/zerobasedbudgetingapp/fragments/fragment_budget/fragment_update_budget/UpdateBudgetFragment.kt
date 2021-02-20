@@ -156,7 +156,6 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
      * Update budget and dismiss dialog
      */
     private fun updateBudget() {
-        // TODO ENTWERDER SO ODER WIE IN ADD EDIT TRANSACTION ACTIVITY
 
         // Budgeted value
         val budgeted =
