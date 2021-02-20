@@ -4,6 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
 
+/**
+ * [Transaction] with [pay], [payeeName], [categoryName], [description] and a [date]
+ */
 @Entity
 data class Transaction(
     var pay: Long,
@@ -12,5 +15,8 @@ data class Transaction(
     var description: String,
     var date: LocalDate
 ) {
+    /**
+     * [Transaction] [id]
+     */
     @PrimaryKey(autoGenerate = true) var id: Long = 0
 }
