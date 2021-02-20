@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    /** Add [transactions] */
+    /**
+     * Add [transactions]
+     * */
     @Insert(onConflict = REPLACE)
     suspend fun add(vararg transactions: Transaction)
 
