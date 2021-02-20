@@ -1,9 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -81,7 +77,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Available money per category
      */
-    val availableMoney: MutableLiveData<Map<Category, Long>> = MutableLiveData(emptyMap())
+    val availableMoney: MutableLiveData<Map<Budget, Long>> = MutableLiveData(emptyMap())
 
     /**
      * Viewmodel observer for categories
@@ -148,23 +144,23 @@ class BudgetViewModel @Inject constructor(
      * Updates [availableMoney]
      */
     private fun updateAvailableMoney() {
-        val cats = categories.value
+        val buds = budgets.value
         val transOfCats = mTransactionsOfCategories.value
         val budsOfCats = mBudgetsOfCategories.value
 
-        if (cats != null && transOfCats != null && budsOfCats != null) {
+        if (buds != null && transOfCats != null && budsOfCats != null) {
             // Update available money per category
-            availableMoney.value = cats.map { category ->
-                category to
-                        // Sum of all transactions of this category until selected month (inclusive)
-                        (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category == category }?.transactions
+            availableMoney.value = buds.map { budget ->
+                budget to
+                        // Sum of all transactions of the category of this budget until selected month (inclusive)
+                        (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
                             ?.filter { transaction -> month.value!!.let { transaction.date.year <= it.year && transaction.date.month <= it.month } }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
-                        // Added with sum of all budgets of this category until selected month (inclusive)
-                        budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category == category }!!.budgets
-                            .filter { budget -> month.value!!.let { budget.month.year <= it.year && budget.month.month <= it.month } }
-                            .fold(0L, { acc, budget -> acc + budget.budgeted })
+                        // Added with sum of all budgets with same category before this budget (inclusive)
+                        budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
+                            .filter { bud -> month.value!!.let { bud.month.year <= it.year && bud.month.month <= it.month } }
+                            .fold(0L, { acc, bud -> acc + bud.budgeted })
 
             }.toMap()
         }
@@ -248,7 +244,6 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
         // Add adapter
         mListBudgeting.adapter = BudgetingListAdapter(
-            mViewModel.categories,
             mViewModel.budgets,
             mViewModel.availableMoney,
             { budget -> // Category click

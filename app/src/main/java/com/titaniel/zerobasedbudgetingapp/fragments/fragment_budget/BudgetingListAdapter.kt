@@ -13,26 +13,19 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
- * Adapter for displaying a list of budgeting items.
- * @param mCategories Containing categories
- * @param mMonthTimestamp Month timestamp
- * @param mItemClickedListener Callback for click event on item
- * @param mContext Context
- * @param lifecycleOwner LifecycleOwner
+ * Adapter in [mContext] for displaying [mBudgetsOfMonth] with the respective [mAvailableMoney]. Notifies [mItemClickedListener] when item is clicked.
+ * Needs [lifecycleOwner].
  */
 class BudgetingListAdapter(
-    private val mCategories: LiveData<List<Category>>,
     private val mBudgetsOfMonth: LiveData<List<Budget>>,
-    private val mAvailableMoney: LiveData<Map<Category, Long>>,
+    private val mAvailableMoney: LiveData<Map<Budget, Long>>,
     private val mItemClickedListener: (Budget) -> Unit,
     private val mContext: Context,
     lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
 
     init {
-        mCategories.observe(lifecycleOwner) {
-            notifyDataSetChanged()
-        }
+        // Setup observers
         mBudgetsOfMonth.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
@@ -71,29 +64,27 @@ class BudgetingListAdapter(
     }
 
     override fun onBindViewHolder(holder: BudgetingItem, position: Int) {
-        val categories = mCategories.value
         val budgets = mBudgetsOfMonth.value
         val availableMoney = mAvailableMoney.value
 
         // Categories and budgets present?
-        if(categories != null && budgets != null && availableMoney != null && categories.size == budgets.size && categories.size == availableMoney.size) {
+        if(budgets != null && availableMoney != null && budgets.size == availableMoney.size) {
 
             // Get category
-            val category = categories[position]
+            val b = budgets[position]
 
             // Set category text to name
-            holder.tvCategory.text = category.name
+            holder.tvCategory.text = b.categoryName
 
             // Find budget
-            val budget = budgets.find { budget -> budget.categoryName == category.name }!!
-            holder.tvBudgeted.text = (budget.budgeted).toString()
+            holder.tvBudgeted.text = (b.budgeted).toString()
 
             // Set available value
-            holder.tvAvailable.text = availableMoney[category].toString()
+            holder.tvAvailable.text = availableMoney[b].toString()
 
             // Entry click listener
             holder.itemView.setOnClickListener {
-                mItemClickedListener(budget)
+                mItemClickedListener(b)
             }
         }
 
@@ -101,7 +92,7 @@ class BudgetingListAdapter(
 
     override fun getItemCount(): Int {
         // Return number of entries
-        return mCategories.value?.size ?: 0
+        return mBudgetsOfMonth.value?.size ?: 0
     }
 
 }
