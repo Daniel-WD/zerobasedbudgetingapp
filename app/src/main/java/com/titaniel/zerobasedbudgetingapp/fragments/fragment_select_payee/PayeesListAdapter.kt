@@ -10,13 +10,12 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.CategoriesListAdapter
+
 
 /**
- * Adapter for displaying a list of payees.
- * @param mPayees Containing payees
- * @param mPayeeClickedListener Callback for click event on payee
- * @param mContext Context
- * @param lifecycleOwner LifecycleOwner
+ * [PayeesListAdapter] in [mContext] for displaying a list of [mPayees].
+ * Needs [lifecycleOwner].
  */
 class PayeesListAdapter(
     private val mPayees: LiveData<List<Payee>>,
@@ -26,10 +25,8 @@ class PayeesListAdapter(
 ) : RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
 
     init {
-        // Observe payees
+        // Setup observers
         mPayees.observe(lifecycleOwner) {
-
-            // Reload list
             notifyDataSetChanged()
         }
     }

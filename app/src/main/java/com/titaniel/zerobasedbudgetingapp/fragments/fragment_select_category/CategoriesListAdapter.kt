@@ -12,11 +12,8 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
- * Adapter for displaying a list of categories.
- * @param categories Containing categories
- * @param mCategoryClickedListener Callback for click event on category
- * @param mContext Context
- * @param lifecycleOwner LifecycleOwner
+ * [CategoriesListAdapter] in [mContext] for displaying a list of [mCategories].
+ * Needs [lifecycleOwner].
  */
 class CategoriesListAdapter(
     private val mCategories: LiveData<List<Category>>,
@@ -26,6 +23,7 @@ class CategoriesListAdapter(
 ) : RecyclerView.Adapter<CategoriesListAdapter.CategoryItem>() {
 
     init {
+        // Setup observer
         mCategories.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }

@@ -21,11 +21,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * [SelectPayeeViewModel] with [payeeRepository].
+ */
 @HiltViewModel
 class SelectPayeeViewModel @Inject constructor(
     payeeRepository: PayeeRepository
 ) : ViewModel() {
 
+    /**
+     * All payees
+     */
     val payees = payeeRepository.getAllPayees().asLiveData()
 
 }
@@ -82,11 +88,11 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Add payee listener
         mIvAddPayee.setOnClickListener {
-            selectPayee(mEtNewPayee.text.toString())
+            returnPayee(mEtNewPayee.text.toString())
         }
         // Keyboard 'OK' click listener
         mEtNewPayee.setOnEditorActionListener { _, _, _ ->
-            selectPayee(mEtNewPayee.text.toString())
+            returnPayee(mEtNewPayee.text.toString())
             true
         }
 
@@ -101,7 +107,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         mListPayees.adapter = PayeesListAdapter(
             mViewModel.payees,
             { payee -> // Payee click callback
-                selectPayee(payee.name)
+                returnPayee(payee.name)
             },
             requireContext(),
             viewLifecycleOwner
@@ -110,25 +116,21 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     }
 
     /**
-     * Validate and return payee to parent
-     * @param payee Payee
-     * @return If payee is valid
+     * Returns [payeeName] to [AddEditTransactionActivity] and dismisses dialog, if [payeeName] is not blank.
      */
-    private fun selectPayee(payee: String): Boolean {
+    private fun returnPayee(payeeName: String) {
         // Payee string not blank?
-        if (payee.isNotBlank()) {
+        if (payeeName.isNotBlank()) {
 
             // Return fragment result
             setFragmentResult(
                 AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(PAYEE_KEY to payee)
+                bundleOf(PAYEE_KEY to payeeName)
             )
 
             // Close fragment
             dismiss()
-            return true
         }
-        return false
     }
 
 }

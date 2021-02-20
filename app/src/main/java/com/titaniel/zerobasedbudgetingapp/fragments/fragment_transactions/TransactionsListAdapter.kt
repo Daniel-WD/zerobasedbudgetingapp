@@ -15,14 +15,12 @@ import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.PayeesListAdapter
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
- * Adapter for displaying list of transactions.
- * @param mTransactions Containing transactions
- * @param mTransactionClickedListener Transaction clicked listener
- * @param mContext Context
- * @param lifecycleOwner LifecycleOwner
+ * [TransactionsListAdapter] in [mContext] for displaying a list of [mTransactions].
+ * Needs [lifecycleOwner].
  */
 class TransactionsListAdapter(
     private val mTransactions: LiveData<List<Transaction>>,
@@ -32,9 +30,8 @@ class TransactionsListAdapter(
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     init {
-        // Observe transactions
+        // Set observers
         mTransactions.observe(lifecycleOwner) {
-            // Reload list
             notifyDataSetChanged()
         }
     }

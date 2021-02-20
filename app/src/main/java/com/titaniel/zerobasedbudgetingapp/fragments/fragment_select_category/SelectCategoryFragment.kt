@@ -21,6 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * [SelectCategoryViewModel] with [categoryRepository].
+ */
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
     categoryRepository: CategoryRepository
@@ -34,7 +37,7 @@ class SelectCategoryViewModel @Inject constructor(
 }
 
 /**
- * Bottom sheet dialog fragment for category selection
+ * [SelectCategoryFragment] for category selection
  */
 @AndroidEntryPoint
 class SelectCategoryFragment : BottomSheetDialogFragment() {
@@ -88,7 +91,7 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
         mListCategories.adapter = CategoriesListAdapter(
             mViewModel.categories,
             { category -> // Category click callback
-                returnResult(category.name)
+                returnCategory(category.name)
             },
             requireContext(),
             viewLifecycleOwner
@@ -96,15 +99,18 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // To be budgeted text click listener
         mTvToBeBudgeted.setOnClickListener {
-            returnResult(Category.TO_BE_BUDGETED)
+            returnCategory(Category.TO_BE_BUDGETED)
         }
     }
 
-    private fun returnResult(result: String) {
+    /**
+     * Return [categoryName] to [AddEditTransactionActivity].
+     */
+    private fun returnCategory(categoryName: String) {
         // Return fragment result
         setFragmentResult(
             AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-            bundleOf(CATEGORY_KEY to result)
+            bundleOf(CATEGORY_KEY to categoryName)
         )
 
         // Close fragment

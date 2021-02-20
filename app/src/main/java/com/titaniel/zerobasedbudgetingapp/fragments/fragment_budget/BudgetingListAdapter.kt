@@ -10,10 +10,9 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
- * Adapter in [mContext] for displaying [mBudgetsOfMonth] with the respective [mAvailableMoney]. Notifies [mItemClickedListener] when item is clicked.
+ * [BudgetingListAdapter] in [mContext] for displaying [mBudgetsOfMonth] with the respective [mAvailableMoney]. Notifies [mItemClickedListener] when item is clicked.
  * Needs [lifecycleOwner].
  */
 class BudgetingListAdapter(

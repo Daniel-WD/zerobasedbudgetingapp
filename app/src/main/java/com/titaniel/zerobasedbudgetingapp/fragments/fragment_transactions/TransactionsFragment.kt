@@ -22,11 +22,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * [TransactionsViewModel] with [transactionRepository].
+ */
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(
     transactionRepository: TransactionRepository
 ) : ViewModel() {
 
+    /**
+     * All transactions
+     */
     val transactions: LiveData<List<Transaction>> =
         transactionRepository.getAllTransactions().asLiveData()
 
