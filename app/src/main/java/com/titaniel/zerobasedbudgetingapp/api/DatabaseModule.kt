@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class DatabaseModule {
 
     /**
-     * Provide transaction dao
+     * Provide transaction dao of [database]
      */
     @Provides
     fun provideTransactionDao(database: Database): TransactionDao {
@@ -30,7 +30,7 @@ class DatabaseModule {
     }
 
     /**
-     * Provide payee dao
+     * Provide payee dao of [database]
      */
     @Provides
     fun providePayeeDao(database: Database): PayeeDao {
@@ -38,7 +38,7 @@ class DatabaseModule {
     }
 
     /**
-     * Provide category dao
+     * Provide category dao of [database]
      */
     @Provides
     fun provideCategoryDao(database: Database): CategoryDao {
@@ -46,7 +46,7 @@ class DatabaseModule {
     }
 
     /**
-     * Provide budget dao
+     * Provide budget dao of [database]
      */
     @Provides
     fun provideBudgetDao(database: Database): BudgetDao {
@@ -54,7 +54,7 @@ class DatabaseModule {
     }
 
     /**
-     * Provide database
+     * Provide database in [context]
      */
     @Provides
     @Singleton
