@@ -12,40 +12,35 @@ class TransactionRepository @Inject constructor(
 ) {
 
     /**
-     * Add transaction
-     * @param transaction Transaction
+     * Add [transaction]
      */
     suspend fun addTransaction(transaction: Transaction) {
         transactionDao.add(transaction)
     }
 
     /**
-     * Delete transaction
-     * @param transaction Transaction
+     * Delete [transaction]
      */
     suspend fun deleteTransaction(transaction: Transaction) {
         transactionDao.delete(transaction)
     }
 
     /**
-     * Update transaction
-     * @param transaction Transaction
+     * Update [transaction]
      */
     suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction)
     }
 
     /**
-     * Get transaction by id
-     * @param transactionId Id of transaction to get
+     * Get transaction with [transactionId]
      */
     fun getTransactionById(transactionId: Long): Flow<Transaction> {
         return transactionDao.getById(transactionId)
     }
 
     /**
-     * Get transactions by category
-     * @param categoryName Category name of transaction to get
+     * Get transactions with [categoryName]
      */
     fun getTransactionsByCategory(categoryName: String): Flow<List<Transaction>> {
         return transactionDao.getByCategory(categoryName)

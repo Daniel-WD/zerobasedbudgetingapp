@@ -12,8 +12,7 @@ class PayeeRepository @Inject constructor(
 ) {
 
     /**
-     * Add payee
-     * @param payee Payee
+     * Add [payee]
      */
     suspend fun addPayee(payee: Payee) {
         payeeDao.add(payee)

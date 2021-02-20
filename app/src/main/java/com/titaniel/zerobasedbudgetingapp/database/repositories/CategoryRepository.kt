@@ -14,8 +14,7 @@ class CategoryRepository @Inject constructor(
 ) {
 
     /**
-     * Add category
-     * @param category Category to add
+     * Add [category]
      */
     suspend fun addCategory(category: Category) {
         categoryDao.add(category)

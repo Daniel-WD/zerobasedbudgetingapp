@@ -14,40 +14,35 @@ class BudgetRepository @Inject constructor(
 ) {
 
     /**
-     * Add budgets to database
-     * @param budgets Budgets to add
+     * Add [budgets] to database
      */
     suspend fun addBudgets(vararg budgets: Budget) {
         budgetDao.add(*budgets)
     }
 
     /**
-     * Updates budget in database
-     * @param budget Budget to update
+     * Updates [budget] in database
      */
     suspend fun updateBudget(budget: Budget) {
         budgetDao.update(budget)
     }
 
     /**
-     * Get budget
-     * @param id Id of budget to get
+     * Get budget with [id]
      */
     fun getBudgetById(id: Long): Flow<Budget> {
         return budgetDao.getBudgetById(id)
     }
 
     /**
-     * Get budgets with specific category
-     * @param categoryName Name of category
+     * Get budgets with [categoryName]
      */
     fun getBudgetsByCategory(categoryName: String): Flow<List<Budget>> {
         return budgetDao.getBudgetsByCategory(categoryName)
     }
 
     /**
-     * Get budgets with specific month
-     * @param month Month
+     * Get budgets with [month]
      */
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>> {
         return budgetDao.getBudgetsByMonth(month)
