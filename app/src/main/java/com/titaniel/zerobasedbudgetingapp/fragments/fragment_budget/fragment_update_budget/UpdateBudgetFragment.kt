@@ -29,16 +29,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpdateBudgetViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val budgetRepository: BudgetRepository
+        savedStateHandle: SavedStateHandle,
+        private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
      * Budget to edit
      */
     val budget =
-        budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
-            .asLiveData()
+            budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+                    .asLiveData()
 
     /**
      * Update budget with [budgeted] value
@@ -95,9 +95,9 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     private val viewModel: UpdateBudgetViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_update_budget, container, false)
@@ -159,7 +159,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budgeted value
         val budgeted =
-            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
+                if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
 
         viewModel.updateBudget(budgeted)
 

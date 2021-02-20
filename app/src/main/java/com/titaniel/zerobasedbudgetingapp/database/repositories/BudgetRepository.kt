@@ -10,7 +10,7 @@ import javax.inject.Inject
  * Repository to interact with budgeting data
  */
 class BudgetRepository @Inject constructor(
-    private val budgetDao: BudgetDao
+        private val budgetDao: BudgetDao
 ) {
 
     /**

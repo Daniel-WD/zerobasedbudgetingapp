@@ -9,10 +9,11 @@ import java.time.LocalDate
  */
 @Entity
 data class Budget(
-    var categoryName: String,
-    val month: LocalDate,
-    var budgeted: Long
+        var categoryName: String,
+        val month: LocalDate,
+        var budgeted: Long
 ) {
     /** [id] of this [Budget] */
-    @PrimaryKey(autoGenerate = true) var id: Long = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
 }

@@ -4,11 +4,12 @@ import com.titaniel.zerobasedbudgetingapp.database.room.daos.PayeeDao
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+
 /**
  * Repository to interact with payee data
  */
 class PayeeRepository @Inject constructor(
-    private val payeeDao: PayeeDao
+        private val payeeDao: PayeeDao
 ) {
 
     /**

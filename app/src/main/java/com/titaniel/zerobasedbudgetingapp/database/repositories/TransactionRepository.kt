@@ -1,14 +1,15 @@
 package com.titaniel.zerobasedbudgetingapp.database.repositories
 
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+
 /**
  * Repository to interact with transaction data
  */
 class TransactionRepository @Inject constructor(
-    private val transactionDao: TransactionDao
+        private val transactionDao: TransactionDao
 ) {
 
     /**

@@ -9,9 +9,9 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
  * [TransactionsOfCategory] relation, mapping [transactions] to a [category]
  */
 data class TransactionsOfCategory(
-    @Embedded val category: Category,
-    @Relation(
-        parentColumn = "name",
-        entityColumn = "categoryName"
-    ) val transactions: List<Transaction>
+        @Embedded val category: Category,
+        @Relation(
+                parentColumn = "name",
+                entityColumn = "categoryName"
+        ) val transactions: List<Transaction>
 )

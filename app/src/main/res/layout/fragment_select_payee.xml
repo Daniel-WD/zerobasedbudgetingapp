@@ -75,13 +75,13 @@
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
         android:hint="@string/activity_add_edit_transaction_add_payee_hint"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:singleLine="true"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/ivAddPayee"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vDivider"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toBottomOf="@+id/vDivider" />
 
     <!-- Image view add payee (At the bottom so its on top of recycler view) -->
     <ImageView

@@ -31,7 +31,7 @@ interface BudgetDao {
      * Get budget with [id]
      */
     @Query("SELECT * FROM budget WHERE id = :id")
-    fun getBudgetById(id: Long) : Flow<Budget>
+    fun getBudgetById(id: Long): Flow<Budget>
 
     /**
      * Get budgets with [month]

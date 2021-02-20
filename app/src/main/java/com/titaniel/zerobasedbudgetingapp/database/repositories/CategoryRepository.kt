@@ -6,11 +6,12 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCateg
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+
 /**
  * Repository to interact with category data
  */
 class CategoryRepository @Inject constructor(
-    private val categoryDao: CategoryDao
+        private val categoryDao: CategoryDao
 ) {
 
     /**

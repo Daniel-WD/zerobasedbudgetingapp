@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,7 +26,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
-    categoryRepository: CategoryRepository
+        categoryRepository: CategoryRepository
 ) : ViewModel() {
 
     /**
@@ -65,9 +65,9 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     private val viewModel: SelectCategoryViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_select_category, container, false)
@@ -89,12 +89,12 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listCategories.adapter = CategoriesListAdapter(
-            viewModel.categories,
-            { category -> // Category click callback
-                returnCategory(category.name)
-            },
-            requireContext(),
-            viewLifecycleOwner
+                viewModel.categories,
+                { category -> // Category click callback
+                    returnCategory(category.name)
+                },
+                requireContext(),
+                viewLifecycleOwner
         )
 
         // To be budgeted text click listener
@@ -109,8 +109,8 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     private fun returnCategory(categoryName: String) {
         // Return fragment result
         setFragmentResult(
-            AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-            bundleOf(CATEGORY_KEY to categoryName)
+                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
+                bundleOf(CATEGORY_KEY to categoryName)
         )
 
         // Close fragment

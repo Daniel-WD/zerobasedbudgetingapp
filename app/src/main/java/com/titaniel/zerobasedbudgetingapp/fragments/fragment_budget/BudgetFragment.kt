@@ -5,24 +5,24 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
-import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -34,9 +34,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    categoryRepository: CategoryRepository,
-    transactionRepository: TransactionRepository,
-    private val budgetRepository: BudgetRepository
+        categoryRepository: CategoryRepository,
+        transactionRepository: TransactionRepository,
+        private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
@@ -83,43 +83,43 @@ class BudgetViewModel @Inject constructor(
      * ViewModel observer for categories
      */
     private val categoriesObserver: Observer<List<Category>> =
-        Observer {
-            checkBudgets()
-        }
+            Observer {
+                checkBudgets()
+            }
 
     /**
      * ViewModel observer for budgetsOfCategories
      */
     private val budgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
-        Observer {
-            updateAvailableMoney()
-        }
+            Observer {
+                updateAvailableMoney()
+            }
 
     /**
      * ViewModel observer for transactionsOfCategories
      */
     private val transactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
-        Observer {
-            updateAvailableMoney()
-        }
+            Observer {
+                updateAvailableMoney()
+            }
 
     /**
      * ViewModel observer for transactions
      */
     private val transactionsObserver: Observer<List<Transaction>> =
-        Observer {
-            updateToBeBudgeted()
-        }
+            Observer {
+                updateToBeBudgeted()
+            }
 
     /**
      * ViewModel observer for budgets
      */
     private val budgetsObserver: Observer<List<Budget>> =
-        Observer {
-            updateToBeBudgeted()
-            checkBudgets()
-            updateAvailableMoney()
-        }
+            Observer {
+                updateToBeBudgeted()
+                checkBudgets()
+                updateAvailableMoney()
+            }
 
     init {
         // Register all observers
@@ -155,13 +155,13 @@ class BudgetViewModel @Inject constructor(
                 budget to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
-                            ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= month.value!! }
-                            ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
+                                ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= month.value!! }
+                                ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
                         budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
-                            .filter { bud -> bud.month <= month.value!! }
-                            .fold(0L, { acc, bud -> acc + bud.budgeted })
+                                .filter { bud -> bud.month <= month.value!! }
+                                .fold(0L, { acc, bud -> acc + bud.budgeted })
 
             }.toMap()
         }
@@ -177,7 +177,7 @@ class BudgetViewModel @Inject constructor(
 
         if (transactions != null && budgets != null) {
             toBeBudgeted.value = transactions.filter { it.categoryName == Category.TO_BE_BUDGETED }
-                .fold(0L, { acc, transaction -> acc + transaction.pay }) -
+                    .fold(0L, { acc, transaction -> acc + transaction.pay }) -
                     budgets.fold(0L, { acc, budget -> acc + budget.budgeted })
 
         }
@@ -191,9 +191,9 @@ class BudgetViewModel @Inject constructor(
         val buds = budgets.value
         if (cats != null && buds != null) {
             val missingBudgets =
-                cats.filter { category -> buds.find { budget -> budget.categoryName == category.name } == null }
-                    .map { category -> Budget(category.name, month.value!!, 0) }
-                    .toTypedArray()
+                    cats.filter { category -> buds.find { budget -> budget.categoryName == category.name } == null }
+                            .map { category -> Budget(category.name, month.value!!, 0) }
+                            .toTypedArray()
             viewModelScope.launch {
                 budgetRepository.addBudgets(*missingBudgets)
             }
@@ -245,33 +245,33 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
         // Add adapter
         listBudgeting.adapter = BudgetingListAdapter(
-            viewModel.budgets,
-            viewModel.availableMoney,
-            { budget -> // budget click
+                viewModel.budgets,
+                viewModel.availableMoney,
+                { budget -> // budget click
 
-                // Create update budget fragment
-                val updateBudgetFragment = UpdateBudgetFragment()
+                    // Create update budget fragment
+                    val updateBudgetFragment = UpdateBudgetFragment()
 
-                // Budget id as argument
-                updateBudgetFragment.arguments =
-                    bundleOf(
-                        UpdateBudgetFragment.BUDGET_ID_KEY to budget.id
-                    )
+                    // Budget id as argument
+                    updateBudgetFragment.arguments =
+                            bundleOf(
+                                    UpdateBudgetFragment.BUDGET_ID_KEY to budget.id
+                            )
 
-                // Show update budget fragment
-                updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
+                    // Show update budget fragment
+                    updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
 
-            },
-            requireContext(),
-            viewLifecycleOwner
+                },
+                requireContext(),
+                viewLifecycleOwner
         )
 
         // Add horizontal dividers
         listBudgeting.addItemDecoration(
-            DividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
-            )
+                DividerItemDecoration(
+                        context,
+                        DividerItemDecoration.VERTICAL
+                )
         )
 
         // Observe to be budgeted value
