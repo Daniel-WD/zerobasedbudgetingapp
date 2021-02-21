@@ -4,11 +4,9 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +32,7 @@ class PayeeDaoTest {
     private val payee4 = Payee("payee4")
 
     @Before
-    fun setup() {
+    fun setup(): Unit = runBlocking {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
@@ -45,10 +43,8 @@ class PayeeDaoTest {
         // Get payee dao
         payeeDao = database.payeeDao()
 
-        GlobalScope.launch {
-            // Add example budgets
-            payeeDao.add(payee1, payee2, payee3, payee4)
-        }
+        // Add example budgets
+        payeeDao.add(payee1, payee2, payee3, payee4)
     }
 
     @After
@@ -58,10 +54,8 @@ class PayeeDaoTest {
     }
 
     @Test
-    fun gets_payees_correctly() {
-        GlobalScope.launch {
-            assertThat(payeeDao.getAll().first()).isEqualTo(listOf(payee1, payee2, payee3, payee4))
-        }
+    fun gets_payees_correctly(): Unit = runBlocking {
+        assertThat(payeeDao.getAll().first()).isEqualTo(listOf(payee1, payee2, payee3, payee4))
     }
 
 }

@@ -5,9 +5,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -38,7 +37,7 @@ class TransactionDaoTest {
             .apply { id = 4 }
 
     @Before
-    fun setup() {
+    fun setup(): Unit = runBlocking {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
@@ -49,10 +48,8 @@ class TransactionDaoTest {
         // Get payee dao
         transactionDao = database.transactionDao()
 
-        GlobalScope.launch {
-            // Add example budgets
-            transactionDao.add(transaction1, transaction2, transaction3, transaction4)
-        }
+        // Add example budgets
+        transactionDao.add(transaction1, transaction2, transaction3, transaction4)
     }
 
     @After
@@ -62,47 +59,39 @@ class TransactionDaoTest {
     }
 
     @Test
-    fun gets_transactions_correctly() {
-        GlobalScope.launch {
-            assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
-        }
+    fun gets_transactions_correctly(): Unit = runBlocking {
+        assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
     }
 
     @Test
-    fun deletes_transactions_correctly() {
-        GlobalScope.launch {
+    fun deletes_transactions_correctly(): Unit = runBlocking {
 
-            // Delete transactions
-            transactionDao.delete(transaction4, transaction1)
+        // Delete transactions
+        transactionDao.delete(transaction4, transaction1)
 
-            assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction2, transaction3))
-        }
+        assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction2, transaction3))
     }
 
     @Test
-    fun updates_transactions_correctly() {
-        GlobalScope.launch {
+    fun updates_transactions_correctly(): Unit = runBlocking {
 
-            // Change some transactions
-            transaction1.categoryName = "cat99"
-            transaction1.description = "description"
-            transaction3.date = LocalDate.of(1989, 3, 23)
+        // Change some transactions
+        transaction1.categoryName = "cat99"
+        transaction1.description = "description"
+        transaction3.date = LocalDate.of(1989, 3, 23)
 
-            // Update transactions
-            transactionDao.update(transaction1, transaction3)
+        // Update transactions
+        transactionDao.update(transaction1, transaction3)
 
-            assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
-        }
+        assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
     }
 
     @Test
-    fun gets_transaction_by_id_correctly() {
-        GlobalScope.launch {
-            assertThat(transactionDao.getById(1).first()).isEqualTo(transaction1)
-            assertThat(transactionDao.getById(2).first()).isEqualTo(transaction2)
-            assertThat(transactionDao.getById(3).first()).isEqualTo(transaction3)
-            assertThat(transactionDao.getById(4).first()).isEqualTo(transaction4)
-        }
+    fun gets_transaction_by_id_correctly(): Unit = runBlocking {
+        assertThat(transactionDao.getById(1).first()).isEqualTo(transaction1)
+        assertThat(transactionDao.getById(2).first()).isEqualTo(transaction2)
+        assertThat(transactionDao.getById(3).first()).isEqualTo(transaction3)
+        assertThat(transactionDao.getById(4).first()).isEqualTo(transaction4)
     }
 
 }
