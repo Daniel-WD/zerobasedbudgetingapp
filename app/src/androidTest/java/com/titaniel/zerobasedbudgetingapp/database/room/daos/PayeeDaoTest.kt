@@ -4,32 +4,28 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDate
 
 class PayeeDaoTest {
 
     // Database
     private lateinit var database: Database
 
-    // Category dao
-    private lateinit var categoryDao: CategoryDao
+    // Payee dao
+    private lateinit var payeeDao: PayeeDao
 
-    // Example budgets
-    private val category1 = Category("cat1")
-    private val category2 = Category("cat2")
-    private val category3 = Category("cat3")
-    private val category4 = Category("cat4")
+    // Example payees
+    private val payee1 = Payee("payee1")
+    private val payee2 = Payee("payee2")
+    private val payee3 = Payee("payee3")
+    private val payee4 = Payee("payee4")
 
     @Before
     fun setup() {
@@ -40,12 +36,12 @@ class PayeeDaoTest {
                 Database::class.java
         ).build()
 
-        // Get category dao
-        categoryDao = database.categoryDao()
+        // Get payee dao
+        payeeDao = database.payeeDao()
 
         GlobalScope.launch {
             // Add example budgets
-            categoryDao.add(category1, category2, category3, category4)
+            payeeDao.add(payee1, payee2, payee3, payee4)
         }
     }
 
@@ -59,7 +55,7 @@ class PayeeDaoTest {
     fun gets_categories_correctly() {
         GlobalScope.launch {
             // Check that all expected elements are in database
-            assertThat(categoryDao.getAll().first()).isEqualTo(listOf(category1, category2, category3, category4))
+            assertThat(payeeDao.getAll().first()).isEqualTo(listOf(payee1, payee2, payee3, payee4))
         }
     }
 
