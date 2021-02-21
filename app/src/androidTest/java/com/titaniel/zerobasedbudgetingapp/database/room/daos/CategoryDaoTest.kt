@@ -20,10 +20,10 @@ import java.time.LocalDate
 class CategoryDaoTest {
 
     // Database
-    lateinit var database: Database
+    private lateinit var database: Database
 
     // Category dao
-    lateinit var categoryDao: CategoryDao
+    private lateinit var categoryDao: CategoryDao
 
     // Example categories
     private val category1 = Category("cat1")
