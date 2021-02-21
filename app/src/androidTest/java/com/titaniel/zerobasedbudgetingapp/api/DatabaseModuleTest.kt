@@ -10,10 +10,14 @@ import org.junit.Test
 
 class DatabaseModuleTest {
 
-    // DatabaseModule
+    /**
+     * Database module to test
+     */
     private val databaseModule = DatabaseModule()
 
-    // Database
+    /**
+     * Database
+     */
     private lateinit var database: Database
 
     @Before

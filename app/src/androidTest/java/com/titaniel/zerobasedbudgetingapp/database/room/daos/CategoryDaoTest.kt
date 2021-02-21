@@ -19,13 +19,19 @@ import java.time.LocalDate
 
 class CategoryDaoTest {
 
-    // Database
+    /**
+     * Database
+     */
     private lateinit var database: Database
 
-    // Category dao
+    /**
+     * CategoryDao to test
+     */
     private lateinit var categoryDao: CategoryDao
 
-    // Example categories
+    /**
+     * Example categories
+     */
     private val category1 = Category("cat1")
     private val category2 = Category("cat2")
     private val category3 = Category("cat3")

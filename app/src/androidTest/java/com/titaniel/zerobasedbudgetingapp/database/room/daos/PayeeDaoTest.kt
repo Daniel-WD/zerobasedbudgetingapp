@@ -15,13 +15,19 @@ import org.junit.Test
 
 class PayeeDaoTest {
 
-    // Database
+    /**
+     * Database
+     */
     private lateinit var database: Database
 
-    // Payee dao
+    /**
+     * PayeeDao to test
+     */
     private lateinit var payeeDao: PayeeDao
 
-    // Example payees
+    /**
+     * Example payees
+     */
     private val payee1 = Payee("payee1")
     private val payee2 = Payee("payee2")
     private val payee3 = Payee("payee3")

@@ -15,13 +15,19 @@ import java.time.LocalDate
 
 class BudgetDaoTest {
 
-    // Database
+    /**
+     * Database
+     */
     private lateinit var database: Database
 
-    // Budget dao
+    /**
+     * BudgetDao to test
+     */
     private lateinit var budgetDao: BudgetDao
 
-    // Example budgets
+    /**
+     * Example budgets
+     */
     private val budget1 = Budget("cat1", LocalDate.of(1999, 5, 1), 100)
     private val budget2 = Budget("cat99", LocalDate.of(1999, 5, 1), 100)
     private val budget3 = Budget("cat2", LocalDate.of(2000, 12, 1), 100)

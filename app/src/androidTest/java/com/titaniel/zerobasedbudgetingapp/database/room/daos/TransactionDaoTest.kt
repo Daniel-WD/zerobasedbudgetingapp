@@ -15,13 +15,19 @@ import java.time.LocalDate
 
 class TransactionDaoTest {
 
-    // Database
+    /**
+     * Database
+     */
     private lateinit var database: Database
 
-    // Transaction dao
+    /**
+     * TransactionDao to test
+     */
     private lateinit var transactionDao: TransactionDao
 
-    // Example transactions
+    /**
+     * Example transactions
+     */
     private val transaction1 = Transaction(1, "payee1", "cat1", "", LocalDate.now())
             .apply { id = 1 }
     private val transaction2 = Transaction(2, "payee1", "cat2", "", LocalDate.now())
