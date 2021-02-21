@@ -48,9 +48,8 @@ class BudgetDaoTest {
     }
 
     @Test
-    fun adds_gets_budgets_correctly() {
+    fun gets_budgets_correctly() {
         GlobalScope.launch {
-            // Check that all expected elements are in database
             assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget2, budget3))
         }
     }

@@ -52,9 +52,8 @@ class PayeeDaoTest {
     }
 
     @Test
-    fun gets_categories_correctly() {
+    fun gets_payees_correctly() {
         GlobalScope.launch {
-            // Check that all expected elements are in database
             assertThat(payeeDao.getAll().first()).isEqualTo(listOf(payee1, payee2, payee3, payee4))
         }
     }
