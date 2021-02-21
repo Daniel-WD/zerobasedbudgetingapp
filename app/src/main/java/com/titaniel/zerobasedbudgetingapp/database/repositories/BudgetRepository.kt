@@ -31,14 +31,14 @@ class BudgetRepository @Inject constructor(
      * Get budget with [id]
      */
     fun getBudgetById(id: Long): Flow<Budget> {
-        return budgetDao.getBudgetById(id)
+        return budgetDao.getById(id)
     }
 
     /**
      * Get budgets with [month]
      */
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>> {
-        return budgetDao.getBudgetsByMonth(month)
+        return budgetDao.getByMonth(month)
     }
 
 }

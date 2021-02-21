@@ -20,15 +20,15 @@ class TransactionRepositoryTest {
     private lateinit var transactionDaoMock: TransactionDao
 
     /**
+     * Example transaction mock
+     */
+    @Mock
+    private lateinit var transactionMock: Transaction
+
+    /**
      * TransactionRepository to test
      */
     private lateinit var transactionRepository: TransactionRepository
-
-    /**
-     * Example [transaction]
-     */
-    @Mock
-    private lateinit var transaction: Transaction
 
     @Before
     fun setup() {
@@ -38,28 +38,28 @@ class TransactionRepositoryTest {
     @Test
     fun performs_add_transactions_correctly(): Unit = runBlocking {
         // Add transaction
-        transactionRepository.addTransactions(transaction)
+        transactionRepository.addTransactions(transactionMock)
 
         // Verify add transaction on dao
-        verify(transactionDaoMock).add(transaction)
+        verify(transactionDaoMock).add(transactionMock)
     }
 
     @Test
     fun performs_delete_transactions_correctly(): Unit = runBlocking {
         // Delete transaction
-        transactionRepository.deleteTransactions(transaction)
+        transactionRepository.deleteTransactions(transactionMock)
 
         // Verify delete transaction on dao
-        verify(transactionDaoMock).delete(transaction)
+        verify(transactionDaoMock).delete(transactionMock)
     }
 
     @Test
     fun performs_update_transactions_correctly(): Unit = runBlocking {
         // Update transaction
-        transactionRepository.updateTransactions(transaction)
+        transactionRepository.updateTransactions(transactionMock)
 
         // Verify update transaction on dao
-        verify(transactionDaoMock).update(transaction)
+        verify(transactionDaoMock).update(transactionMock)
     }
 
     @Test

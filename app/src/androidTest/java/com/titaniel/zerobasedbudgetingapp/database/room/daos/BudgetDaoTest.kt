@@ -76,16 +76,16 @@ class BudgetDaoTest {
 
     @Test
     fun gets_budget_by_id_correctly(): Unit = runBlocking {
-        assertThat(budgetDao.getBudgetById(1).first()).isEqualTo(budget1)
-        assertThat(budgetDao.getBudgetById(2).first()).isEqualTo(budget2)
-        assertThat(budgetDao.getBudgetById(3).first()).isEqualTo(budget3)
+        assertThat(budgetDao.getById(1).first()).isEqualTo(budget1)
+        assertThat(budgetDao.getById(2).first()).isEqualTo(budget2)
+        assertThat(budgetDao.getById(3).first()).isEqualTo(budget3)
     }
 
     @Test
     fun gets_budgets_by_month_correctly(): Unit = runBlocking {
-        assertThat(budgetDao.getBudgetsByMonth(LocalDate.of(1999, 5, 1)).first())
+        assertThat(budgetDao.getByMonth(LocalDate.of(1999, 5, 1)).first())
                 .isEqualTo(listOf(budget1, budget2))
-        assertThat(budgetDao.getBudgetsByMonth(LocalDate.of(2000, 12, 1)).first())
+        assertThat(budgetDao.getByMonth(LocalDate.of(2000, 12, 1)).first())
                 .isEqualTo(listOf(budget3))
     }
 
