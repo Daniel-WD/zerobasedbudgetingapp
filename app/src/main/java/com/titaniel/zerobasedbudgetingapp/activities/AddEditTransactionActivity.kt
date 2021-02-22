@@ -8,9 +8,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.appbar.MaterialToolbar
@@ -51,14 +51,14 @@ class AddEditTransactionViewModel @Inject constructor(
     val pay = MutableLiveData(0L)
 
     /**
-     * [payee] of transaction
+     * [payeeName] of transaction
      */
-    val payee = MutableLiveData("")
+    val payeeName = MutableLiveData("")
 
     /**
-     * [category] of transaction
+     * [categoryName] of transaction
      */
-    val category = MutableLiveData("")
+    val categoryName = MutableLiveData("")
 
     /**
      * [description] of transaction
@@ -92,15 +92,20 @@ class AddEditTransactionViewModel @Inject constructor(
      * When [editTransaction] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
      */
     fun applyData() {
+        // Validate data
+        if(payeeName.value!!.isBlank() || categoryName.value!!.isBlank() || date.value == null) {
+            throw IllegalArgumentException("Invalid data")
+        }
+
         // Check if should edit transaction
         if (editTransaction.value != null) { // Edit transaction
 
             // Apply new values
             editTransaction.value!!.pay = pay.value!!
-            editTransaction.value!!.payeeName = payee.value!!
-            editTransaction.value!!.categoryName = category.value!!
+            editTransaction.value!!.payeeName = payeeName.value!!
+            editTransaction.value!!.categoryName = categoryName.value!!
             editTransaction.value!!.date = date.value!!
-            editTransaction.value!!.description = description.value!!
+            editTransaction.value!!.description = description.value!!.trim()
 
             // Update transaction
             viewModelScope.launch {
@@ -111,15 +116,15 @@ class AddEditTransactionViewModel @Inject constructor(
 
             viewModelScope.launch {
                 // Add payee if new
-                payeeRepository.addPayees(Payee(payee.value!!))
+                payeeRepository.addPayees(Payee(payeeName.value!!))
 
                 // Save new transaction
                 transactionRepository.addTransactions(
                         Transaction(
                                 pay.value!!,
-                                payee.value!!,
-                                category.value!!.trim(),
-                                description.value!!,
+                                payeeName.value!!,
+                                categoryName.value!!,
+                                description.value!!.trim(),
                                 date.value!!
                         )
                 )
@@ -251,8 +256,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
                 etDescription.setText(it.description)
 
-                viewModel.payee.value = it.payeeName
-                viewModel.category.value = it.categoryName
+                viewModel.payeeName.value = it.payeeName
+                viewModel.categoryName.value = it.categoryName
                 viewModel.date.value = it.date
 
                 // Set value text cursor to end
@@ -307,12 +312,12 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Set payee observer
-        viewModel.payee.observe(this) {
+        viewModel.payeeName.observe(this) {
             tvPayee.text = it
         }
 
         // Set model observer
-        viewModel.category.observe(this) {
+        viewModel.categoryName.observe(this) {
             tvCategory.text =
                     if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it
         }
@@ -385,7 +390,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         supportFragmentManager
                 .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
                     val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
-                    payee?.let { viewModel.payee.value = it }
+                    payee?.let { viewModel.payeeName.value = it }
                     checkCreateApplyEnabled()
                 }
 
@@ -393,7 +398,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         supportFragmentManager
                 .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
                     val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
-                    category?.let { viewModel.category.value = it }
+                    category?.let { viewModel.categoryName.value = it }
                     checkCreateApplyEnabled()
                 }
 
@@ -417,7 +422,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private fun checkCreateApplyEnabled() {
         fabCreateApply.isEnabled =
-                viewModel.payee.value?.isNotBlank() == true && viewModel.category.value?.isNotBlank() == true && viewModel.date.value != null
+                viewModel.payeeName.value!!.isNotBlank() && viewModel.categoryName.value!!.isNotBlank() && viewModel.date.value != null
     }
 
 }
