@@ -36,9 +36,8 @@ class UpdateBudgetViewModel @Inject constructor(
     /**
      * Budget to edit
      */
-    val budget =
-            budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
-                    .asLiveData()
+    val budget = budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+            .asLiveData()
 
     /**
      * Update budget with [budgeted] value

@@ -10,7 +10,6 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -163,10 +162,10 @@ class AddEditTransactionViewModelWithoutEditTransactionTest: CoroutinesAndLiveDa
 class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataTest() {
 
     /**
-     * SavedStateHandle mock
+     * SavedStateHandle spy
      */
     @Spy
-    private lateinit var savedStateHandleMock: SavedStateHandle
+    private lateinit var savedStateHandleSpy: SavedStateHandle
 
     /**
      * TransactionRepository mock
@@ -198,7 +197,7 @@ class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataT
         super.setup()
 
         // Set editTransaction id
-        savedStateHandleMock.set(AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY, editTransaction.id)
+        savedStateHandleSpy.set(AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY, editTransaction.id)
 
         // Stub getTransactionById of transaction repository
         `when`(transactionRepositoryMock.getTransactionById(editTransaction.id))
@@ -206,7 +205,7 @@ class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataT
 
         // Create ViewModel to test
         addEditTransactionViewModel = AddEditTransactionViewModel(
-                savedStateHandleMock,
+                savedStateHandleSpy,
                 transactionRepositoryMock,
                 payeeRepositoryMock
         )
