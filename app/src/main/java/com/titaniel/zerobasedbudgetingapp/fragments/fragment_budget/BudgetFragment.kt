@@ -275,7 +275,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         listBudgeting.layoutManager = LinearLayoutManager(requireContext())
 
         // Add adapter
-        listBudgeting.adapter = BudgetingListAdapter(
+        listBudgeting.adapter = BudgetListAdapter(
                 viewModel.budgetsOfMonth,
                 viewModel.availableMoney,
                 { budget -> // budget click
