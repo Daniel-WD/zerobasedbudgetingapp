@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -39,10 +40,12 @@ class BudgetViewModel @Inject constructor(
         private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
+    // FIXME -> should be private after month can be set by the user
+    @VisibleForTesting()
     /**
      * Month
      */
-    private val month = MutableLiveData(LocalDate.of(2021, 2, 1))
+    val month = MutableLiveData(LocalDate.of(2021, 2, 1))
 
     /**
      * All categories
@@ -65,9 +68,14 @@ class BudgetViewModel @Inject constructor(
     val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
 
     /**
-     * All budgets of selected month
+     * All budgets of selected month TODO -> update when month is set, could be erased....
      */
-    val budgets = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
+    val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
+
+    /**
+     * All budgets
+     */
+    val allBudgets = budgetRepository.getAllBudgets().asLiveData()
 
     /**
      * All transactions
@@ -75,7 +83,7 @@ class BudgetViewModel @Inject constructor(
     val transactions = transactionRepository.getAllTransactions().asLiveData()
 
     /**
-     * Available money per category
+     * Available money per budget
      */
     val availableMoney: MutableLiveData<Map<Budget, Long>> = MutableLiveData(emptyMap())
 
@@ -112,11 +120,27 @@ class BudgetViewModel @Inject constructor(
             }
 
     /**
-     * ViewModel observer for budgets
+     * ViewModel observer for budgetsOfMonth
      */
-    private val budgetsObserver: Observer<List<Budget>> =
+    private val budgetsOfMonthObserver: Observer<List<Budget>> =
+            Observer {
+                checkBudgets()
+                updateAvailableMoney()
+            }
+
+    /**
+     * ViewModel observer for allBudgets
+     */
+    private val allBudgetsObserver: Observer<List<Budget>> =
             Observer {
                 updateToBeBudgeted()
+            }
+
+    /**
+     * ViewModel observer for month
+     */
+    private val monthObserver: Observer<LocalDate> =
+            Observer {
                 checkBudgets()
                 updateAvailableMoney()
             }
@@ -127,7 +151,9 @@ class BudgetViewModel @Inject constructor(
         budgetsOfCategories.observeForever(budgetsOfCategoriesObserver)
         transactionsOfCategories.observeForever(transactionsOfCategoriesObserver)
         transactions.observeForever(transactionsObserver)
-        budgets.observeForever(budgetsObserver)
+        budgetsOfMonth.observeForever(budgetsOfMonthObserver)
+        allBudgets.observeForever(allBudgetsObserver)
+        month.observeForever(monthObserver)
     }
 
     override fun onCleared() {
@@ -138,29 +164,32 @@ class BudgetViewModel @Inject constructor(
         budgetsOfCategories.removeObserver(budgetsOfCategoriesObserver)
         transactionsOfCategories.removeObserver(transactionsOfCategoriesObserver)
         transactions.removeObserver(transactionsObserver)
-        budgets.removeObserver(budgetsObserver)
+        budgetsOfMonth.removeObserver(budgetsOfMonthObserver)
+        month.removeObserver(monthObserver)
+        allBudgets.removeObserver(allBudgetsObserver)
     }
 
     /**
      * Updates [availableMoney]
      */
-    private fun updateAvailableMoney() {
-        val buds = budgets.value
+    private fun updateAvailableMoney() { //TODO After first test iteration month filter to database?
+        val budsMon = budgetsOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
+        val mon = month.value
 
-        if (buds != null && transOfCats != null && budsOfCats != null) {
-            // Update available money per category
-            availableMoney.value = buds.map { budget ->
+        if (budsMon != null && transOfCats != null && budsOfCats != null && mon != null) {
+            // Update available money per budget
+            availableMoney.value = budsMon.map { budget ->
                 budget to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
-                                ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= month.value!! }
+                                ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= mon }
                                 ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
                         budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
-                                .filter { bud -> bud.month <= month.value!! }
+                                .filter { bud -> bud.month <= mon }
                                 .fold(0L, { acc, bud -> acc + bud.budgeted })
 
             }.toMap()
@@ -172,14 +201,13 @@ class BudgetViewModel @Inject constructor(
      * Update [toBeBudgeted]
      */
     private fun updateToBeBudgeted() {
-        val transactions = transactions.value
-        val budgets = budgets.value
+        val trans = transactions.value
+        val buds = allBudgets.value
 
-        if (transactions != null && budgets != null) {
-            toBeBudgeted.value = transactions.filter { it.categoryName == Category.TO_BE_BUDGETED }
+        if (trans != null && buds != null) {
+            toBeBudgeted.value = trans.filter { it.categoryName == Category.TO_BE_BUDGETED }
                     .fold(0L, { acc, transaction -> acc + transaction.pay }) -
-                    budgets.fold(0L, { acc, budget -> acc + budget.budgeted })
-
+                    buds.fold(0L, { acc, budget -> acc + budget.budgeted })
         }
     }
 
@@ -188,11 +216,14 @@ class BudgetViewModel @Inject constructor(
      */
     private fun checkBudgets() {
         val cats = categories.value
-        val buds = budgets.value
-        if (cats != null && buds != null) {
+        val budsMon = budgetsOfMonth.value
+        val mon = month.value
+
+        if (cats != null && budsMon != null && mon != null) {
             val missingBudgets =
-                    cats.filter { category -> buds.find { budget -> budget.categoryName == category.name } == null }
-                            .map { category -> Budget(category.name, month.value!!, 0) }
+                    // TODO doc
+                    cats.filter { category -> budsMon.find { budget -> budget.categoryName == category.name } == null }
+                            .map { category -> Budget(category.name, mon, 0) }
                             .toTypedArray()
             viewModelScope.launch {
                 budgetRepository.addBudgets(*missingBudgets)
@@ -245,7 +276,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
         // Add adapter
         listBudgeting.adapter = BudgetingListAdapter(
-                viewModel.budgets,
+                viewModel.budgetsOfMonth,
                 viewModel.availableMoney,
                 { budget -> // budget click
 

@@ -95,7 +95,7 @@ class AddEditTransactionViewModel @Inject constructor(
         // Validate data
         if(payeeName.value!!.isBlank() || categoryName.value!!.isBlank() || date.value == null) {
             throw IllegalArgumentException("Invalid data")
-        }
+        } // TODO -> own method and use in activity
 
         // Check if should edit transaction
         if (editTransaction.value != null) { // Edit transaction

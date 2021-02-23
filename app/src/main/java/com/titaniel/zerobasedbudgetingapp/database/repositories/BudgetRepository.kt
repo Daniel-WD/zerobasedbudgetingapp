@@ -28,6 +28,13 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Get all budgets
+     */
+    fun getAllBudgets(): Flow<List<Budget>> { // TODO: TEST
+        return budgetDao.getAll()
+    }
+
+    /**
      * Get budget with [id]
      */
     fun getBudgetById(id: Long): Flow<Budget> {
