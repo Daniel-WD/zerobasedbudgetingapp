@@ -8,9 +8,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.appbar.MaterialToolbar
@@ -27,13 +28,16 @@ import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.Select
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.TestOnly
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+
 
 /**
  * [AddEditTransactionViewModel] for [AddEditTransactionActivity] with [savedStateHandle], [transactionRepository] and [payeeRepository]
@@ -53,7 +57,7 @@ class AddEditTransactionViewModel @Inject constructor(
     /**
      * [payeeName] of transaction
      */
-    val payeeName = MutableLiveData("")
+    val payeeName = MutableLiveData<String>()
 
     /**
      * [categoryName] of transaction
@@ -161,7 +165,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * View model
      */
-    private val viewModel: AddEditTransactionViewModel by viewModels()
+    val viewModel: AddEditTransactionViewModel by provideViewModel()
 
     /**
      * Toolbar
@@ -251,17 +255,15 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 etPay.setText(it.pay.toString())
 
                 // Set value text cursor to end
-                etPay.setSelection(etPay.text.length)
+                etPay.setSelection(etPay.text.length) // TODO: -> onTextChanged?
 
+                // TODO doc
 
-                etDescription.setText(it.description)
+                etDescription.setText(it.description) // TODO -> 2 Way binding?
 
                 viewModel.payeeName.value = it.payeeName
                 viewModel.categoryName.value = it.categoryName
                 viewModel.date.value = it.date
-
-                // Set value text cursor to end
-                etPay.setSelection(etPay.text.length)
 
                 // Update save btn enabled
                 checkCreateApplyEnabled()

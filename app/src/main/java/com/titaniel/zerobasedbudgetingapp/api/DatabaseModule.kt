@@ -7,11 +7,14 @@ import com.titaniel.zerobasedbudgetingapp.database.room.daos.BudgetDao
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.PayeeDao
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 /**
