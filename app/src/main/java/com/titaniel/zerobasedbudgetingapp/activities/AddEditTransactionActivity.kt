@@ -5,6 +5,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
@@ -165,6 +166,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * View model
      */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: AddEditTransactionViewModel by provideViewModel()
 
     /**
