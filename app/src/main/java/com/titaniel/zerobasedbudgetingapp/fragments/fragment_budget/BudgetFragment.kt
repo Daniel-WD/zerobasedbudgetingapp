@@ -24,6 +24,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -63,6 +64,16 @@ class BudgetViewModel @Inject constructor(
     private val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
+     * All budgets
+     */
+    private val allBudgets = budgetRepository.getAllBudgets().asLiveData()
+
+    /**
+     * All transactions
+     */
+    private val transactions = transactionRepository.getAllTransactions().asLiveData()
+
+    /**
      * To be budgeted
      */
     val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
@@ -71,16 +82,6 @@ class BudgetViewModel @Inject constructor(
      * All budgets of selected month TODO -> update when month is set, could be erased....
      */
     val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
-
-    /**
-     * All budgets
-     */
-    val allBudgets = budgetRepository.getAllBudgets().asLiveData()
-
-    /**
-     * All transactions
-     */
-    val transactions = transactionRepository.getAllTransactions().asLiveData()
 
     /**
      * Available money per budget
@@ -257,7 +258,8 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     /**
      * View model
      */
-    private val viewModel: BudgetViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: BudgetViewModel by provideViewModel()
 
     override fun onStart() {
         super.onStart()
@@ -268,7 +270,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         listBudgeting = requireView().findViewById(R.id.listBudgeting)
 
         // Setup toolbar
-        toolbar.menu
+        toolbar.menu //TODO ???
 
         // Init list categories
         // Set layout manager

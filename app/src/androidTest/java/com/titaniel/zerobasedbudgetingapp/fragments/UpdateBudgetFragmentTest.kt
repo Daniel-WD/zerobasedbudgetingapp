@@ -47,7 +47,7 @@ class UpdateBudgetFragmentTest {
         `when`(mockViewModel.budget).thenReturn(MutableLiveData(exampleBudget))
 
         // Launch scenario
-        launchFragmentInHiltContainer<UpdateBudgetFragment>(bundleOf(UpdateBudgetFragment.BUDGET_ID_KEY to -1)) {
+        launchFragmentInHiltContainer<UpdateBudgetFragment> {
             (this as UpdateBudgetFragment).apply {
                 replace(UpdateBudgetFragment::viewModel, mockViewModel)
                 testFragment = this

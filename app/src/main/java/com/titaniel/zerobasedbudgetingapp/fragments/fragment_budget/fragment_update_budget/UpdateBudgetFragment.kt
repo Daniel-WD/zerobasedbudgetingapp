@@ -115,6 +115,10 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budget observer
         viewModel.budget.observe(viewLifecycleOwner) {
+            // Check budget non-null
+            if(it == null) {
+                return@observe
+            }
 
             // Set category name
             tvCategory.text = it.categoryName
