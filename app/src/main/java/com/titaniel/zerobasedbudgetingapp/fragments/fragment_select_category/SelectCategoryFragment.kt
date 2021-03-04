@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -17,6 +18,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -62,7 +64,8 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     /**
      * View model
      */
-    private val viewModel: SelectCategoryViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: SelectCategoryViewModel by provideViewModel()
 
     override fun onCreateView(
             inflater: LayoutInflater,

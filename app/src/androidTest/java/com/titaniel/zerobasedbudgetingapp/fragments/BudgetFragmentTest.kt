@@ -228,7 +228,7 @@ class BudgetFragmentTest {
                     0,
                     click()
                 )
-            );
+            )
 
         // Check if UpdateBudgetFragment has been opened
         onView(withId(R.id.etBudgeted)).check(matches(isDisplayed()))
