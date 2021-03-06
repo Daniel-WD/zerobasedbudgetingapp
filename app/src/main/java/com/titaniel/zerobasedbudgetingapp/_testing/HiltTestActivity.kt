@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.titaniel.zerobasedbudgetingapp
+package com.titaniel.zerobasedbudgetingapp._testing
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint

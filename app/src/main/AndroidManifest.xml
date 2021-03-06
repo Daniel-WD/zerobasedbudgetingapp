@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.AddEditTransactionActivity" />
-        <activity android:name=".HiltTestActivity" />
+        <activity android:name="._testing.HiltTestActivity" />
     </application>
 
 </manifest>

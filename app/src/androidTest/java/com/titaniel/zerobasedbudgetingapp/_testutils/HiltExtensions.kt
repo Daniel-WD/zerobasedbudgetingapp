@@ -27,7 +27,7 @@ import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import com.titaniel.zerobasedbudgetingapp.HiltTestActivity
+import com.titaniel.zerobasedbudgetingapp._testing.HiltTestActivity
 import com.titaniel.zerobasedbudgetingapp.R
 
 /**
