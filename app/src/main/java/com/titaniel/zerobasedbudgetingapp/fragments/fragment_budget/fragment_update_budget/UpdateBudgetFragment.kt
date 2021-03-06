@@ -11,7 +11,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -31,14 +30,15 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpdateBudgetViewModel @Inject constructor(
-        savedStateHandle: SavedStateHandle,
-        private val budgetRepository: BudgetRepository
+    savedStateHandle: SavedStateHandle,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
      * Budget to edit
      */
-    val budget = budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+    val budget =
+        budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
             .asLiveData()
 
     /**
@@ -97,9 +97,9 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     val viewModel: UpdateBudgetViewModel by provideViewModel()
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_update_budget, container, false)
@@ -116,7 +116,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         // Budget observer
         viewModel.budget.observe(viewLifecycleOwner) {
             // Check budget non-null
-            if(it == null) {
+            if (it == null) {
                 return@observe
             }
 
@@ -165,7 +165,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budgeted value
         val budgeted =
-                if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
+            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
 
         viewModel.updateBudget(budgeted)
 

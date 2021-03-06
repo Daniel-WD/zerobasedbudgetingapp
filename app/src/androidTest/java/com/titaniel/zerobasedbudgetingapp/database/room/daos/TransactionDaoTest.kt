@@ -28,21 +28,21 @@ class TransactionDaoTest {
      * Example transactions
      */
     private val transaction1 = Transaction(1, "payee1", "cat1", "", LocalDate.now())
-            .apply { id = 1 }
+        .apply { id = 1 }
     private val transaction2 = Transaction(2, "payee1", "cat2", "", LocalDate.now())
-            .apply { id = 2 }
+        .apply { id = 2 }
     private val transaction3 = Transaction(3, "payee1", "cat2", "", LocalDate.now())
-            .apply { id = 3 }
+        .apply { id = 3 }
     private val transaction4 = Transaction(4, "payee1", "cat1", "", LocalDate.now())
-            .apply { id = 4 }
+        .apply { id = 4 }
 
     @Before
     fun setup(): Unit = runBlocking {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                Database::class.java
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            Database::class.java
         ).build()
 
         // Get payee dao
@@ -60,7 +60,14 @@ class TransactionDaoTest {
 
     @Test
     fun gets_transactions_correctly(): Unit = runBlocking {
-        assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
+        assertThat(transactionDao.getAll().first()).isEqualTo(
+            listOf(
+                transaction1,
+                transaction2,
+                transaction3,
+                transaction4
+            )
+        )
     }
 
     @Test
@@ -83,7 +90,14 @@ class TransactionDaoTest {
         // Update transactions
         transactionDao.update(transaction1, transaction3)
 
-        assertThat(transactionDao.getAll().first()).isEqualTo(listOf(transaction1, transaction2, transaction3, transaction4))
+        assertThat(transactionDao.getAll().first()).isEqualTo(
+            listOf(
+                transaction1,
+                transaction2,
+                transaction3,
+                transaction4
+            )
+        )
     }
 
     @Test

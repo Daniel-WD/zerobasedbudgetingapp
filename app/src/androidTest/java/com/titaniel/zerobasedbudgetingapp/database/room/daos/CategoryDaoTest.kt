@@ -41,8 +41,8 @@ class CategoryDaoTest {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                Database::class.java
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            Database::class.java
         ).build()
 
         // Get category dao
@@ -60,7 +60,14 @@ class CategoryDaoTest {
 
     @Test
     fun gets_categories_correctly(): Unit = runBlocking {
-        assertThat(categoryDao.getAll().first()).isEqualTo(listOf(category1, category2, category3, category4))
+        assertThat(categoryDao.getAll().first()).isEqualTo(
+            listOf(
+                category1,
+                category2,
+                category3,
+                category4
+            )
+        )
     }
 
     @Test
@@ -75,21 +82,24 @@ class CategoryDaoTest {
         val transaction6 = Transaction(6, "payee1", "cat5", "", LocalDate.now())
 
         // Define expected TransactionsOfCategories
-        val transactionsOfCategory1 = TransactionsOfCategory(category1, listOf(transaction1, transaction4))
-        val transactionsOfCategory2 = TransactionsOfCategory(category2, listOf(transaction2, transaction3))
+        val transactionsOfCategory1 =
+            TransactionsOfCategory(category1, listOf(transaction1, transaction4))
+        val transactionsOfCategory2 =
+            TransactionsOfCategory(category2, listOf(transaction2, transaction3))
         val transactionsOfCategory3 = TransactionsOfCategory(category3, listOf(transaction5))
         val transactionsOfCategory4 = TransactionsOfCategory(category4, emptyList())
 
         // Add transactions to database
-        database.transactionDao().add(transaction1, transaction2, transaction3, transaction4, transaction5, transaction6)
+        database.transactionDao()
+            .add(transaction1, transaction2, transaction3, transaction4, transaction5, transaction6)
 
         assertThat(categoryDao.getTransactionsOfCategories().first()).isEqualTo(
-                listOf(
-                        transactionsOfCategory1,
-                        transactionsOfCategory2,
-                        transactionsOfCategory3,
-                        transactionsOfCategory4
-                )
+            listOf(
+                transactionsOfCategory1,
+                transactionsOfCategory2,
+                transactionsOfCategory3,
+                transactionsOfCategory4
+            )
         )
     }
 
@@ -114,12 +124,12 @@ class CategoryDaoTest {
         database.budgetDao().add(budget1, budget2, budget3, budget4, budget5, budget6)
 
         assertThat(categoryDao.getBudgetsOfCategories().first()).isEqualTo(
-                listOf(
-                        budgetsOfCategory1,
-                        budgetsOfCategory2,
-                        budgetsOfCategory3,
-                        budgetsOfCategory4
-                )
+            listOf(
+                budgetsOfCategory1,
+                budgetsOfCategory2,
+                budgetsOfCategory3,
+                budgetsOfCategory4
+            )
         )
     }
 

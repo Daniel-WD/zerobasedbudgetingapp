@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Repository to interact with payee data
  */
 class PayeeRepository @Inject constructor(
-        private val payeeDao: PayeeDao
+    private val payeeDao: PayeeDao
 ) {
 
     /**

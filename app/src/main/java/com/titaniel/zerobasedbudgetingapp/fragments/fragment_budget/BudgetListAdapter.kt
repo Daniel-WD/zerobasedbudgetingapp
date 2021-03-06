@@ -16,11 +16,11 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
  * Needs [lifecycleOwner].
  */
 class BudgetListAdapter(
-        private val budgetsOfMonth: LiveData<List<Budget>>,
-        private val availableMoney: LiveData<Map<Budget, Long>>,
-        private val itemClickedListener: (Budget) -> Unit,
-        private val context: Context,
-        lifecycleOwner: LifecycleOwner
+    private val budgetsOfMonth: LiveData<List<Budget>>,
+    private val availableMoney: LiveData<Map<Budget, Long>>,
+    private val itemClickedListener: (Budget) -> Unit,
+    private val context: Context,
+    lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<BudgetListAdapter.BudgetingItem>() {
 
     init {

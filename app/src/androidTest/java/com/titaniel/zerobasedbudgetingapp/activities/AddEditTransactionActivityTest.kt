@@ -19,8 +19,6 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.text.IsEmptyString.isEmptyString
 import org.junit.After

@@ -1,14 +1,10 @@
 package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
-import com.titaniel.zerobasedbudgetingapp.database.room.daos.PayeeDao
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 

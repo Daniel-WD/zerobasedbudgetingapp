@@ -8,8 +8,11 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +24,7 @@ import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
-class AddEditTransactionViewModelWithoutEditTransactionTest: CoroutinesAndLiveDataTest() {
+class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveDataTest() {
 
     /**
      * SavedStateHandle mock
@@ -56,9 +59,9 @@ class AddEditTransactionViewModelWithoutEditTransactionTest: CoroutinesAndLiveDa
 
         // Create ViewModel to test
         addEditTransactionViewModel = AddEditTransactionViewModel(
-                savedStateHandleMock,
-                transactionRepositoryMock,
-                payeeRepositoryMock
+            savedStateHandleMock,
+            transactionRepositoryMock,
+            payeeRepositoryMock
         )
 
     }
@@ -98,7 +101,8 @@ class AddEditTransactionViewModelWithoutEditTransactionTest: CoroutinesAndLiveDa
         addEditTransactionViewModel.description.value = description
         addEditTransactionViewModel.date.value = date
 
-        val expectedTransaction = Transaction(pay, payeeName, categoryName, description.trim(), date)
+        val expectedTransaction =
+            Transaction(pay, payeeName, categoryName, description.trim(), date)
 
         // Apply data
         addEditTransactionViewModel.applyData()
@@ -159,7 +163,7 @@ class AddEditTransactionViewModelWithoutEditTransactionTest: CoroutinesAndLiveDa
 }
 
 @RunWith(MockitoJUnitRunner::class)
-class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataTest() {
+class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveDataTest() {
 
     /**
      * SavedStateHandle spy
@@ -187,7 +191,8 @@ class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataT
     /**
      * Edit transaction
      */
-    private val editTransaction = Transaction(123, "payee", "category", "description", LocalDate.now())
+    private val editTransaction =
+        Transaction(123, "payee", "category", "description", LocalDate.now())
             .apply { id = 5 }
 
     @ObsoleteCoroutinesApi
@@ -197,17 +202,20 @@ class AddEditTransactionViewModelWithEditTransactionTest: CoroutinesAndLiveDataT
         super.setup()
 
         // Set editTransaction id
-        savedStateHandleSpy.set(AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY, editTransaction.id)
+        savedStateHandleSpy.set(
+            AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
+            editTransaction.id
+        )
 
         // Stub getTransactionById of transaction repository
         `when`(transactionRepositoryMock.getTransactionById(editTransaction.id))
-                .thenReturn(flow { emit(editTransaction) })
+            .thenReturn(flow { emit(editTransaction) })
 
         // Create ViewModel to test
         addEditTransactionViewModel = AddEditTransactionViewModel(
-                savedStateHandleSpy,
-                transactionRepositoryMock,
-                payeeRepositoryMock
+            savedStateHandleSpy,
+            transactionRepositoryMock,
+            payeeRepositoryMock
         )
 
     }

@@ -5,10 +5,10 @@ import org.mockito.Mockito
 object TestUtils {
 
     /**
-     * Mockit.any not null workaround
+     * Mockito.any not null workaround
      */
     fun <T> any(): T {
-        return Mockito.any<T>()
+        return Mockito.any()
     }
 
 }

@@ -4,7 +4,6 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -36,16 +35,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-        categoryRepository: CategoryRepository,
-        transactionRepository: TransactionRepository,
-        private val budgetRepository: BudgetRepository
+    categoryRepository: CategoryRepository,
+    transactionRepository: TransactionRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     // FIXME -> should be private after month can be set by the user
-    @VisibleForTesting()
-    /**
-     * Month
-     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+            /**
+             * Month
+             */
     val month = MutableLiveData(LocalDate.of(2021, 2, 1))
 
     /**
@@ -61,7 +60,8 @@ class BudgetViewModel @Inject constructor(
     /**
      * Transactions by categories
      */
-    private val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
+    private val transactionsOfCategories =
+        categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * All budgets
@@ -92,59 +92,59 @@ class BudgetViewModel @Inject constructor(
      * ViewModel observer for categories
      */
     private val categoriesObserver: Observer<List<Category>> =
-            Observer {
-                checkBudgets()
-            }
+        Observer {
+            checkBudgets()
+        }
 
     /**
      * ViewModel observer for budgetsOfCategories
      */
     private val budgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
-            Observer {
-                updateAvailableMoney()
-            }
+        Observer {
+            updateAvailableMoney()
+        }
 
     /**
      * ViewModel observer for transactionsOfCategories
      */
     private val transactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
-            Observer {
-                updateAvailableMoney()
-            }
+        Observer {
+            updateAvailableMoney()
+        }
 
     /**
      * ViewModel observer for transactions
      */
     private val transactionsObserver: Observer<List<Transaction>> =
-            Observer {
-                updateToBeBudgeted()
-            }
+        Observer {
+            updateToBeBudgeted()
+        }
 
     /**
      * ViewModel observer for budgetsOfMonth
      */
     private val budgetsOfMonthObserver: Observer<List<Budget>> =
-            Observer {
-                checkBudgets()
-                updateAvailableMoney()
-            }
+        Observer {
+            checkBudgets()
+            updateAvailableMoney()
+        }
 
     /**
      * ViewModel observer for allBudgets
      */
     private val allBudgetsObserver: Observer<List<Budget>> =
-            Observer {
-                updateToBeBudgeted()
-            }
+        Observer {
+            updateToBeBudgeted()
+        }
 
     /**
      * ViewModel observer for month
      */
     private val monthObserver: Observer<LocalDate> =
-            Observer {
-                checkBudgets()
-                updateAvailableMoney()
-            }
+        Observer {
+            checkBudgets()
+            updateAvailableMoney()
+        }
 
     init {
         // Register all observers
@@ -185,13 +185,13 @@ class BudgetViewModel @Inject constructor(
                 budget to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
-                                ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= mon }
-                                ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
+                            ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= mon }
+                            ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
                         budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
-                                .filter { bud -> bud.month <= mon }
-                                .fold(0L, { acc, bud -> acc + bud.budgeted })
+                            .filter { bud -> bud.month <= mon }
+                            .fold(0L, { acc, bud -> acc + bud.budgeted })
 
             }.toMap()
         }
@@ -207,7 +207,7 @@ class BudgetViewModel @Inject constructor(
 
         if (trans != null && buds != null) {
             toBeBudgeted.value = trans.filter { it.categoryName == Category.TO_BE_BUDGETED }
-                    .fold(0L, { acc, transaction -> acc + transaction.pay }) -
+                .fold(0L, { acc, transaction -> acc + transaction.pay }) -
                     buds.fold(0L, { acc, budget -> acc + budget.budgeted })
         }
     }
@@ -222,10 +222,10 @@ class BudgetViewModel @Inject constructor(
 
         if (cats != null && budsMon != null && mon != null) {
             val missingBudgets =
-                    // TODO doc
-                    cats.filter { category -> budsMon.find { budget -> budget.categoryName == category.name } == null }
-                            .map { category -> Budget(category.name, mon, 0) }
-                            .toTypedArray()
+                // TODO doc
+                cats.filter { category -> budsMon.find { budget -> budget.categoryName == category.name } == null }
+                    .map { category -> Budget(category.name, mon, 0) }
+                    .toTypedArray()
             viewModelScope.launch {
                 budgetRepository.addBudgets(*missingBudgets)
             }
@@ -278,33 +278,33 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
         // Add adapter
         listBudgeting.adapter = BudgetListAdapter(
-                viewModel.budgetsOfMonth,
-                viewModel.availableMoney,
-                { budget -> // budget click
+            viewModel.budgetsOfMonth,
+            viewModel.availableMoney,
+            { budget -> // budget click
 
-                    // Create update budget fragment
-                    val updateBudgetFragment = UpdateBudgetFragment()
+                // Create update budget fragment
+                val updateBudgetFragment = UpdateBudgetFragment()
 
-                    // Budget id as argument
-                    updateBudgetFragment.arguments =
-                            bundleOf(
-                                    UpdateBudgetFragment.BUDGET_ID_KEY to budget.id
-                            )
+                // Budget id as argument
+                updateBudgetFragment.arguments =
+                    bundleOf(
+                        UpdateBudgetFragment.BUDGET_ID_KEY to budget.id
+                    )
 
-                    // Show update budget fragment
-                    updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
+                // Show update budget fragment
+                updateBudgetFragment.show(childFragmentManager, "UpdateBudgetFragment")
 
-                },
-                requireContext(),
-                viewLifecycleOwner
+            },
+            requireContext(),
+            viewLifecycleOwner
         )
 
         // Add horizontal dividers
         listBudgeting.addItemDecoration(
-                DividerItemDecoration(
-                        context,
-                        DividerItemDecoration.VERTICAL
-                )
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
         )
 
         // Observe to be budgeted value

@@ -36,8 +36,8 @@ class PayeeDaoTest {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                Database::class.java
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            Database::class.java
         ).build()
 
         // Get payee dao

@@ -16,10 +16,10 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
  * Needs [lifecycleOwner].
  */
 class CategoriesListAdapter(
-        private val categories: LiveData<List<Category>>,
-        private val categoryClickedListener: (Category) -> Unit,
-        private val context: Context,
-        lifecycleOwner: LifecycleOwner
+    private val categories: LiveData<List<Category>>,
+    private val categoryClickedListener: (Category) -> Unit,
+    private val context: Context,
+    lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<CategoriesListAdapter.CategoryItem>() {
 
     init {

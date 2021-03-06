@@ -9,11 +9,11 @@ import java.time.LocalDate
  */
 @Entity
 data class Transaction(
-        var pay: Long,
-        var payeeName: String,
-        var categoryName: String,
-        var description: String,
-        var date: LocalDate
+    var pay: Long,
+    var payeeName: String,
+    var categoryName: String,
+    var description: String,
+    var date: LocalDate
 ) {
     /**
      * [Transaction] [id]

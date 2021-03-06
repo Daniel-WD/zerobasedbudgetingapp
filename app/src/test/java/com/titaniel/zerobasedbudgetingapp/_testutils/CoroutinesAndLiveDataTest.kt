@@ -3,16 +3,12 @@ package com.titaniel.zerobasedbudgetingapp._testutils
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 
 /**
  * Inherit this class when testing LiveData and when there are problems with coroutine tests

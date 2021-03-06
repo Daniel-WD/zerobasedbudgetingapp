@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +27,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SelectCategoryViewModel @Inject constructor(
-        categoryRepository: CategoryRepository
+    categoryRepository: CategoryRepository
 ) : ViewModel() {
 
     /**
@@ -68,9 +67,9 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     val viewModel: SelectCategoryViewModel by provideViewModel()
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_select_category, container, false)
@@ -92,12 +91,12 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listCategories.adapter = CategoriesListAdapter(
-                viewModel.categories,
-                { category -> // Category click callback
-                    returnCategory(category.name)
-                },
-                requireContext(),
-                viewLifecycleOwner
+            viewModel.categories,
+            { category -> // Category click callback
+                returnCategory(category.name)
+            },
+            requireContext(),
+            viewLifecycleOwner
         )
 
         // To be budgeted text click listener
@@ -112,8 +111,8 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     private fun returnCategory(categoryName: String) {
         // Return fragment result
         setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(CATEGORY_KEY to categoryName)
+            AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
+            bundleOf(CATEGORY_KEY to categoryName)
         )
 
         // Close fragment

@@ -64,8 +64,8 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Create ViewModel instance
         updateBudgetViewModel = UpdateBudgetViewModel(
-                savedStateHandleSpy,
-                budgetRepositoryMock
+            savedStateHandleSpy,
+            budgetRepositoryMock
         )
 
     }

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +11,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.appbar.MaterialToolbar
@@ -33,7 +31,6 @@ import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.TestOnly
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -45,9 +42,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(
-        savedStateHandle: SavedStateHandle,
-        private val transactionRepository: TransactionRepository,
-        private val payeeRepository: PayeeRepository
+    savedStateHandle: SavedStateHandle,
+    private val transactionRepository: TransactionRepository,
+    private val payeeRepository: PayeeRepository
 ) : ViewModel() {
 
     /**
@@ -79,7 +76,7 @@ class AddEditTransactionViewModel @Inject constructor(
      * Contains [editTransaction]. Presence indicates that [editTransaction] should be edited
      */
     val editTransaction = transactionRepository.getTransactionById(
-            savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
+        savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
     ).asLiveData()
 
     /**
@@ -98,7 +95,7 @@ class AddEditTransactionViewModel @Inject constructor(
      */
     fun applyData() {
         // Validate data
-        if(payeeName.value!!.isBlank() || categoryName.value!!.isBlank() || date.value == null) {
+        if (payeeName.value!!.isBlank() || categoryName.value!!.isBlank() || date.value == null) {
             throw IllegalArgumentException("Invalid data")
         } // TODO -> own method and use in activity
 
@@ -125,13 +122,13 @@ class AddEditTransactionViewModel @Inject constructor(
 
                 // Save new transaction
                 transactionRepository.addTransactions(
-                        Transaction(
-                                pay.value!!,
-                                payeeName.value!!,
-                                categoryName.value!!,
-                                description.value!!.trim(),
-                                date.value!!
-                        )
+                    Transaction(
+                        pay.value!!,
+                        payeeName.value!!,
+                        categoryName.value!!,
+                        description.value!!.trim(),
+                        date.value!!
+                    )
                 )
             }
         }
@@ -278,9 +275,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             // If edit transaction exists, set its timestamp as selected date
             builder.setSelection(
-                    it?.date?.let { date ->
-                        date.atStartOfDay(ZoneId.of("GMT"))!!.toInstant()!!.toEpochMilli() + 1
-                    } ?: MaterialDatePicker.todayInUtcMilliseconds())
+                it?.date?.let { date ->
+                    date.atStartOfDay(ZoneId.of("GMT"))!!.toInstant()!!.toEpochMilli() + 1
+                } ?: MaterialDatePicker.todayInUtcMilliseconds())
 
             // Builder date picker
             datePicker = builder.build()
@@ -290,7 +287,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
                 // Set transaction timestamp
                 viewModel.date.value =
-                        Instant.ofEpochMilli(timestamp).atZone(ZoneId.of("GMT")).toLocalDate()
+                    Instant.ofEpochMilli(timestamp).atZone(ZoneId.of("GMT")).toLocalDate()
 
                 // Check save enabled
                 checkCreateApplyEnabled()
@@ -323,7 +320,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Set model observer
         viewModel.categoryName.observe(this) {
             tvCategory.text =
-                    if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it
+                if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it
         }
 
         // Set date observer
@@ -343,8 +340,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
         etPay.addTextChangedListener { value ->
             // Set transaction value, 0 when blank
             viewModel.pay.value =
-                    if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
-                            .toLong()
+                if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
+                    .toLong()
         }
 
         // Description text changed listener
@@ -392,19 +389,19 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Fragment result listeners
         // Set payee on payee fragment result
         supportFragmentManager
-                .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
-                    val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
-                    payee?.let { viewModel.payeeName.value = it }
-                    checkCreateApplyEnabled()
-                }
+            .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
+                val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
+                payee?.let { viewModel.payeeName.value = it }
+                checkCreateApplyEnabled()
+            }
 
         // Set category on category fragment result
         supportFragmentManager
-                .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
-                    val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
-                    category?.let { viewModel.categoryName.value = it }
-                    checkCreateApplyEnabled()
-                }
+            .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
+                val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
+                category?.let { viewModel.categoryName.value = it }
+                checkCreateApplyEnabled()
+            }
 
         // Focus value text
         etPay.requestFocus()
@@ -426,7 +423,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private fun checkCreateApplyEnabled() {
         fabCreateApply.isEnabled =
-                viewModel.payeeName.value!!.isNotBlank() && viewModel.categoryName.value!!.isNotBlank() && viewModel.date.value != null
+            viewModel.payeeName.value!!.isNotBlank() && viewModel.categoryName.value!!.isNotBlank() && viewModel.date.value != null
     }
 
 }

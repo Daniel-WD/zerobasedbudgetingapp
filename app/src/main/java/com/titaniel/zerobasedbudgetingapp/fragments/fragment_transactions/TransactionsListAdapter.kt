@@ -22,10 +22,10 @@ import com.titaniel.zerobasedbudgetingapp.utils.Utils
  * Needs [lifecycleOwner].
  */
 class TransactionsListAdapter(
-        private val transactions: LiveData<List<Transaction>>,
-        private val transactionClickedListener: (Transaction) -> Unit,
-        private val context: Context,
-        lifecycleOwner: LifecycleOwner
+    private val transactions: LiveData<List<Transaction>>,
+    private val transactionClickedListener: (Transaction) -> Unit,
+    private val context: Context,
+    lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     init {
@@ -85,7 +85,7 @@ class TransactionsListAdapter(
 
             // Set image description available visibility
             holder.imgDescriptionAvailable.visibility =
-                    if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
+                if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
 
             // Set value text
             holder.tvPay.text = transaction.pay.toString()
@@ -95,7 +95,7 @@ class TransactionsListAdapter(
 
             // Set category text
             holder.cpCategory.text =
-                    if (transaction.categoryName == Category.TO_BE_BUDGETED) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
+                if (transaction.categoryName == Category.TO_BE_BUDGETED) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
 
             // Set date text
             holder.tvDate.text = Utils.convertLocalDateToString(transaction.date)

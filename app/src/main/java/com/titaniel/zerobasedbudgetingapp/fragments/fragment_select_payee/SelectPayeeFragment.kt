@@ -9,7 +9,6 @@ import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +27,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SelectPayeeViewModel @Inject constructor(
-        payeeRepository: PayeeRepository
+    payeeRepository: PayeeRepository
 ) : ViewModel() {
 
     /**
@@ -73,9 +72,9 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     val viewModel: SelectPayeeViewModel by provideViewModel()
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_select_payee, container, false)
@@ -108,12 +107,12 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listPayees.adapter = PayeesListAdapter(
-                viewModel.payees,
-                { payee -> // Payee click callback
-                    returnPayee(payee.name)
-                },
-                requireContext(),
-                viewLifecycleOwner
+            viewModel.payees,
+            { payee -> // Payee click callback
+                returnPayee(payee.name)
+            },
+            requireContext(),
+            viewLifecycleOwner
         )
 
     }
@@ -127,8 +126,8 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
             // Return fragment result
             setFragmentResult(
-                    AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                    bundleOf(PAYEE_KEY to payeeName)
+                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
+                bundleOf(PAYEE_KEY to payeeName)
             )
 
             // Close fragment

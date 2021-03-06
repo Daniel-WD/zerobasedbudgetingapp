@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Category(
-        @PrimaryKey val name: String
+    @PrimaryKey val name: String
 ) {
     companion object {
         /**

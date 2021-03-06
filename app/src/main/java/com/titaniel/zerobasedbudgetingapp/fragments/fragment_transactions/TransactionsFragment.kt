@@ -3,7 +3,6 @@ package com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -25,14 +24,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(
-        transactionRepository: TransactionRepository
+    transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     /**
      * All transactions
      */
     val transactions: LiveData<List<Transaction>> =
-            transactionRepository.getAllTransactions().asLiveData()
+        transactionRepository.getAllTransactions().asLiveData()
 
 }
 
@@ -74,26 +73,26 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
 
         // Set adapter
         transactionsList.adapter = TransactionsListAdapter(
-                viewModel.transactions,
-                { transaction ->
-                    // Start add/edit transaction activity and transmit transaction uuid
-                    startActivity(
-                            Intent(requireContext(), AddEditTransactionActivity::class.java).putExtra(
-                                    AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
-                                    transaction.id
-                            ),
-                    )
-                },
-                requireContext(),
-                viewLifecycleOwner
+            viewModel.transactions,
+            { transaction ->
+                // Start add/edit transaction activity and transmit transaction uuid
+                startActivity(
+                    Intent(requireContext(), AddEditTransactionActivity::class.java).putExtra(
+                        AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
+                        transaction.id
+                    ),
+                )
+            },
+            requireContext(),
+            viewLifecycleOwner
         )
 
         // Add horizontal dividers
         transactionsList.addItemDecoration(
-                DividerItemDecoration(
-                        context,
-                        DividerItemDecoration.VERTICAL
-                )
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
         )
     }
 
