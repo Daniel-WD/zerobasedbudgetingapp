@@ -7,7 +7,10 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 
-
+/**
+ * Source: StackOverflow...
+ * Used in espresso tests to match RecyclerView item at [position] with [itemMatcher]
+ */
 fun atPosition(position: Int, itemMatcher: Matcher<View?>): Matcher<View?> {
     return object : BoundedMatcher<View?, RecyclerView>(RecyclerView::class.java) {
         override fun describeTo(description: Description) {
