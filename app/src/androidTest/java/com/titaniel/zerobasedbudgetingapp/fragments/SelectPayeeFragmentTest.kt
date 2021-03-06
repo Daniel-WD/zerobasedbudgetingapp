@@ -47,7 +47,7 @@ class SelectPayeeFragmentTest {
     /**
      * Example categories
      */
-    private val examplePayees = listOf(
+    private val examplePayees = mutableListOf(
         Payee("payee1"),
         Payee("payee2"),
         Payee("payee3"),
@@ -119,6 +119,25 @@ class SelectPayeeFragmentTest {
                 atPosition(
                     4,
                     hasDescendant(withText("payee5"))
+                )
+            )
+        )
+
+    }
+
+    @Test
+    fun handles_data_change_correctly() {
+
+        // Change data
+        examplePayees.add(Payee("newPayee"))
+
+        // Assert data correct
+        // Entry 6
+        onView(withId(R.id.listPayees)).check(
+            matches(
+                atPosition(
+                    5,
+                    hasDescendant(withText("newPayee"))
                 )
             )
         )

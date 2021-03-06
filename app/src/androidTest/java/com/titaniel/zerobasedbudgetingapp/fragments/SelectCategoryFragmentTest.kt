@@ -42,7 +42,7 @@ class SelectCategoryFragmentTest {
     /**
      * Example categories
      */
-    private val exampleCategories = listOf(
+    private val exampleCategories = mutableListOf(
         Category("cat1"),
         Category("cat2"),
         Category("cat3"),
@@ -114,6 +114,25 @@ class SelectCategoryFragmentTest {
                 atPosition(
                     4,
                     hasDescendant(withText("cat5"))
+                )
+            )
+        )
+
+    }
+
+    @Test
+    fun handles_data_change_correctly() {
+
+        // Change data
+        exampleCategories.add(Category("newCat"))
+
+        // Assert data correct
+        // Entry 6
+        onView(withId(R.id.listCategories)).check(
+            matches(
+                atPosition(
+                    5,
+                    hasDescendant(withText("newCat"))
                 )
             )
         )
