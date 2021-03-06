@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions
 
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -14,6 +15,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -53,7 +55,8 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
     /**
      * ViewModel
      */
-    private val viewModel: TransactionsViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: TransactionsViewModel by provideViewModel()
 
     override fun onStart() {
         super.onStart()
