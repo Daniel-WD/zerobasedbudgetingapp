@@ -95,9 +95,7 @@ class AddEditTransactionViewModel @Inject constructor(
      */
     fun applyData() {
         // Validate data
-        if (payeeName.value!!.isBlank() || categoryName.value!!.isBlank() || date.value == null) {
-            throw IllegalArgumentException("Invalid data")
-        } // TODO -> own method and use in activity
+        require(isDataValid())
 
         // Check if should edit transaction
         if (editTransaction.value != null) { // Edit transaction
@@ -133,6 +131,11 @@ class AddEditTransactionViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Checks if essential data for a transaction is present
+     */
+    fun isDataValid() = payeeName.value!!.isNotBlank() && categoryName.value!!.isNotBlank() && date.value != null
 
 }
 
@@ -251,21 +254,22 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
+                // Set pay test
                 etPay.setText(it.pay.toString())
 
                 // Set value text cursor to end
-                etPay.setSelection(etPay.text.length) // TODO: -> onTextChanged?
+                etPay.setSelection(etPay.text.length)
 
-                // TODO doc
+                // Set description text
+                etDescription.setText(it.description)
 
-                etDescription.setText(it.description) // TODO -> 2 Way binding?
-
+                // Set ViewModel values
                 viewModel.payeeName.value = it.payeeName
                 viewModel.categoryName.value = it.categoryName
                 viewModel.date.value = it.date
 
                 // Update save btn enabled
-                checkCreateApplyEnabled()
+                updateCreateApplyEnabled()
 
             }
 
@@ -290,7 +294,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                     Instant.ofEpochMilli(timestamp).atZone(ZoneId.of("GMT")).toLocalDate()
 
                 // Check save enabled
-                checkCreateApplyEnabled()
+                updateCreateApplyEnabled()
 
             }
         })
@@ -392,7 +396,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
             .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
                 val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
                 payee?.let { viewModel.payeeName.value = it }
-                checkCreateApplyEnabled()
+                updateCreateApplyEnabled()
             }
 
         // Set category on category fragment result
@@ -400,7 +404,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
             .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
                 val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
                 category?.let { viewModel.categoryName.value = it }
-                checkCreateApplyEnabled()
+                updateCreateApplyEnabled()
             }
 
         // Focus value text
@@ -421,9 +425,8 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Update if create/apply btn should be enabled
      */
-    private fun checkCreateApplyEnabled() {
-        fabCreateApply.isEnabled =
-            viewModel.payeeName.value!!.isNotBlank() && viewModel.categoryName.value!!.isNotBlank() && viewModel.date.value != null
+    private fun updateCreateApplyEnabled() {
+        fabCreateApply.isEnabled = viewModel.isDataValid()
     }
 
 }

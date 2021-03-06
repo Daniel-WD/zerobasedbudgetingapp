@@ -30,7 +30,7 @@ class BudgetRepository @Inject constructor(
     /**
      * Get all budgets
      */
-    fun getAllBudgets(): Flow<List<Budget>> { // TODO: TEST
+    fun getAllBudgets(): Flow<List<Budget>> {
         return budgetDao.getAll()
     }
 

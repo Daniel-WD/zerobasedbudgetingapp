@@ -262,7 +262,6 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
     @Test
     fun updates_available_money_correctly() {
-        // TODO check if awaitValue in other test is still needed
 
         // Expected output: transactions + budgets (with corresponding category and <= month)
         val expectedAvailableMoney = mapOf(

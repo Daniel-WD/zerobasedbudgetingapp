@@ -269,9 +269,6 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
         listBudgeting = requireView().findViewById(R.id.listBudgeting)
 
-        // Setup toolbar
-        toolbar.menu //TODO ???
-
         // Init list categories
         // Set layout manager
         listBudgeting.layoutManager = LinearLayoutManager(requireContext())

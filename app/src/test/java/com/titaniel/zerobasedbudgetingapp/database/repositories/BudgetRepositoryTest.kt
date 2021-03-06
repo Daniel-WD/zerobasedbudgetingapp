@@ -77,5 +77,16 @@ class BudgetRepositoryTest {
         // Verify get budgets by month on dao
         verify(budgetDaoMock).getByMonth(month)
     }
+    
+    @Test
+    fun performs_get_all_budgets_correctly() {
+
+        // Get all budgets
+        budgetRepository.getAllBudgets()
+
+        // Verify get budgets on dao
+        verify(budgetDaoMock).getAll()
+
+    }
 
 }

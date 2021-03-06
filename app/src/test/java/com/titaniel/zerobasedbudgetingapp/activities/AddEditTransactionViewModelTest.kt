@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.activities
 
 import androidx.lifecycle.SavedStateHandle
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
@@ -17,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
@@ -58,11 +60,11 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         `when`(transactionRepositoryMock.getTransactionById(-1)).thenReturn(emptyFlow())
 
         // Create ViewModel to test
-        addEditTransactionViewModel = AddEditTransactionViewModel(
+        addEditTransactionViewModel = spy(AddEditTransactionViewModel(
             savedStateHandleMock,
             transactionRepositoryMock,
             payeeRepositoryMock
-        )
+        ))
 
     }
 
@@ -86,7 +88,7 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
     }
 
     @Test
-    fun applies_data_correctly() = runBlocking {
+    fun applies_data_correctly(): Unit = runBlocking {
 
         // Setup data
         val pay = 500L
@@ -113,50 +115,45 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         // Verify addPayees called
         verify(payeeRepositoryMock).addPayees(Payee(payeeName))
 
+        // Verify checks for data validity
+        verify(addEditTransactionViewModel).isDataValid()
+
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun throws_exception_on_apply_data_with_invalid_data_I() {
+    @Test
+    fun checks_data_validity_correctly() {
 
-        // Setup data 1
-        addEditTransactionViewModel.pay.value = 500L
-        addEditTransactionViewModel.payeeName.value = ""
-        addEditTransactionViewModel.categoryName.value = "category1"
-        addEditTransactionViewModel.description.value = "   Super \n cool description    \n"
+        // Data case 1
+        addEditTransactionViewModel.categoryName.value = "name"
+        addEditTransactionViewModel.payeeName.value = "name"
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
-        addEditTransactionViewModel.applyData()
+        assertThat(addEditTransactionViewModel.isDataValid()).isTrue()
 
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun throws_exception_on_apply_data_with_invalid_data_II() {
-
-        // Setup data 1
-        addEditTransactionViewModel.pay.value = 500L
-        addEditTransactionViewModel.payeeName.value = "payee1"
+        // Data case 2
         addEditTransactionViewModel.categoryName.value = ""
-        addEditTransactionViewModel.description.value = "   Super \n cool description    \n"
+        addEditTransactionViewModel.payeeName.value = "name"
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
-        addEditTransactionViewModel.applyData()
+        assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
-    }
+        // Data case 3
+        addEditTransactionViewModel.categoryName.value = "name"
+        addEditTransactionViewModel.payeeName.value = ""
+        addEditTransactionViewModel.date.value = LocalDate.now()
 
-    @Test(expected = IllegalArgumentException::class)
-    fun throws_exception_on_apply_data_with_invalid_data_III() {
+        // Apply data
+        assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
-        // Setup data 1
-        addEditTransactionViewModel.pay.value = 500L
-        addEditTransactionViewModel.payeeName.value = "payee1"
-        addEditTransactionViewModel.categoryName.value = "category1"
-        addEditTransactionViewModel.description.value = "   Super \n cool description    \n"
+        // Data case 4
+        addEditTransactionViewModel.categoryName.value = "name"
+        addEditTransactionViewModel.payeeName.value = "name"
         addEditTransactionViewModel.date.value = null
 
         // Apply data
-        addEditTransactionViewModel.applyData()
+        assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
     }
 
