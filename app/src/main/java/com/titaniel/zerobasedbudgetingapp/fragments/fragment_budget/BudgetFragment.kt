@@ -79,7 +79,7 @@ class BudgetViewModel @Inject constructor(
     val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
 
     /**
-     * All budgets of selected month TODO -> update when month is set, could be erased....
+     * All budgets of selected month
      */
     val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
 
@@ -173,7 +173,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Updates [availableMoney]
      */
-    private fun updateAvailableMoney() { //TODO After first test iteration month filter to database?
+    private fun updateAvailableMoney() {
         val budsMon = budgetsOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
@@ -220,12 +220,15 @@ class BudgetViewModel @Inject constructor(
         val budsMon = budgetsOfMonth.value
         val mon = month.value
 
-        if (cats != null && budsMon != null && mon != null) {
+        if(cats != null && budsMon != null && mon != null) {
             val missingBudgets =
-                // TODO doc
+                // Find categories that have no budget in selected month
                 cats.filter { category -> budsMon.find { budget -> budget.categoryName == category.name } == null }
+                    // Create budgets for filtered categories
                     .map { category -> Budget(category.name, mon, 0) }
                     .toTypedArray()
+
+            // Add missing budgets
             viewModelScope.launch {
                 budgetRepository.addBudgets(*missingBudgets)
             }
