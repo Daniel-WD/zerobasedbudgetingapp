@@ -8,6 +8,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
+import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
@@ -44,7 +45,7 @@ class BudgetFragmentTest {
     /**
      * BudgetsOfMonth example data
      */
-    private val budgetsOfMonth = listOf(
+    private val exampleBudgetsOfMonth = listOf(
         Budget("sex", LocalDate.of(2020, 10, 1), 20),
         Budget("girlfriend", LocalDate.of(2020, 10, 1), 100),
         Budget("computer", LocalDate.of(2020, 10, 1), 202342),
@@ -55,20 +56,20 @@ class BudgetFragmentTest {
     /**
      * AvailableMoney example data
      */
-    private val availableMoney = mutableMapOf(
-        budgetsOfMonth[0] to 100L,
-        budgetsOfMonth[1] to 200L,
-        budgetsOfMonth[2] to 0L,
-        budgetsOfMonth[3] to 4L,
-        budgetsOfMonth[4] to -10000L
+    private var exampleAvailableMoney = mutableMapOf(
+        exampleBudgetsOfMonth[0] to 100L,
+        exampleBudgetsOfMonth[1] to 200L,
+        exampleBudgetsOfMonth[2] to 0L,
+        exampleBudgetsOfMonth[3] to 4L,
+        exampleBudgetsOfMonth[4] to -10000L
     )
 
     @Before
     fun setup() {
         // Set ViewModel properties
         `when`(mockViewModel.toBeBudgeted).thenReturn(MutableLiveData(toBeBudgeted))
-        `when`(mockViewModel.budgetsOfMonth).thenReturn(MutableLiveData(budgetsOfMonth))
-        `when`(mockViewModel.availableMoney).thenReturn(MutableLiveData(availableMoney))
+        `when`(mockViewModel.budgetsOfMonth).thenReturn(MutableLiveData(exampleBudgetsOfMonth))
+        `when`(mockViewModel.availableMoney).thenReturn(MutableLiveData(exampleAvailableMoney))
 
         // Launch scenario
         launchFragmentInHiltContainer<BudgetFragment> {
@@ -85,136 +86,7 @@ class BudgetFragmentTest {
         // ToBeBudgeted text is correct
         onView(withId(R.id.tvToBeBudgeted)).check(matches(withText(toBeBudgeted.toString())))
 
-        // budget list content is correct
-        // Entry 1
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    0,
-                    hasDescendant(withText("sex"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    0,
-                    hasDescendant(withText("20"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    0,
-                    hasDescendant(withText("100"))
-                )
-            )
-        )
-
-        // Entry 2
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    1,
-                    hasDescendant(withText("girlfriend"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    1,
-                    hasDescendant(withText("100"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    1,
-                    hasDescendant(withText("200"))
-                )
-            )
-        )
-
-        // Entry 3
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText("computer"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText("202342"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText("0"))
-                )
-            )
-        )
-
-        // Entry 4
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    3,
-                    hasDescendant(withText("ide"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    3,
-                    hasDescendant(withText("203"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    3,
-                    hasDescendant(withText("4"))
-                )
-            )
-        )
-
-        // Entry 5
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    4,
-                    hasDescendant(withText("groceries"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    4,
-                    hasDescendant(withText("21230"))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    4,
-                    hasDescendant(withText("-10000"))
-                )
-            )
-        )
+        checkBudgetListContent()
 
     }
 
@@ -259,28 +131,24 @@ class BudgetFragmentTest {
         val newBudgetedValue = 234234L
 
         // Set new values
-        budgetsOfMonth[2].categoryName = newCat
-        budgetsOfMonth[2].budgeted = newBudgetedValue
+        exampleBudgetsOfMonth[2].categoryName = newCat
+        exampleBudgetsOfMonth[2].budgeted = newBudgetedValue
 
-        // Check if new values are displayed
+        // Reset available money
+        exampleAvailableMoney = mutableMapOf(
+            exampleBudgetsOfMonth[0] to 100L,
+            exampleBudgetsOfMonth[1] to 200L,
+            exampleBudgetsOfMonth[2] to 0L,
+            exampleBudgetsOfMonth[3] to 4L,
+            exampleBudgetsOfMonth[4] to -10000L
+        )
 
-        // Entry 3
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText(newCat))
-                )
-            )
-        )
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText(newBudgetedValue.toString()))
-                )
-            )
-        )
+        // Set budgetsOfMonth value in ViewModel
+        testFragment.requireActivity().runOnUiThread {
+            mockViewModel.availableMoney.value = exampleAvailableMoney
+        }
+
+        checkBudgetListContent()
 
     }
 
@@ -291,20 +159,18 @@ class BudgetFragmentTest {
         val newAvailableMoneyValue = 234234999L
 
         // Set new values
-        availableMoney[budgetsOfMonth[2]] = newAvailableMoneyValue
+        exampleAvailableMoney[exampleBudgetsOfMonth[2]] = newAvailableMoneyValue
 
-        // Check if new values are displayed
+        checkBudgetListContent()
 
-        // Entry 3
-        onView(withId(R.id.listBudgeting)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText(newAvailableMoneyValue.toString()))
-                )
-            )
-        )
+    }
 
+    private fun checkBudgetListContent() {
+        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleBudgetsOfMonth,
+            { hasDescendant(withText(it.budgeted.toString())) },
+            { hasDescendant(withText(it.categoryName)) })
+        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleAvailableMoney.toList(),
+            { hasDescendant(withText(it.second.toString())) })
     }
 
 }

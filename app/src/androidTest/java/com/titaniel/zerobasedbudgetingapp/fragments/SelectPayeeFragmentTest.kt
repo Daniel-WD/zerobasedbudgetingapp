@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
+import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
@@ -18,6 +19,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.PayeesListAdapter
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.Utils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,56 +69,7 @@ class SelectPayeeFragmentTest {
     @Test
     fun starts_correctly() {
 
-        // Payee list content is correct
-        // Entry 1
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    0,
-                    hasDescendant(withText("payee1"))
-                )
-            )
-        )
-
-        // Entry 2
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    1,
-                    hasDescendant(withText("payee2"))
-                )
-            )
-        )
-
-        // Entry 3
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText("payee3"))
-                )
-            )
-        )
-
-        // Entry 4
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    3,
-                    hasDescendant(withText("payee4"))
-                )
-            )
-        )
-
-        // Entry 5
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    4,
-                    hasDescendant(withText("payee5"))
-                )
-            )
-        )
+        checkPayeeListContent()
 
     }
 
@@ -126,16 +79,7 @@ class SelectPayeeFragmentTest {
         // Change data
         examplePayees.add(Payee("newPayee"))
 
-        // Assert data correct
-        // Entry 6
-        onView(withId(R.id.listPayees)).check(
-            matches(
-                atPosition(
-                    5,
-                    hasDescendant(withText("newPayee"))
-                )
-            )
-        )
+        checkPayeeListContent()
 
     }
 
@@ -185,5 +129,10 @@ class SelectPayeeFragmentTest {
         // Check if fragment finishes
         assertThat(testFragment.isAdded).isFalse()
 
+    }
+
+    private fun checkPayeeListContent() {
+        checkRecyclerViewContentHasCorrectData(R.id.listPayees, examplePayees,
+            { hasDescendant(withText(it.name)) })
     }
 }

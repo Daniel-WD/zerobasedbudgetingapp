@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
+import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
@@ -67,56 +68,7 @@ class SelectCategoryFragmentTest {
     @Test
     fun starts_correctly() {
 
-        // Categories list content is correct
-        // Entry 1
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    0,
-                    hasDescendant(withText("cat1"))
-                )
-            )
-        )
-
-        // Entry 2
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    1,
-                    hasDescendant(withText("cat2"))
-                )
-            )
-        )
-
-        // Entry 3
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    2,
-                    hasDescendant(withText("cat3"))
-                )
-            )
-        )
-
-        // Entry 4
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    3,
-                    hasDescendant(withText("cat4"))
-                )
-            )
-        )
-
-        // Entry 5
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    4,
-                    hasDescendant(withText("cat5"))
-                )
-            )
-        )
+        checkCategoryListContent()
 
     }
 
@@ -126,16 +78,7 @@ class SelectCategoryFragmentTest {
         // Change data
         exampleCategories.add(Category("newCat"))
 
-        // Assert data correct
-        // Entry 6
-        onView(withId(R.id.listCategories)).check(
-            matches(
-                atPosition(
-                    5,
-                    hasDescendant(withText("newCat"))
-                )
-            )
-        )
+        checkCategoryListContent()
 
     }
 
@@ -161,6 +104,10 @@ class SelectCategoryFragmentTest {
         // Check if fragment finishes
         assertThat(testFragment.isAdded).isFalse()
 
+    }
+
+    private fun checkCategoryListContent() {
+        checkRecyclerViewContentHasCorrectData(R.id.listCategories, exampleCategories, { hasDescendant(withText(it.name)) })
     }
 
 }

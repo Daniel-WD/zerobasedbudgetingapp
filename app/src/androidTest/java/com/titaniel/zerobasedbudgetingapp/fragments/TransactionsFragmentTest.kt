@@ -1,17 +1,21 @@
 package com.titaniel.zerobasedbudgetingapp.fragments
 
+import android.view.View
+import androidx.annotation.IdRes
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
+import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,10 +65,7 @@ class TransactionsFragmentTest {
 
     @Test
     fun starts_correctly() {
-
-        // Transaction list content is correct
-        checkTransactionListContentEqualToData()
-
+        checkTransactionListContent()
     }
 
     @Test
@@ -73,52 +74,14 @@ class TransactionsFragmentTest {
         // Change data
         exampleTransactions[2].payeeName = "newPayee"
 
-        // Check transaction list content is correct
-        checkTransactionListContentEqualToData()
-
+        checkTransactionListContent()
     }
 
-    /**
-     * Checks if [exampleTransactions] correctly represented in [TransactionsFragment] by [R.id.transactionsList]
-     */
-    private fun checkTransactionListContentEqualToData() {
-
-        val interaction = onView(withId(R.id.transactionsList))
-
-        exampleTransactions.forEachIndexed { i, transaction ->
-            // Entry i
-            interaction.check(
-                matches(
-                    atPosition(
-                        i,
-                        hasDescendant(withText(transaction.pay.toString()))
-                    )
-                )
-            )
-            interaction.check(
-                matches(
-                    atPosition(
-                        i,
-                        hasDescendant(withText(transaction.categoryName))
-                    )
-                )
-            )
-            interaction.check(
-                matches(
-                    atPosition(
-                        i,
-                        hasDescendant(withText(transaction.payeeName))
-                    )
-                )
-            )
-            interaction.check(
-                matches(
-                    atPosition(
-                        i,
-                        hasDescendant(withText(Utils.convertLocalDateToString(transaction.date)))
-                    )
-                )
-            )
-        }
+    private fun checkTransactionListContent() {
+        checkRecyclerViewContentHasCorrectData(R.id.transactionsList, exampleTransactions,
+            { hasDescendant(withText(it.pay.toString())) },
+            { hasDescendant(withText(it.categoryName)) },
+            { hasDescendant(withText(it.payeeName)) },
+            { hasDescendant(withText(Utils.convertLocalDateToString(it.date))) })
     }
 }
