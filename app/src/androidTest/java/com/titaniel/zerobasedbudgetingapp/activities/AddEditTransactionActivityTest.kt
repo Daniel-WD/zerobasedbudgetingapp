@@ -2,17 +2,18 @@ package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.app.Activity
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
+import com.google.common.util.concurrent.Service
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
@@ -169,10 +170,8 @@ class AddEditTransactionActivityTest {
         // Click delete
         onView(withId(R.id.delete)).perform(click())
 
-        scenario.onActivity { activity ->
-            // Finishes
-            assertThat(activity.isFinishing).isTrue()
-        }
+        // Check if destroyed
+        assertThat(scenario.state.isAtLeast(Lifecycle.State.DESTROYED)).isTrue()
 
         // Verify deleteEditTransaction() called
         verify(mockViewModel).deleteEditTransaction()
