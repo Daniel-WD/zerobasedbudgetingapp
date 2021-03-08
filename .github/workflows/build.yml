@@ -31,4 +31,4 @@ jobs:
         api-level: 29
         script: |
           git update-index --chmod=+x gradlew
-          ./gradlew connectedCheck
+          ./gradlew connectedCheck --stacktrace
