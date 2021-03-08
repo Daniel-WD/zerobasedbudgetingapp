@@ -74,7 +74,9 @@ class AddEditTransactionActivityTest {
     @After
     fun tearDown() {
         // Close scenario
-        scenario.close()
+        try {
+            scenario.close()
+        } catch (e: Throwable) {}
     }
 
     @Test
