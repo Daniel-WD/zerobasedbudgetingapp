@@ -119,6 +119,9 @@ class AddEditTransactionActivityTest {
             )
         )
 
+        // Stub data validity check to return true
+        `when`(mockViewModel.isDataValid()).thenReturn(true)
+
         // Recreate scenario (recreate didn't work)
         scenario.close()
         scenario = launchActivity()
@@ -143,7 +146,7 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.confirm_button)).perform(click())
 
         // Title for transaction creation
-        onView(withId(R.id.toolbar)).check(matches(hasDescendant(withText(R.string.activity_add_edit_transaction_edit_transaction))))
+        onView(withId(android.R.id.content)).check(matches(hasDescendant(withText(R.string.activity_add_edit_transaction_edit_transaction))))
 
         // Button text is create
         onView(withId(R.id.fabCreateApply)).check(matches(withText(R.string.activity_add_edit_transaction_apply)))
@@ -315,9 +318,6 @@ class AddEditTransactionActivityTest {
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
 
-        // Create btn not enabled
-        onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
-
         // Select payee
         scenario.onActivity { activity ->
             activity.supportFragmentManager.setFragmentResult(
@@ -325,9 +325,6 @@ class AddEditTransactionActivityTest {
                 bundleOf(SelectPayeeFragment.PAYEE_KEY to payee)
             )
         }
-
-        // Create btn not enabled
-        onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
 
         // Select category
         scenario.onActivity { activity ->
@@ -339,6 +336,9 @@ class AddEditTransactionActivityTest {
 
         // Create btn not enabled
         onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
+
+        // Stub data validity check to return true
+        `when`(mockViewModel.isDataValid()).thenReturn(true)
 
         // Select today as date
         onView(withId(R.id.layoutDate)).perform(click())
@@ -374,14 +374,8 @@ class AddEditTransactionActivityTest {
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
 
-        // Create btn not enabled
-        onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
-
         // Type description
         onView(withId(R.id.etDescription)).perform(typeText(description))
-
-        // Create btn not enabled
-        onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
 
         // Select payee
         scenario.onActivity { activity ->
@@ -391,15 +385,15 @@ class AddEditTransactionActivityTest {
             )
         }
 
-        // Create btn not enabled
-        onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
-
         // Select today as date
         onView(withId(R.id.layoutDate)).perform(click())
         onView(withId(R.id.confirm_button)).perform(click())
 
         // Create btn not enabled
         onView(withId(R.id.fabCreateApply)).check(matches(not(isEnabled())))
+
+        // Stub data validity check to return true
+        `when`(mockViewModel.isDataValid()).thenReturn(true)
 
         // Select category
         scenario.onActivity { activity ->
