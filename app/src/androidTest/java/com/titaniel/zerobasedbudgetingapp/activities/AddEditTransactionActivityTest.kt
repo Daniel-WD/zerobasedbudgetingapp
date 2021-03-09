@@ -61,9 +61,9 @@ class AddEditTransactionActivityTest {
         // Add lifecycle callback
         ActivityLifecycleMonitorRegistry.getInstance()
             .addLifecycleCallback { activity: Activity, stage: Stage ->
-                if (stage == Stage.PRE_ON_CREATE) {
+                if (stage == Stage.PRE_ON_CREATE && activity is AddEditTransactionActivity) {
                     // Set mockViewModel before onCreate()
-                    (activity as AddEditTransactionActivity).apply {
+                    activity.apply {
                         replace(AddEditTransactionActivity::viewModel, mockViewModel)
                     }
                 }
