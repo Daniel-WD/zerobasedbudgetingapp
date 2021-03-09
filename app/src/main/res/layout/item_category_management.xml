@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Item for manage categories activity -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp">
+
+    <!-- Drag handle -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/fragment_budget_category_margin"
+        android:src="@drawable/ic_baseline_drag_handle_24" />
+
+    <!-- Category name -->
+    <TextView
+        android:id="@+id/tvBudgeted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="72dp"
+        android:includeFontPadding="false"
+        android:textSize="16sp"
+        tools:text="Category 1" />
+
+    <!-- Edit btn -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="56dp"
+        android:src="@drawable/ic_baseline_edit_24" />
+
+    <!-- Delete btn -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_baseline_delete_24" />
+
+</FrameLayout>
