@@ -20,6 +20,8 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.text.IsEmptyString.isEmptyString
 import org.junit.After
@@ -165,10 +167,12 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun handles_delete_click_correctly_on_new_transaction_mode() {
+    fun handles_delete_click_correctly_on_new_transaction_mode() = runBlocking {
 
         // Click delete
         onView(withId(R.id.delete)).perform(click())
+
+        delay(1000)
 
         // Check activity finishing
         assertThat(scenario.state == Lifecycle.State.DESTROYED).isTrue()
