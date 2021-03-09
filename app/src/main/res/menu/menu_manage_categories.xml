@@ -6,7 +6,7 @@
 
     <!-- Add category -->
     <item
-        android:id="@+id/btnAddCategory"
+        android:id="@+id/addCategory"
         android:icon="@drawable/ic_baseline_add_24"
         android:title="@string/activity_manage_categories_add_category"
         app:showAsAction="always" />
