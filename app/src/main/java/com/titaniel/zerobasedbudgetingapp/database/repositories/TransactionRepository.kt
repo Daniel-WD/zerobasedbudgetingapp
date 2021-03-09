@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Repository to interact with transaction data
  */
 class TransactionRepository @Inject constructor(
-        private val transactionDao: TransactionDao
+    private val transactionDao: TransactionDao
 ) {
 
     /**

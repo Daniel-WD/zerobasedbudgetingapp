@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Set selected bottom navigation page
+        // Set start bottom navigation page
         findViewById<BottomNavigationView>(R.id.bottom_navigation).selectedItemId = R.id.page_budget
 
     }
@@ -50,9 +50,9 @@ class MainActivity : AppCompatActivity() {
      */
     private fun loadFragment(fragment: Fragment?): Boolean = if (fragment != null) {
         supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit()
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
         true
     } else false
 

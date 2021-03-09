@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Payee(
-        @PrimaryKey val name: String
+    @PrimaryKey val name: String
 )

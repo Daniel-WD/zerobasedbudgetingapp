@@ -12,16 +12,16 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 
 /**
- * [BudgetingListAdapter] in [context] for displaying [budgetsOfMonth] with the respective [availableMoney]. Notifies [itemClickedListener] when item is clicked.
+ * [BudgetListAdapter] in [context] for displaying [budgetsOfMonth] with the respective [availableMoney]. Notifies [itemClickedListener] when item is clicked.
  * Needs [lifecycleOwner].
  */
-class BudgetingListAdapter(
-        private val budgetsOfMonth: LiveData<List<Budget>>,
-        private val availableMoney: LiveData<Map<Budget, Long>>,
-        private val itemClickedListener: (Budget) -> Unit,
-        private val context: Context,
-        lifecycleOwner: LifecycleOwner
-) : RecyclerView.Adapter<BudgetingListAdapter.BudgetingItem>() {
+class BudgetListAdapter(
+    private val budgetsOfMonth: LiveData<List<Budget>>,
+    private val availableMoney: LiveData<Map<Budget, Long>>,
+    private val itemClickedListener: (Budget) -> Unit,
+    private val context: Context,
+    lifecycleOwner: LifecycleOwner
+) : RecyclerView.Adapter<BudgetListAdapter.BudgetingItem>() {
 
     init {
         // Setup observers

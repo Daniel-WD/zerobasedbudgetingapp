@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Repository to interact with category data
  */
 class CategoryRepository @Inject constructor(
-        private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao
 ) {
 
     /**

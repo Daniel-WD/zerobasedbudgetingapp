@@ -10,7 +10,7 @@ import javax.inject.Inject
  * Repository to interact with budgeting data
  */
 class BudgetRepository @Inject constructor(
-        private val budgetDao: BudgetDao
+    private val budgetDao: BudgetDao
 ) {
 
     /**
@@ -28,17 +28,24 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Get all budgets
+     */
+    fun getAllBudgets(): Flow<List<Budget>> {
+        return budgetDao.getAll()
+    }
+
+    /**
      * Get budget with [id]
      */
     fun getBudgetById(id: Long): Flow<Budget> {
-        return budgetDao.getBudgetById(id)
+        return budgetDao.getById(id)
     }
 
     /**
      * Get budgets with [month]
      */
     fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>> {
-        return budgetDao.getBudgetsByMonth(month)
+        return budgetDao.getByMonth(month)
     }
 
 }

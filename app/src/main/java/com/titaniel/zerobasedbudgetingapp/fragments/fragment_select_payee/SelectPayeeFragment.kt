@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,7 +27,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SelectPayeeViewModel @Inject constructor(
-        payeeRepository: PayeeRepository
+    payeeRepository: PayeeRepository
 ) : ViewModel() {
 
     /**
@@ -67,12 +68,13 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     /**
      * View model
      */
-    private val viewModel: SelectPayeeViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: SelectPayeeViewModel by provideViewModel()
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_select_payee, container, false)
@@ -105,12 +107,12 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listPayees.adapter = PayeesListAdapter(
-                viewModel.payees,
-                { payee -> // Payee click callback
-                    returnPayee(payee.name)
-                },
-                requireContext(),
-                viewLifecycleOwner
+            viewModel.payees,
+            { payee -> // Payee click callback
+                returnPayee(payee.name)
+            },
+            requireContext(),
+            viewLifecycleOwner
         )
 
     }
@@ -124,8 +126,8 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
             // Return fragment result
             setFragmentResult(
-                    AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                    bundleOf(PAYEE_KEY to payeeName)
+                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
+                bundleOf(PAYEE_KEY to payeeName)
             )
 
             // Close fragment

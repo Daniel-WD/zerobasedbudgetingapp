@@ -17,10 +17,10 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
  * Needs [lifecycleOwner].
  */
 class PayeesListAdapter(
-        private val payees: LiveData<List<Payee>>,
-        private val payeeClickedListener: (Payee) -> Unit,
-        private val context: Context,
-        lifecycleOwner: LifecycleOwner
+    private val payees: LiveData<List<Payee>>,
+    private val payeeClickedListener: (Payee) -> Unit,
+    private val context: Context,
+    lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<PayeesListAdapter.PayeeItem>() {
 
     init {

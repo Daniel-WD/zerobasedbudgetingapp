@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.viewModels
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -29,16 +30,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpdateBudgetViewModel @Inject constructor(
-        savedStateHandle: SavedStateHandle,
-        private val budgetRepository: BudgetRepository
+    savedStateHandle: SavedStateHandle,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
      * Budget to edit
      */
     val budget =
-            budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
-                    .asLiveData()
+        budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+            .asLiveData()
 
     /**
      * Update budget with [budgeted] value
@@ -92,12 +93,13 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     /**
      * View model
      */
-    private val viewModel: UpdateBudgetViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: UpdateBudgetViewModel by provideViewModel()
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Create root view
         return inflater.inflate(R.layout.fragment_update_budget, container, false)
@@ -113,6 +115,10 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budget observer
         viewModel.budget.observe(viewLifecycleOwner) {
+            // Check budget non-null
+            if (it == null) {
+                return@observe
+            }
 
             // Set category name
             tvCategory.text = it.categoryName
@@ -159,7 +165,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Budgeted value
         val budgeted =
-                if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
+            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
 
         viewModel.updateBudget(budgeted)
 

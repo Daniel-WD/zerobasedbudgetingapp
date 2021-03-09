@@ -60,9 +60,9 @@ class DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): Database {
         return Room.databaseBuilder(
-                context,
-                Database::class.java,
-                "Database"
+            context,
+            Database::class.java,
+            "Database"
         ).build()
     }
 

@@ -1,6 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -13,6 +15,12 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface CategoryDao {
+
+    /**
+     * Add [categories]
+     */
+    @Insert(onConflict = REPLACE)
+    suspend fun add(vararg categories: Category)
 
     /**
      * Get all categories
