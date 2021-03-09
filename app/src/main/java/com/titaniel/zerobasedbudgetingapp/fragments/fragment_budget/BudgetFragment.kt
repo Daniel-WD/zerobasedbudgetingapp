@@ -1,5 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
+import android.content.Intent
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.ManageCategoriesActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
@@ -23,6 +26,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -271,6 +275,19 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         toolbar = requireView().findViewById(R.id.toolbar)
         tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
         listBudgeting = requireView().findViewById(R.id.listBudgeting)
+
+        // Setup menu item click listener
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                // Manage categories click
+                R.id.categoryManagement -> {
+                    // Start ManageCategoriesActivity
+                    startActivity(Intent(requireContext(), ManageCategoriesActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
 
         // Init list categories
         // Set layout manager

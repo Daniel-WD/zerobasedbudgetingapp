@@ -43,7 +43,7 @@
     <string name="activity_add_edit_transaction_to_be_budgeted">To be budgeted</string>
 
     <!-- Fragment budget -->
-    <string name="fragment_budget_search_category">Search category</string>
+    <string name="fragment_budget_search_category">Manage categories</string>
 
     <string name="fragment_budget_category">Category</string>
     <string name="fragment_budget_budgeted">Budgeted</string>
