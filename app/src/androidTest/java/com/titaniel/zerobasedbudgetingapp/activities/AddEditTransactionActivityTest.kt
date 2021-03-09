@@ -105,7 +105,7 @@ class AddEditTransactionActivityTest {
 
     }
 
-//    @Test
+    @Test
     fun starts_correctly_with_edit_transaction() {
 
         // Create editTransaction data
@@ -167,7 +167,7 @@ class AddEditTransactionActivityTest {
         ownScenario.close()
     }
 
-    // @Test
+     @Test
     fun handles_delete_click_correctly_on_new_transaction_mode() = runBlocking {
 
         // Click delete
