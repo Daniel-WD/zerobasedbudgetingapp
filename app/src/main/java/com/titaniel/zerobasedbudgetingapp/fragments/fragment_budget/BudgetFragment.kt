@@ -316,13 +316,15 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
             viewLifecycleOwner
         )
 
-        // Add horizontal dividers
-        listBudgeting.addItemDecoration(
-            DividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
+        // Add horizontal dividers, if not already there
+        if(listBudgeting.itemDecorationCount == 0) {
+            listBudgeting.addItemDecoration(
+                DividerItemDecoration(
+                    context,
+                    DividerItemDecoration.VERTICAL
+                )
             )
-        )
+        }
 
         // Observe to be budgeted value
         viewModel.toBeBudgeted.observe(viewLifecycleOwner) {
