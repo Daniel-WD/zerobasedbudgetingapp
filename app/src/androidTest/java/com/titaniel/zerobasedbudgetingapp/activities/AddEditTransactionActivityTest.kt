@@ -125,9 +125,9 @@ class AddEditTransactionActivityTest {
         // Stub data validity check to return true
         `when`(mockViewModel.isDataValid()).thenReturn(true)
 
-        // Recreate scenario (recreate didn't work)
-        scenario.close()
-        scenario = launchActivity()
+        // Recreate ownScenario (recreate didn't work)
+
+        val ownScenario = launchActivity<AddEditTransactionActivity>()
 
         // Check pay
         onView(withId(R.id.etPay)).check(matches(withText(pay.toString())))
@@ -164,6 +164,7 @@ class AddEditTransactionActivityTest {
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(date)
 
+        ownScenario.close()
     }
 
     @Test
@@ -172,6 +173,7 @@ class AddEditTransactionActivityTest {
         // Click delete
         onView(withId(R.id.delete)).perform(click())
 
+        // (Makes it work on GitHub actions :D)
         delay(1000)
 
         // Check activity finishing
