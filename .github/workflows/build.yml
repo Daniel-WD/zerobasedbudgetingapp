@@ -31,4 +31,7 @@ jobs:
         api-level: 29
         script: |
           git update-index --chmod=+x gradlew
+          adb logcat -c
+          adb logcat &
           ./gradlew connectedCheck --stacktrace
+        # ./gradlew :presentation:connectedDebugAndroidTest
