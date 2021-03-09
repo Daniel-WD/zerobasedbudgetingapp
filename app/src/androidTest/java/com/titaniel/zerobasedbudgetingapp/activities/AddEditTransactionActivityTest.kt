@@ -74,9 +74,7 @@ class AddEditTransactionActivityTest {
     @After
     fun tearDown() {
         // Close scenario
-        try {
-            scenario.close()
-        } catch (e: Throwable) {}
+        scenario.close()
     }
 
     @Test
@@ -172,8 +170,8 @@ class AddEditTransactionActivityTest {
         // Click delete
         onView(withId(R.id.delete)).perform(click())
 
-        // Check if destroyed
-        assertThat(scenario.state.isAtLeast(Lifecycle.State.DESTROYED)).isTrue()
+        // Check activity finishing
+        assertThat(scenario.state == Lifecycle.State.DESTROYED).isTrue()
 
         // Verify deleteEditTransaction() called
         verify(mockViewModel).deleteEditTransaction()
