@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -15,6 +17,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryReposito
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -29,7 +32,7 @@ class ManageCategoriesViewModel @Inject constructor(
     /**
      * All categories
      */
-    val categories = categoryRepository.getAllCategories().asLiveData()
+    val categories = categoryRepository.getAllCategories().map { it.toMutableList() }.asLiveData()
 
 }
 
@@ -55,6 +58,47 @@ class ManageCategoriesActivity : AppCompatActivity() {
     private lateinit var fabConfirm: FloatingActionButton
 
     /**
+     * ItemTouchHelper used for reordering items in the list
+     */
+    private val itemTouchHelper by lazy {
+        val simpleItemTouchCallback =
+            object : ItemTouchHelper.SimpleCallback(UP or DOWN, 0) {
+
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+
+                    // Get positions to swap
+                    val pos1 = viewHolder.adapterPosition
+                    val pos2 = target.adapterPosition
+
+                    // Get categories
+                    val cats = viewModel.categories.value!!
+
+                    // Swap category positions
+                    cats[pos1] = cats[pos2].also { cats[pos2] = cats[pos1] }
+
+                    // Notify adapter
+                    (recyclerView.adapter as ManageCategoriesListAdapter).notifyItemMoved(pos1, pos2)
+
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+                override fun isLongPressDragEnabled(): Boolean {
+                    // Disable long press
+                    return false
+                }
+            }
+
+        ItemTouchHelper(simpleItemTouchCallback)
+    }
+
+
+    /**
      * View model
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -71,7 +115,7 @@ class ManageCategoriesActivity : AppCompatActivity() {
 
         // Setup item add listener
         toolbar.setOnMenuItemClickListener { item ->
-            when(item.itemId) {
+            when (item.itemId) {
                 R.id.addCategory -> {
                     TODO("Add category")
                     true
@@ -93,15 +137,16 @@ class ManageCategoriesActivity : AppCompatActivity() {
         // Set adapter
         listCategories.adapter = ManageCategoriesListAdapter(
             viewModel.categories,
-            {category, event ->
+            { category, event ->
                 TODO("react on delete and edit")
             },
+            itemTouchHelper,
             this,
             this
         )
 
         // Add horizontal dividers, if not already there
-        if(listCategories.itemDecorationCount == 0) {
+        if (listCategories.itemDecorationCount == 0) {
             listCategories.addItemDecoration(
                 DividerItemDecoration(
                     this,
@@ -109,6 +154,9 @@ class ManageCategoriesActivity : AppCompatActivity() {
                 )
             )
         }
+
+        // Set itemTouchHelper
+        itemTouchHelper.attachToRecyclerView(listCategories)
 
     }
 

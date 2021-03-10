@@ -1,13 +1,16 @@
 package com.titaniel.zerobasedbudgetingapp.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
@@ -18,8 +21,9 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
  * Notifies [itemEventListener] when an action is performed on the item.
  */
 class ManageCategoriesListAdapter(
-    private val categories: LiveData<List<Category>>,
+    private val categories: LiveData<MutableList<Category>>,
     private val itemEventListener: (Category, Int) -> Unit,
+    private val itemTouchHelper: ItemTouchHelper,
     private val context: Context,
     lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<ManageCategoriesListAdapter.ManageCategoriesItem>() {
@@ -46,6 +50,7 @@ class ManageCategoriesListAdapter(
     /**
      * Represents category, on which various actions can be performed
      */
+    @SuppressLint("ClickableViewAccessibility")
     class ManageCategoriesItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         /**
@@ -70,12 +75,27 @@ class ManageCategoriesListAdapter(
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageCategoriesItem {
         // Inflate view
         val view = LayoutInflater.from(context).inflate(R.layout.item_category_management, parent, false)
 
         // Create ViewHolder
-        return ManageCategoriesItem(view)
+        val viewHolder = ManageCategoriesItem(view)
+
+        // Setup drag for drag handle
+        viewHolder.ivDragHandle.setOnTouchListener { _, event ->
+
+            // Check action down event
+            if(event.actionMasked == MotionEvent.ACTION_DOWN) {
+                // Start dragging
+                itemTouchHelper.startDrag(viewHolder)
+            }
+
+            true
+        }
+
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: ManageCategoriesItem, position: Int) {
