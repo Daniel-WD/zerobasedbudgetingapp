@@ -101,10 +101,10 @@ class ManageCategoriesListAdapter(
     override fun onBindViewHolder(holder: ManageCategoriesItem, position: Int) {
 
         // Are categories present?
-        categories.value?.let { categories ->
+        categories.value?.let { cats ->
 
             // Get category
-            val category = categories[position]
+            val category = cats[position]
 
             // Set category text to name
             holder.tvCategoryName.text = category.name
@@ -116,7 +116,15 @@ class ManageCategoriesListAdapter(
 
             // Set listener for delete
             holder.ivDelete.setOnClickListener {
-                itemEventListener(category, DELETE_CATEGORY_EVENT)
+
+                // Calc index of category to remove
+                val removeIndex = cats.indexOf(category)
+
+                // Remove category
+                cats.removeAt(removeIndex)
+
+                // Notify adapter
+                notifyItemRemoved(removeIndex)
             }
         }
 
