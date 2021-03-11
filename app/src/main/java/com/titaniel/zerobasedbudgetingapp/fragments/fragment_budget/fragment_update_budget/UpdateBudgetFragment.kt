@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -19,6 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,6 +98,11 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: UpdateBudgetViewModel by provideViewModel()
 
+    /**
+     * Parent ViewModel
+     */
+    private val parentViewModel: BudgetViewModel by provideViewModel({requireParentFragment()})
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,24 +121,25 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         ivDone = requireView().findViewById(R.id.ivDone)
 
         // Budget observer
-        viewModel.budget.observe(viewLifecycleOwner) {
+        viewModel.budget.observe(viewLifecycleOwner) { budget ->
+
             // Check budget non-null
-            if (it == null) {
-                return@observe
+            budget?.let { bud ->
+
+                // Set category name
+                tvCategory.text = parentViewModel.categories.value!!.find { it.id == bud.categoryId }!!.name
+
+                // Set budgeted value
+                etBudgeted.setText(bud.budgeted.toString())
+
+                // Select budget text
+                etBudgeted.selectAll()
+
+                // Focus budgeted EditText
+                etBudgeted.requestFocus()
+
             }
-
-            // Set category name
-            tvCategory.text = it.categoryName
-
-            // Set budgeted value
-            etBudgeted.setText(it.budgeted.toString())
-
-            // Select budget text
-            etBudgeted.selectAll()
-
-            // Focus budgeted EditText
-            etBudgeted.requestFocus()
-        }
+}
 
         // Setup done listener
         ivDone.setOnClickListener {

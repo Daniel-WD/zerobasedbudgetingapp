@@ -1,10 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import androidx.room.Query
-import androidx.room.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
@@ -21,6 +18,12 @@ interface CategoryDao {
      */
     @Insert(onConflict = REPLACE)
     suspend fun add(vararg categories: Category)
+
+    /**
+     * Update [categories]
+     */
+    @Update
+    suspend fun update(vararg categories: Category)
 
     /**
      * Get all categories
@@ -43,9 +46,9 @@ interface CategoryDao {
     fun getBudgetsOfCategories(): Flow<List<BudgetsOfCategory>>
 
     /**
-     * Get category by [categoryName]
+     * Get category by [categoryId]
      */
-    @Query("SELECT * FROM category WHERE category.name == :categoryName")
-    fun getById(categoryName: String): Flow<Category>
+    @Query("SELECT * FROM category WHERE category.id == :categoryId")
+    fun getById(categoryId: Long): Flow<Category>
 
 }

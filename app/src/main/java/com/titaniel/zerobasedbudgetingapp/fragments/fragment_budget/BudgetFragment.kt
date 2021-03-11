@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activities.ManageCategoriesActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
@@ -23,10 +22,10 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepos
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,7 +53,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * All categories
      */
-    private val categories = categoryRepository.getAllCategories().asLiveData()
+    val categories = categoryRepository.getAllCategories().asLiveData()
 
     /**
      * Budgets by categories
@@ -83,21 +82,21 @@ class BudgetViewModel @Inject constructor(
     val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
 
     /**
-     * All budgets of selected month
+     * All budgetsWithCategory of selected month
      */
-    val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month.value!!).asLiveData()
+    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!).asLiveData()
 
     /**
      * Available money per budget
      */
-    val availableMoney: MutableLiveData<Map<Budget, Long>> = MutableLiveData(emptyMap())
+    val availableMoney: MutableLiveData<Map<BudgetWithCategory, Long>> = MutableLiveData(emptyMap())
 
     /**
      * ViewModel observer for categories
      */
     private val categoriesObserver: Observer<List<Category>> =
         Observer {
-            checkBudgets()
+            //checkBudgets() //I
         }
 
     /**
@@ -125,11 +124,11 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * ViewModel observer for budgetsOfMonth
+     * ViewModel observer for budgetsWithCategoryOfMonth
      */
-    private val budgetsOfMonthObserver: Observer<List<Budget>> =
+    private val budgetsWithCategoryOfMonthObserver: Observer<List<BudgetWithCategory>> =
         Observer {
-            checkBudgets()
+            checkBudgets() //IIII
             updateAvailableMoney()
         }
 
@@ -156,7 +155,7 @@ class BudgetViewModel @Inject constructor(
         budgetsOfCategories.observeForever(budgetsOfCategoriesObserver)
         transactionsOfCategories.observeForever(transactionsOfCategoriesObserver)
         transactions.observeForever(transactionsObserver)
-        budgetsOfMonth.observeForever(budgetsOfMonthObserver)
+        budgetsWithCategoryOfMonth.observeForever(budgetsWithCategoryOfMonthObserver)
         allBudgets.observeForever(allBudgetsObserver)
         month.observeForever(monthObserver)
     }
@@ -169,7 +168,7 @@ class BudgetViewModel @Inject constructor(
         budgetsOfCategories.removeObserver(budgetsOfCategoriesObserver)
         transactionsOfCategories.removeObserver(transactionsOfCategoriesObserver)
         transactions.removeObserver(transactionsObserver)
-        budgetsOfMonth.removeObserver(budgetsOfMonthObserver)
+        budgetsWithCategoryOfMonth.removeObserver(budgetsWithCategoryOfMonthObserver)
         month.removeObserver(monthObserver)
         allBudgets.removeObserver(allBudgetsObserver)
     }
@@ -178,25 +177,24 @@ class BudgetViewModel @Inject constructor(
      * Updates [availableMoney]
      */
     private fun updateAvailableMoney() {
-        val budsMon = budgetsOfMonth.value
+        val budsMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
         val mon = month.value
 
         if (budsMon != null && transOfCats != null && budsOfCats != null && mon != null) {
             // Update available money per budget
-            availableMoney.value = budsMon.map { budget ->
-                budget to
+            availableMoney.value = budsMon.map { budgetWithCategory ->
+                budgetWithCategory to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
-                        (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.name == budget.categoryName }?.transactions
+                        (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category == budgetWithCategory.category }?.transactions
                             ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= mon }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
-                        budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.name == budget.categoryName }!!.budgets
+                        budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category == budgetWithCategory.category }!!.budgets
                             .filter { bud -> bud.month <= mon }
                             .fold(0L, { acc, bud -> acc + bud.budgeted })
-
             }.toMap()
         }
 
@@ -210,7 +208,7 @@ class BudgetViewModel @Inject constructor(
         val buds = allBudgets.value
 
         if (trans != null && buds != null) {
-            toBeBudgeted.value = trans.filter { it.categoryName == Category.TO_BE_BUDGETED }
+            toBeBudgeted.value = trans.filter { it.categoryId == Category.TO_BE_BUDGETED.id }
                 .fold(0L, { acc, transaction -> acc + transaction.pay }) -
                     buds.fold(0L, { acc, budget -> acc + budget.budgeted })
         }
@@ -221,15 +219,15 @@ class BudgetViewModel @Inject constructor(
      */
     private fun checkBudgets() {
         val cats = categories.value
-        val budsMon = budgetsOfMonth.value
+        val budgetsWithCategory = budgetsWithCategoryOfMonth.value
         val mon = month.value
 
-        if(cats != null && budsMon != null && mon != null) {
+        if(cats != null && budgetsWithCategory != null && mon != null) {
             val missingBudgets =
                 // Find categories that have no budget in selected month
-                cats.filter { category -> budsMon.find { budget -> budget.categoryName == category.name } == null }
+                cats.filter { category -> budgetsWithCategory.find { budgetWithCategory -> budgetWithCategory.category == category } == null }
                     // Create budgets for filtered categories
-                    .map { category -> Budget(category.name, mon, 0) }
+                    .map { category -> Budget(category.id, mon, 0) }
                     .toTypedArray()
 
             // Add missing budgets
@@ -295,7 +293,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
         // Add adapter
         listBudgeting.adapter = BudgetListAdapter(
-            viewModel.budgetsOfMonth,
+            viewModel.budgetsWithCategoryOfMonth,
             viewModel.availableMoney,
             { budget -> // budget click
 

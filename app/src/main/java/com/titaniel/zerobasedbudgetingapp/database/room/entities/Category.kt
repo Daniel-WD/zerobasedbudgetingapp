@@ -8,12 +8,19 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Category(
-    @PrimaryKey val name: String
+    var name: String
 ) {
+
     companion object {
         /**
-         * Indicator for [TO_BE_BUDGETED] transactions
+         * Category that represents [TO_BE_BUDGETED]
          */
-        const val TO_BE_BUDGETED = "TO_BE_BUDGETED"
+        val TO_BE_BUDGETED = Category("\nTO_BE_BUDGETED").apply { id = -1 }
     }
+
+    /**
+     * [Transaction]s [id]
+     */
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
 }

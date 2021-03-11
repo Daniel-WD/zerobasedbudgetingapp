@@ -13,24 +13,23 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.Utils
 
 /**
- * [TransactionsListAdapter] in [context] for displaying a list of [transactions].
+ * [TransactionsListAdapter] in [context] for displaying a list of [transactionsWithCategoryAndPayee].
  * Needs [lifecycleOwner].
  */
 class TransactionsListAdapter(
-    private val transactions: LiveData<List<Transaction>>,
-    private val transactionClickedListener: (Transaction) -> Unit,
+    private val transactionsWithCategoryAndPayee: LiveData<List<TransactionWithCategoryAndPayee>>,
+    private val transactionClickedListener: (TransactionWithCategoryAndPayee) -> Unit,
     private val context: Context,
     lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<TransactionsListAdapter.TransactionItem>() {
 
     init {
         // Set observers
-        transactions.observe(lifecycleOwner) {
+        transactionsWithCategoryAndPayee.observe(lifecycleOwner) {
             notifyDataSetChanged()
         }
     }
@@ -78,31 +77,31 @@ class TransactionsListAdapter(
 
     override fun onBindViewHolder(holder: TransactionItem, position: Int) {
         // Transactions available?
-        transactions.value?.let {
+        transactionsWithCategoryAndPayee.value?.let {
 
             // Transaction
-            val transaction = it[position]
+            val transactionWithCategoryAndPayee = it[position]
 
             // Set image description available visibility
             holder.imgDescriptionAvailable.visibility =
-                if (transaction.description.isEmpty()) INVISIBLE else VISIBLE
+                if (transactionWithCategoryAndPayee.transaction.description.isEmpty()) INVISIBLE else VISIBLE
 
             // Set value text
-            holder.tvPay.text = transaction.pay.toString()
+            holder.tvPay.text = transactionWithCategoryAndPayee.transaction.pay.toString()
 
             // Set payee text
-            holder.cpPayee.text = transaction.payeeName
+            holder.cpPayee.text = transactionWithCategoryAndPayee.payee.name
 
             // Set category text
             holder.cpCategory.text =
-                if (transaction.categoryName == Category.TO_BE_BUDGETED) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transaction.categoryName
+                if (transactionWithCategoryAndPayee.category == null) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transactionWithCategoryAndPayee.category.name
 
             // Set date text
-            holder.tvDate.text = Utils.convertLocalDateToString(transaction.date)
+            holder.tvDate.text = Utils.convertLocalDateToString(transactionWithCategoryAndPayee.transaction.date)
 
             // Set click listener, item click callback
             holder.itemView.setOnClickListener {
-                transactionClickedListener(transaction)
+                transactionClickedListener(transactionWithCategoryAndPayee)
             }
         }
 
@@ -110,7 +109,7 @@ class TransactionsListAdapter(
 
     override fun getItemCount(): Int {
         // Return number transactions
-        return transactions.value?.size ?: 0
+        return transactionsWithCategoryAndPayee.value?.size ?: 0
     }
 
 }

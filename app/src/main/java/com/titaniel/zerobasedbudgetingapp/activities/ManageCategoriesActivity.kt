@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.activities
 import android.os.Bundle
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -15,6 +16,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_add_edit_category.AddEditCategoryFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -140,30 +143,46 @@ class ManageCategoriesActivity : AppCompatActivity() {
             viewModel.categories,
             { category, event ->
 
-                // Check if delete
-                if(event == ManageCategoriesListAdapter.DELETE_CATEGORY_EVENT) {
+                when(event) {
+                    // Delete category click
+                    ManageCategoriesListAdapter.DELETE_CATEGORY_EVENT -> {
+                        // Create and show alert dialog for delete
+                        MaterialAlertDialogBuilder(this)
+                            .setTitle(getString(R.string.activity_manage_categories_title))
+                            .setMessage(getString(R.string.activity_manage_categories_delete_dialog_content, category.name))
+                            .setNegativeButton(getString(R.string.activity_manage_categories_delete_dialog_cancel)) { _, _ -> }
+                            .setPositiveButton(getString(R.string.activity_manage_categories_delete_dialog_confirm)) { _, _ ->
 
-                    // Create and show alert dialog for delete
-                    MaterialAlertDialogBuilder(this)
-                        .setTitle(getString(R.string.activity_manage_categories_title))
-                        .setMessage(getString(R.string.activity_manage_categories_delete_dialog_content, category.name))
-                        .setNegativeButton(getString(R.string.activity_manage_categories_delete_dialog_cancel)) { _, _ -> }
-                        .setPositiveButton(getString(R.string.activity_manage_categories_delete_dialog_confirm)) { _, _ ->
+                                // Get categories, check not null
+                                val cats = viewModel.categories.value
+                                requireNotNull(cats)
 
-                            // Get categories, check not null
-                            val cats = viewModel.categories.value
-                            requireNotNull(cats)
+                                // Calc index of category to remove
+                                val removeIndex = cats.indexOf(category)
 
-                            // Calc index of category to remove
-                            val removeIndex = cats.indexOf(category)
+                                // Remove category
+                                cats.removeAt(removeIndex)
 
-                            // Remove category
-                            cats.removeAt(removeIndex)
+                                // Notify adapter
+                                listCategories.adapter!!.notifyItemRemoved(removeIndex)
+                            }
+                            .show()
+                    }
+                    // Edit category click
+                    ManageCategoriesListAdapter.EDIT_CATEGORY_EVENT -> {
 
-                            // Notify adapter
-                            listCategories.adapter!!.notifyItemRemoved(removeIndex)
-                        }
-                        .show()
+                        // Create add edit category fragment
+                        val addEditCategoryFragment = AddEditCategoryFragment()
+
+                        // Category id as argument
+                        addEditCategoryFragment.arguments =
+                            bundleOf(
+                                AddEditCategoryFragment.CATEGORY_ID_KEY to category.id
+                            )
+
+                        // Show add edit category fragment
+                        addEditCategoryFragment.show(supportFragmentManager, "AddEditCategoryFragment")
+                    }
                 }
             },
             itemTouchHelper,

@@ -9,7 +9,7 @@ import java.time.LocalDate
  */
 @Entity
 data class Budget(
-    var categoryName: String,
+    var categoryId: Long,
     val month: LocalDate,
     var budgeted: Long
 ) {

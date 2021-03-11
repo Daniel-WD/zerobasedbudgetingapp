@@ -6,12 +6,12 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
- * [BudgetsOfCategory] relation, mapping [budgets] to a [category]
+ * [BudgetWithCategory] relation. [Budget] with [Category].
  */
-data class BudgetsOfCategory(
-    @Embedded val category: Category,
+data class BudgetWithCategory(
+    @Embedded val budget: Budget,
     @Relation(
-        parentColumn = "id",
-        entityColumn = "categoryId"
-    ) val budgets: List<Budget>
+        parentColumn = "categoryId",
+        entityColumn = "id"
+    ) val category: Category
 )

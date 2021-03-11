@@ -2,6 +2,7 @@ package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -45,6 +46,13 @@ class TransactionRepository @Inject constructor(
      */
     fun getAllTransactions(): Flow<List<Transaction>> {
         return transactionDao.getAll()
+    }
+
+    /**
+     * Get all TransactionWithCategory
+     */
+    fun getAllTransactionsWithCategoryAndPayee(): Flow<List<TransactionWithCategoryAndPayee>> {
+        return transactionDao.getAllTransactionsWithCategoryAndPayee()
     }
 
 }

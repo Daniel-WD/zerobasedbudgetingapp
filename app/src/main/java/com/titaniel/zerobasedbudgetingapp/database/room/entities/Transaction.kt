@@ -10,13 +10,13 @@ import java.time.LocalDate
 @Entity
 data class Transaction(
     var pay: Long,
-    var payeeName: String,
-    var categoryName: String,
+    var payeeId: Long,
+    var categoryId: Long,
     var description: String,
     var date: LocalDate
 ) {
     /**
-     * [Transaction] [id]
+     * [Transaction]s [id]
      */
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

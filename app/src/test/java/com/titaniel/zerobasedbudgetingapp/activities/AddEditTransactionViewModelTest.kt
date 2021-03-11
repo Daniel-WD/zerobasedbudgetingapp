@@ -18,7 +18,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
@@ -98,8 +97,8 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         val date = LocalDate.now()
 
         addEditTransactionViewModel.pay.value = pay
-        addEditTransactionViewModel.payeeName.value = payeeName
-        addEditTransactionViewModel.categoryName.value = categoryName
+        addEditTransactionViewModel.payee.value = payeeName
+        addEditTransactionViewModel.category.value = categoryName
         addEditTransactionViewModel.description.value = description
         addEditTransactionViewModel.date.value = date
 
@@ -124,32 +123,32 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
     fun checks_data_validity_correctly() {
 
         // Data case 1
-        addEditTransactionViewModel.categoryName.value = "name"
-        addEditTransactionViewModel.payeeName.value = "name"
+        addEditTransactionViewModel.category.value = "name"
+        addEditTransactionViewModel.payee.value = "name"
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isTrue()
 
         // Data case 2
-        addEditTransactionViewModel.categoryName.value = ""
-        addEditTransactionViewModel.payeeName.value = "name"
+        addEditTransactionViewModel.category.value = ""
+        addEditTransactionViewModel.payee.value = "name"
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
         // Data case 3
-        addEditTransactionViewModel.categoryName.value = "name"
-        addEditTransactionViewModel.payeeName.value = ""
+        addEditTransactionViewModel.category.value = "name"
+        addEditTransactionViewModel.payee.value = ""
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
         // Data case 4
-        addEditTransactionViewModel.categoryName.value = "name"
-        addEditTransactionViewModel.payeeName.value = "name"
+        addEditTransactionViewModel.category.value = "name"
+        addEditTransactionViewModel.payee.value = "name"
         addEditTransactionViewModel.date.value = null
 
         // Apply data
@@ -249,8 +248,8 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
         val date = LocalDate.now().plusDays(10)
 
         addEditTransactionViewModel.pay.value = pay
-        addEditTransactionViewModel.payeeName.value = payeeName
-        addEditTransactionViewModel.categoryName.value = categoryName
+        addEditTransactionViewModel.payee.value = payeeName
+        addEditTransactionViewModel.category.value = categoryName
         addEditTransactionViewModel.description.value = description
         addEditTransactionViewModel.date.value = date
 

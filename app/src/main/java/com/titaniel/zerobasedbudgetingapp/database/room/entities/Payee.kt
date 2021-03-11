@@ -8,5 +8,11 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Payee(
-    @PrimaryKey val name: String
-)
+    var name: String
+) {
+    /**
+     * [Payee]s [id]
+     */
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+}

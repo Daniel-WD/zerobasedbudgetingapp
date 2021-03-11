@@ -13,7 +13,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,8 +30,8 @@ class TransactionsViewModel @Inject constructor(
     /**
      * All transactions
      */
-    val transactions: LiveData<List<Transaction>> =
-        transactionRepository.getAllTransactions().asLiveData()
+    val transactionsWithCategoryAndPayee: LiveData<List<TransactionWithCategoryAndPayee>> =
+        transactionRepository.getAllTransactionsWithCategoryAndPayee().asLiveData()
 
 }
 
@@ -73,13 +73,13 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
 
         // Set adapter
         transactionsList.adapter = TransactionsListAdapter(
-            viewModel.transactions,
-            { transaction ->
+            viewModel.transactionsWithCategoryAndPayee,
+            { transactionWithCategoryAndPayee ->
                 // Start add/edit transaction activity and transmit transaction uuid
                 startActivity(
                     Intent(requireContext(), AddEditTransactionActivity::class.java).putExtra(
                         AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
-                        transaction.id
+                        transactionWithCategoryAndPayee.transaction.id
                     ),
                 )
             },

@@ -39,7 +39,7 @@ class AddEditCategoryViewModel @Inject constructor(
      * Category to edit
      */
     val category =
-        categoryRepository.getCategoryByName(savedStateHandle[AddEditCategoryFragment.CATEGORY_ID_KEY]!!)
+        categoryRepository.getCategoryById(savedStateHandle[AddEditCategoryFragment.CATEGORY_ID_KEY]!!)
             .asLiveData()
 
     /**
@@ -48,14 +48,14 @@ class AddEditCategoryViewModel @Inject constructor(
     fun updateCategory(categoryName: String) {
 
         // Get budget, check non-null
-        val bud = category.value
-        requireNotNull(bud)
+        val cat = category.value
+        requireNotNull(cat)
 
-        // Set category name TODO
-//        bud.budgeted = budgeted
+        // Set category name
+        cat.name = categoryName
         viewModelScope.launch {
-            // Update budget in repo TODO
-//            budgetRepository.updateBudgets(bud)
+            // Update category in repo
+            categoryRepository.updateCategories(cat)
         }
 
     }
@@ -159,6 +159,7 @@ class AddEditCategoryFragment : BottomSheetDialogFragment() {
         // Budgeted value
         val newCategoryName = etCategory.text.toString()
 
+        // Update category
         viewModel.updateCategory(newCategoryName)
 
         // Close fragment

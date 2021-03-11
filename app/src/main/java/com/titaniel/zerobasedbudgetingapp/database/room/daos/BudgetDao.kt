@@ -1,11 +1,10 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import androidx.room.Query
-import androidx.room.Update
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -44,5 +43,26 @@ interface BudgetDao {
      */
     @Query("SELECT * FROM budget")
     fun getAll(): Flow<List<Budget>>
+
+    /**
+     * Get all BudgetWithCategory
+     */
+    @Transaction
+    @Query("SELECT * FROM budget")
+    fun getAllBudgetsWithCategory(): Flow<List<BudgetWithCategory>>
+
+    /**
+     * Get BudgetWithCategory with [month]
+     */
+    @Transaction
+    @Query("SELECT * FROM budget WHERE month = :month")
+    fun getBudgetsWithCategoryByMonth(month: LocalDate): Flow<List<BudgetWithCategory>>
+
+    /**
+     * Get BudgetWithCategory by [id]
+     */
+    @Transaction
+    @Query("SELECT * FROM budget WHERE budget.id = :id")
+    fun getBudgetWithCategoryById(id: Long): Flow<BudgetWithCategory>
 
 }

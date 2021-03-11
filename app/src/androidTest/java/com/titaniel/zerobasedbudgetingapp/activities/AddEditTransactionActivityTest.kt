@@ -13,7 +13,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
-import com.google.common.util.concurrent.Service
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
@@ -51,9 +50,9 @@ class AddEditTransactionActivityTest {
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.payeeName).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.payee).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.pay).thenReturn(MutableLiveData(0L))
-        `when`(mockViewModel.categoryName).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.category).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.description).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.date).thenReturn(MutableLiveData())
         `when`(mockViewModel.editTransaction).thenReturn(MutableLiveData(null))
@@ -159,8 +158,8 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values in ViewModel correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payeeName)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(categoryName)
+        assertThat(mockViewModel.payee.value).isEqualTo(payeeName)
+        assertThat(mockViewModel.category.value).isEqualTo(categoryName)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(date)
 
@@ -360,8 +359,8 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payee)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(category)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
 
@@ -419,8 +418,8 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payee)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(category)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
     }

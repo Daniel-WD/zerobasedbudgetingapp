@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.database.room.daos
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -40,5 +41,11 @@ interface TransactionDao {
      */
     @Query("SELECT * FROM `transaction`")
     fun getAll(): Flow<List<Transaction>>
+
+    /**
+     * Get all TransactionWithCategoryAndPayee
+     */
+    @Query("SELECT * FROM `transaction`")
+    fun getAllTransactionsWithCategoryAndPayee(): Flow<List<TransactionWithCategoryAndPayee>>
 
 }

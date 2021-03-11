@@ -15,8 +15,8 @@ class PayeeRepository @Inject constructor(
     /**
      * Add [payees]
      */
-    suspend fun addPayees(vararg payees: Payee) {
-        payeeDao.add(*payees)
+    suspend fun addPayees(vararg payees: Payee): Array<Long> {
+        return payeeDao.add(*payees)
     }
 
     /**

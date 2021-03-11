@@ -15,6 +15,20 @@ class CategoryRepository @Inject constructor(
 ) {
 
     /**
+     * Add [categories]
+     */
+    suspend fun addCategories(vararg categories: Category) {
+        categoryDao.add(*categories)
+    }
+
+    /**
+     * Update [categories]
+     */
+    suspend fun updateCategories(vararg categories: Category) {
+        categoryDao.update(*categories)
+    }
+
+    /**
      * Get all categories
      */
     fun getAllCategories(): Flow<List<Category>> {
@@ -22,10 +36,10 @@ class CategoryRepository @Inject constructor(
     }
 
     /**
-     * Get category by [categoryName]
+     * Get category by [categoryId]
      */
-    fun getCategoryByName(categoryName: String): Flow<Category> {
-        return categoryDao.getById(categoryName)
+    fun getCategoryById(categoryId: Long): Flow<Category> {
+        return categoryDao.getById(categoryId)
     }
 
     /**

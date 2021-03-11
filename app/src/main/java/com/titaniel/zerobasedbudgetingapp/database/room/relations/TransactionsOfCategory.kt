@@ -11,7 +11,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 data class TransactionsOfCategory(
     @Embedded val category: Category,
     @Relation(
-        parentColumn = "name",
-        entityColumn = "categoryName"
+        parentColumn = "id",
+        entityColumn = "categoryId"
     ) val transactions: List<Transaction>
 )

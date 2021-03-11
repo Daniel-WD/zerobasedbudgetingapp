@@ -7,7 +7,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
@@ -68,7 +67,7 @@ class BudgetFragmentTest {
     fun setup() {
         // Set ViewModel properties
         `when`(mockViewModel.toBeBudgeted).thenReturn(MutableLiveData(toBeBudgeted))
-        `when`(mockViewModel.budgetsOfMonth).thenReturn(MutableLiveData(exampleBudgetsOfMonth))
+        `when`(mockViewModel.budgetsWithCategoryOfMonth).thenReturn(MutableLiveData(exampleBudgetsOfMonth))
         `when`(mockViewModel.availableMoney).thenReturn(MutableLiveData(exampleAvailableMoney))
 
         // Launch scenario
