@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
@@ -138,7 +139,32 @@ class ManageCategoriesActivity : AppCompatActivity() {
         listCategories.adapter = ManageCategoriesListAdapter(
             viewModel.categories,
             { category, event ->
-                TODO("react on delete and edit")
+
+                // Check if delete
+                if(event == ManageCategoriesListAdapter.DELETE_CATEGORY_EVENT) {
+
+                    // Create and show alert dialog for delete
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle(getString(R.string.activity_manage_categories_title))
+                        .setMessage(getString(R.string.activity_manage_categories_delete_dialog_content, category.name))
+                        .setNegativeButton(getString(R.string.activity_manage_categories_delete_dialog_cancel)) { _, _ -> }
+                        .setPositiveButton(getString(R.string.activity_manage_categories_delete_dialog_confirm)) { _, _ ->
+
+                            // Get categories, check not null
+                            val cats = viewModel.categories.value
+                            requireNotNull(cats)
+
+                            // Calc index of category to remove
+                            val removeIndex = cats.indexOf(category)
+
+                            // Remove category
+                            cats.removeAt(removeIndex)
+
+                            // Notify adapter
+                            listCategories.adapter!!.notifyItemRemoved(removeIndex)
+                        }
+                        .show()
+                }
             },
             itemTouchHelper,
             this,

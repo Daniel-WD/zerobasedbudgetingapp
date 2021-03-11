@@ -12,6 +12,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -116,15 +118,7 @@ class ManageCategoriesListAdapter(
 
             // Set listener for delete
             holder.ivDelete.setOnClickListener {
-
-                // Calc index of category to remove
-                val removeIndex = cats.indexOf(category)
-
-                // Remove category
-                cats.removeAt(removeIndex)
-
-                // Notify adapter
-                notifyItemRemoved(removeIndex)
+                itemEventListener(category, DELETE_CATEGORY_EVENT)
             }
         }
 
