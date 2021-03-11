@@ -22,6 +22,13 @@ class CategoryRepository @Inject constructor(
     }
 
     /**
+     * Get category by [categoryName]
+     */
+    fun getCategoryByName(categoryName: String): Flow<Category> {
+        return categoryDao.getById(categoryName)
+    }
+
+    /**
      * Get all TransactionsOfCategory relations
      */
     fun getTransactionsOfCategories(): Flow<List<TransactionsOfCategory>> {

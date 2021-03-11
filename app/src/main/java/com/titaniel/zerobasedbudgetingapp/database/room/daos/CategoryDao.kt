@@ -42,4 +42,10 @@ interface CategoryDao {
     @Query("SELECT * FROM category")
     fun getBudgetsOfCategories(): Flow<List<BudgetsOfCategory>>
 
+    /**
+     * Get category by [categoryName]
+     */
+    @Query("SELECT * FROM category WHERE category.name == :categoryName")
+    fun getById(categoryName: String): Flow<Category>
+
 }
