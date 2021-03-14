@@ -77,11 +77,11 @@ class DatabaseModule {
 //        GlobalScope.launch {
 //            db.clearAllTables()
 //            db.categoryDao().add(
-//                Category("Freundin"),
-//                Category("Lebensmittel"),
-//                Category("PC"),
-//                Category("Fisch"),
-//                Category("Sex")
+//                Category("Freundin", 0),
+//                Category("Lebensmittel", 1),
+//                Category("PC", 2),
+//                Category("Fisch", 3),
+//                Category("Sex", 4)
 //            )
 //        }
 //

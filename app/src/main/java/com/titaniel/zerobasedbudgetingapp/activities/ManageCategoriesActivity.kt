@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.ItemTouchHelper.DOWN
+import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -16,12 +19,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_add_edit_category.AddEditCategoryFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.reEmit
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -34,9 +37,88 @@ class ManageCategoriesViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
+     * Observer for [categories]
+     */
+    private val categoriesObserver: Observer<List<Category>> by lazy {
+
+        // Create observer
+        Observer {
+
+            // Check not null
+            it?.let {
+
+                // Set newCategories
+                newCategories.value = it.toMutableList()
+
+                // Remove this observer
+                categories.removeObserver(categoriesObserver)
+            }
+
+        }
+    }
+
+    /**
      * All categories
      */
-    val categories = categoryRepository.getAllCategories().map { it.toMutableList() }.asLiveData()
+    private val categories = categoryRepository.getAllCategories().asLiveData()
+
+    /**
+     * New categories, copy of first [categories] value with changes by the user.
+     */
+    val newCategories: MutableLiveData<MutableList<Category>> = MutableLiveData()
+
+    init {
+        // Set categoriesObserver
+        categories.observeForever(categoriesObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        // Make sure categoriesObserver has been detached
+        categories.removeObserver(categoriesObserver)
+    }
+
+    /**
+     * Give category with [categoryId] new [name]. Returns true if name is valid, false otherwise
+     */
+    fun addEditCategory(
+        categoryId: Long?,
+        name: String
+    ): Boolean {
+
+        // Check name valid
+        if (name.isBlank() || newCategories.value!!.filter { it.id != categoryId }.find { it.name == name } != null) {
+            return false
+        }
+
+        // Get cats
+        val cats = newCategories.value
+        requireNotNull(cats)
+
+        if(categoryId == null) {
+            // Create new category
+            val newCat = Category(name, cats.size)
+
+            // Add new category to cats
+            cats.add(newCat)
+
+        } else {
+            // Find category
+            val category = cats.find { it.id == categoryId }
+            requireNotNull(category)
+
+            // Set newName
+            category.name = name
+
+        }
+
+        // Re emit newCategories value to notify recycler view
+        newCategories.reEmit()
+
+        return true
+
+    }
 
 }
 
@@ -78,14 +160,18 @@ class ManageCategoriesActivity : AppCompatActivity() {
                     val pos1 = viewHolder.adapterPosition
                     val pos2 = target.adapterPosition
 
-                    // Get categories
-                    val cats = viewModel.categories.value!!
+                    // Get categories as mutable list
+                    val cats = viewModel.newCategories.value
+                    requireNotNull(cats)
 
                     // Swap category positions
                     cats[pos1] = cats[pos2].also { cats[pos2] = cats[pos1] }
 
                     // Notify adapter
-                    (recyclerView.adapter as ManageCategoriesListAdapter).notifyItemMoved(pos1, pos2)
+                    (recyclerView.adapter as ManageCategoriesListAdapter).notifyItemMoved(
+                        pos1,
+                        pos2
+                    )
 
                     return true
                 }
@@ -121,7 +207,7 @@ class ManageCategoriesActivity : AppCompatActivity() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.addCategory -> {
-                    TODO("Add category")
+                    addEditCategory()
                     true
                 }
                 else -> false
@@ -140,21 +226,26 @@ class ManageCategoriesActivity : AppCompatActivity() {
 
         // Set adapter
         listCategories.adapter = ManageCategoriesListAdapter(
-            viewModel.categories,
+            viewModel.newCategories,
             { category, event ->
 
-                when(event) {
+                when (event) {
                     // Delete category click
                     ManageCategoriesListAdapter.DELETE_CATEGORY_EVENT -> {
                         // Create and show alert dialog for delete
                         MaterialAlertDialogBuilder(this)
                             .setTitle(getString(R.string.activity_manage_categories_title))
-                            .setMessage(getString(R.string.activity_manage_categories_delete_dialog_content, category.name))
+                            .setMessage(
+                                getString(
+                                    R.string.activity_manage_categories_delete_dialog_content,
+                                    category.name
+                                )
+                            )
                             .setNegativeButton(getString(R.string.activity_manage_categories_delete_dialog_cancel)) { _, _ -> }
                             .setPositiveButton(getString(R.string.activity_manage_categories_delete_dialog_confirm)) { _, _ ->
 
                                 // Get categories, check not null
-                                val cats = viewModel.categories.value
+                                val cats = viewModel.newCategories.value
                                 requireNotNull(cats)
 
                                 // Calc index of category to remove
@@ -170,18 +261,7 @@ class ManageCategoriesActivity : AppCompatActivity() {
                     }
                     // Edit category click
                     ManageCategoriesListAdapter.EDIT_CATEGORY_EVENT -> {
-
-                        // Create add edit category fragment
-                        val addEditCategoryFragment = AddEditCategoryFragment()
-
-                        // Category id as argument
-                        addEditCategoryFragment.arguments =
-                            bundleOf(
-                                AddEditCategoryFragment.CATEGORY_ID_KEY to category.id
-                            )
-
-                        // Show add edit category fragment
-                        addEditCategoryFragment.show(supportFragmentManager, "AddEditCategoryFragment")
+                        addEditCategory(category.id)
                     }
                 }
             },
@@ -203,6 +283,27 @@ class ManageCategoriesActivity : AppCompatActivity() {
         // Set itemTouchHelper
         itemTouchHelper.attachToRecyclerView(listCategories)
 
+    }
+
+    /**
+     * Opens AddEditCategoryFragment to edit category with [categoryId]. Adds new category when [categoryId] is -1 or none is provided.
+     */
+    private fun addEditCategory(categoryId: Long = -1) {
+
+        // Create add edit category fragment
+        val addEditCategoryFragment = AddEditCategoryFragment()
+
+        // Category id as argument
+        addEditCategoryFragment.arguments =
+            bundleOf(
+                AddEditCategoryFragment.CATEGORY_ID_KEY to categoryId
+            )
+
+        // Show add edit category fragment
+        addEditCategoryFragment.show(
+            supportFragmentManager,
+            "AddEditCategoryFragment"
+        )
     }
 
 }

@@ -21,6 +21,8 @@
     <string name="activity_manage_categories_delete_dialog_confirm">Yes</string>
     <string name="activity_manage_categories_delete_dialog_cancel">Cancel</string>
 
+    <string name="activity_manage_categories_new_category">New Category</string>
+
     <!-- AddEditTransactionActivity -->
     <string name="activity_add_edit_transaction_create_transaction">Create Transaction</string>
     <string name="activity_add_edit_transaction_edit_transaction">Edit Transaction</string>

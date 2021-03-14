@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -23,7 +24,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
  * Notifies [itemEventListener] when an action is performed on the item.
  */
 class ManageCategoriesListAdapter(
-    private val categories: LiveData<MutableList<Category>>,
+    private val categories: MutableLiveData<MutableList<Category>>,
     private val itemEventListener: (Category, Int) -> Unit,
     private val itemTouchHelper: ItemTouchHelper,
     private val context: Context,

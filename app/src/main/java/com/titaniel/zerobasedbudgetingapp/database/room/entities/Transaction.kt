@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 /**
- * [Transaction] with [pay], [payeeName], [categoryName], [description] and a [date]
+ * [Transaction] with [pay], [payeeId], [categoryId], [description], [date] and [id]
  */
 @Entity
 data class Transaction(
@@ -13,11 +13,7 @@ data class Transaction(
     var payeeId: Long,
     var categoryId: Long,
     var description: String,
-    var date: LocalDate
-) {
-    /**
-     * [Transaction]s [id]
-     */
+    var date: LocalDate,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-}
+)

@@ -5,15 +5,13 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 /**
- * [Budget] with [categoryName], [month] and [budgeted] value
+ * [Budget] with [categoryId], [month], [budgeted] value and [id]
  */
 @Entity
 data class Budget(
-    var categoryId: Long,
+    val categoryId: Long,
     val month: LocalDate,
-    var budgeted: Long
-) {
-    /** [id] of this [Budget] */
+    var budgeted: Long,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-}
+)

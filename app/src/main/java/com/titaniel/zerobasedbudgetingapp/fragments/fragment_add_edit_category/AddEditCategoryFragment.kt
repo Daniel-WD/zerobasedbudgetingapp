@@ -9,58 +9,13 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.activities.ManageCategoriesViewModel
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetViewModel
-import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-/**
- * [UpdateBudgetViewModel] with [savedStateHandle] and [budgetRepository]
- */
-@HiltViewModel
-class AddEditCategoryViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val categoryRepository: CategoryRepository
-) : ViewModel() {
-
-    /**
-     * Category to edit
-     */
-    val category =
-        categoryRepository.getCategoryById(savedStateHandle[AddEditCategoryFragment.CATEGORY_ID_KEY]!!)
-            .asLiveData()
-
-    /**
-     * Update category to have [categoryName]
-     */
-    fun updateCategory(categoryName: String) {
-
-        // Get budget, check non-null
-        val cat = category.value
-        requireNotNull(cat)
-
-        // Set category name
-        cat.name = categoryName
-        viewModelScope.launch {
-            // Update category in repo
-            categoryRepository.updateCategories(cat)
-        }
-
-    }
-
-}
 
 /**
  * [UpdateBudgetFragment] to change budgeted value of a [Budget]
@@ -73,7 +28,7 @@ class AddEditCategoryFragment : BottomSheetDialogFragment() {
         /**
          * Category id key
          */
-        const val CATEGORY_ID_KEY = "category_name_key"
+        const val CATEGORY_ID_KEY = "category_id_key"
 
     }
 
@@ -88,10 +43,9 @@ class AddEditCategoryFragment : BottomSheetDialogFragment() {
     private lateinit var ivDone: ImageView
 
     /**
-     * View model
+     * Parent ViewModel
      */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val viewModel: AddEditCategoryViewModel by provideViewModel()
+    private val parentViewModel: ManageCategoriesViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -109,32 +63,45 @@ class AddEditCategoryFragment : BottomSheetDialogFragment() {
         etCategory = requireView().findViewById(R.id.etCategory)
         ivDone = requireView().findViewById(R.id.ivDone)
 
-        // Category observer
-        viewModel.category.observe(viewLifecycleOwner) {
-            // Check category non-null
-            if (it == null) {
-                return@observe
-            }
+        // Get category
+        val category =
+            requireArguments()[CATEGORY_ID_KEY].let { id -> parentViewModel.newCategories.value?.find { it.id == id } }
 
-            // Set category name
-            etCategory.setText(it.name)
+        // Setup etCategory
+        // Set category name
+        etCategory.setText(category?.name ?: getString(R.string.activity_manage_categories_new_category))
 
-            // Select category name text
-            etCategory.selectAll()
+        // Select category name text
+        etCategory.selectAll()
 
-            // Focus category name EditText
-            etCategory.requestFocus()
-        }
+        // Focus category name EditText
+        etCategory.requestFocus()
 
         // Setup done listener
         ivDone.setOnClickListener {
-            updateCategoryName()
+            // Try change category
+            parentViewModel.addEditCategory(
+                category?.id,
+                etCategory.text.toString()
+            ).let {
+                if (it) {
+                    dismiss()
+                }
+            }
         }
 
         // Keyboard done action click listener
         etCategory.setOnEditorActionListener { _, action, _ ->
             if (action == EditorInfo.IME_ACTION_DONE) {
-                updateCategoryName()
+                // Try change category
+                parentViewModel.addEditCategory(
+                    category?.id,
+                    etCategory.text.toString()
+                ).let {
+                    if (it) {
+                        dismiss()
+                    }
+                }
             }
             false
         }
@@ -151,18 +118,4 @@ class AddEditCategoryFragment : BottomSheetDialogFragment() {
         return dialog
     }
 
-    /**
-     * Update category name and dismiss dialog
-     */
-    private fun updateCategoryName() {
-
-        // Budgeted value
-        val newCategoryName = etCategory.text.toString()
-
-        // Update category
-        viewModel.updateCategory(newCategoryName)
-
-        // Close fragment
-        dismiss()
-    }
 }
