@@ -43,16 +43,16 @@ class ManageCategoriesViewModel @Inject constructor(
     private val categoriesObserver: Observer<List<Category>> by lazy {
 
         // Create observer
-        Observer {
+        Observer { categories ->
 
             // Check not null
-            it?.let {
+            categories?.let { cats ->
 
                 // Set newCategories
-                newCategories.value = it.toMutableList()
+                newCategories.value = cats.map { it.copy() }.toMutableList()
 
                 // Remove this observer
-                categories.removeObserver(categoriesObserver)
+                this.categories.removeObserver(categoriesObserver)
             }
 
         }
@@ -61,10 +61,12 @@ class ManageCategoriesViewModel @Inject constructor(
     /**
      * All categories
      */
-    private val categories = categoryRepository.getAllCategories().map { list -> list.sortedBy { it.index } }.asLiveData()
+    private val categories =
+        categoryRepository.getAllCategories().map { list -> list.sortedBy { it.index } }
+            .asLiveData()
 
     /**
-     * New categories, copy of first [categories] value with changes by the user.
+     * New categories, copy of first [categories] value with changes by the user. NOTE: Needed so that changes don't get discarded when [categories] gets changed.
      */
     val newCategories: MutableLiveData<MutableList<Category>> = MutableLiveData()
 
@@ -81,6 +83,12 @@ class ManageCategoriesViewModel @Inject constructor(
     }
 
     /**
+     * Returns if [newCategories] is different from [categories]
+     */
+    fun hasChanges() =
+        categories.value != newCategories.value
+
+    /**
      * Give category with [categoryId] new [name]. Returns true if name is valid, false otherwise
      */
     fun addEditCategory(
@@ -89,7 +97,8 @@ class ManageCategoriesViewModel @Inject constructor(
     ): Boolean {
 
         // Check name valid
-        if (name.isBlank() || newCategories.value!!.filter { it.id != categoryId }.find { it.name == name } != null) {
+        if (name.isBlank() || newCategories.value!!.filter { it.id != categoryId }
+                .find { it.name == name } != null) {
             return false
         }
 
@@ -97,7 +106,7 @@ class ManageCategoriesViewModel @Inject constructor(
         val cats = newCategories.value
         requireNotNull(cats)
 
-        if(categoryId == null) {
+        if (categoryId == null) {
             // Create new category
             val newCat = Category(name, cats.size)
 
@@ -217,8 +226,20 @@ class ManageCategoriesActivity : AppCompatActivity() {
 
         // Setup close listener
         toolbar.setNavigationOnClickListener {
-            // TODO Discard changes
-            finish()
+            // Create and show alert dialog for discard changes, if changes have been made
+            if (viewModel.hasChanges()) {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.activity_manage_categories_discard_dialog_title))
+                    .setMessage(getString(R.string.activity_manage_categories_discard_dialog_content))
+                    .setNegativeButton(getString(R.string.activity_manage_categories_dialog_cancel)) { _, _ -> }
+                    .setPositiveButton(getString(R.string.activity_manage_categories_dialog_confirm)) { _, _ ->
+                        finish()
+                    }
+                    .show()
+            } else { // Finish otherwise
+                finish()
+            }
+
         }
 
         // Setup listCategories
@@ -235,15 +256,15 @@ class ManageCategoriesActivity : AppCompatActivity() {
                     ManageCategoriesListAdapter.DELETE_CATEGORY_EVENT -> {
                         // Create and show alert dialog for delete
                         MaterialAlertDialogBuilder(this)
-                            .setTitle(getString(R.string.activity_manage_categories_title))
+                            .setTitle(getString(R.string.activity_manage_categories_delete_dialog_title))
                             .setMessage(
                                 getString(
                                     R.string.activity_manage_categories_delete_dialog_content,
                                     category.name
                                 )
                             )
-                            .setNegativeButton(getString(R.string.activity_manage_categories_delete_dialog_cancel)) { _, _ -> }
-                            .setPositiveButton(getString(R.string.activity_manage_categories_delete_dialog_confirm)) { _, _ ->
+                            .setNegativeButton(getString(R.string.activity_manage_categories_dialog_cancel)) { _, _ -> }
+                            .setPositiveButton(getString(R.string.activity_manage_categories_dialog_confirm)) { _, _ ->
 
                                 // Get categories, check not null
                                 val cats = viewModel.newCategories.value

@@ -14,13 +14,17 @@
 
     <string name="activity_manage_categories_add_category">Add Category</string>
 
-    <string name="activity_manage_categories_delete_dialog_title">Delete Category</string>
+    <string name="activity_manage_categories_delete_dialog_title">Delete Category?</string>
     <string name="activity_manage_categories_delete_dialog_content">
         Do you really want to delete %s? All transactions that use this category will be set to \"To be Budgeted\".
     </string>
-    <string name="activity_manage_categories_delete_dialog_confirm">Yes</string>
-    <string name="activity_manage_categories_delete_dialog_cancel">Cancel</string>
+    <string name="activity_manage_categories_dialog_confirm">Yes</string>
+    <string name="activity_manage_categories_dialog_cancel">Cancel</string>
 
+    <string name="activity_manage_categories_discard_dialog_title">Discard Changes?</string>
+    <string name="activity_manage_categories_discard_dialog_content">
+        Do you really want to discard all changes?
+    </string>
     <string name="activity_manage_categories_new_category">New Category</string>
 
     <!-- AddEditTransactionActivity -->
