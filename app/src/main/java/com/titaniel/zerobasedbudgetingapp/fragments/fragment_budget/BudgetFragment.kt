@@ -29,6 +29,7 @@ import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_upd
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -84,7 +85,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * All budgetsWithCategory of selected month
      */
-    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!).asLiveData()
+    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!).map { list -> list.sortedBy { it.category.index } }.asLiveData()
 
     /**
      * Available money per budget

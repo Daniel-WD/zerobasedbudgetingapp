@@ -26,7 +26,7 @@ class BudgetListAdapter(
 
     init {
         // Setup observers
-        budgetsWithCategoryOfMonth.observe(lifecycleOwner) {
+        budgetsWithCategoryOfMonth.observe(lifecycleOwner) { budgetsWithCategory ->
             notifyDataSetChanged()
         }
         availableMoney.observe(lifecycleOwner) {

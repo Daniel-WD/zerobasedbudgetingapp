@@ -25,6 +25,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.reEmit
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -60,7 +61,7 @@ class ManageCategoriesViewModel @Inject constructor(
     /**
      * All categories
      */
-    private val categories = categoryRepository.getAllCategories().asLiveData()
+    private val categories = categoryRepository.getAllCategories().map { list -> list.sortedBy { it.index } }.asLiveData()
 
     /**
      * New categories, copy of first [categories] value with changes by the user.
