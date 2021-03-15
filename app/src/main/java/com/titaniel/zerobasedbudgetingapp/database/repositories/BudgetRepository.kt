@@ -29,6 +29,13 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Delete [budgets] in database
+     */
+    suspend fun deleteBudgets(vararg budgets: Budget) {
+        budgetDao.delete(*budgets)
+    }
+
+    /**
      * Get all budgets
      */
     fun getAllBudgets(): Flow<List<Budget>> {

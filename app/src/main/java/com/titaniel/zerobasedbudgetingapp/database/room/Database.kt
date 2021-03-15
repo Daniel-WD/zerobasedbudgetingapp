@@ -19,7 +19,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.DatabaseAttributeConverters
 @Database(
     entities = [Transaction::class, Category::class, Payee::class, Budget::class],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(DatabaseAttributeConverters::class)
 abstract class Database : RoomDatabase() {

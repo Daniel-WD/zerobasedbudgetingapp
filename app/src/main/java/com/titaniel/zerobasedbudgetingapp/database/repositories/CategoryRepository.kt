@@ -22,6 +22,13 @@ class CategoryRepository @Inject constructor(
     }
 
     /**
+     * Delete [categories]
+     */
+    suspend fun deleteCategories(vararg categories: Category) {
+        categoryDao.delete(*categories)
+    }
+
+    /**
      * Update [categories]
      */
     suspend fun updateCategories(vararg categories: Category) {

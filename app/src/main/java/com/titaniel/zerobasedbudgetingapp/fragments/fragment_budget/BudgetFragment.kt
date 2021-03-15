@@ -178,14 +178,14 @@ class BudgetViewModel @Inject constructor(
      * Updates [availableMoney]
      */
     private fun updateAvailableMoney() {
-        val budsMon = budgetsWithCategoryOfMonth.value
+        val budsWithCatMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
         val mon = month.value
 
-        if (budsMon != null && transOfCats != null && budsOfCats != null && mon != null) {
+        if (budsWithCatMon != null && transOfCats != null && budsOfCats != null && mon != null && budsOfCats.size == budsWithCatMon.size) {
             // Update available money per budget
-            availableMoney.value = budsMon.map { budgetWithCategory ->
+            availableMoney.value = budsWithCatMon.map { budgetWithCategory ->
                 budgetWithCategory to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.id == budgetWithCategory.category.id }?.transactions

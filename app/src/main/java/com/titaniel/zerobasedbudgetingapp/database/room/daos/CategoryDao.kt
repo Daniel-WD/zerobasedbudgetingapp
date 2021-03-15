@@ -26,6 +26,12 @@ interface CategoryDao {
     suspend fun update(vararg categories: Category)
 
     /**
+     * Delete [categories]
+     */
+    @Delete
+    suspend fun delete(vararg categories: Category)
+
+    /**
      * Get all categories
      */
     @Query("SELECT * FROM category")

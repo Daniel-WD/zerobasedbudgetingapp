@@ -27,6 +27,12 @@ interface BudgetDao {
     suspend fun update(vararg budgets: Budget)
 
     /**
+     * Delete [budgets]
+     */
+    @Delete
+    suspend fun delete(vararg budgets: Budget)
+
+    /**
      * Get budget with [id]
      */
     @Query("SELECT * FROM budget WHERE id = :id")

@@ -16,7 +16,7 @@
 
     <string name="activity_manage_categories_delete_dialog_title">Delete Category?</string>
     <string name="activity_manage_categories_delete_dialog_content">
-        Do you really want to delete %s? All transactions that use this category will be set to \"To be Budgeted\".
+        Do you really want to delete %s? All transactions that use this category will be set to \"To be Budgeted\" and its budgets will be deleted.
     </string>
     <string name="activity_manage_categories_dialog_confirm">Yes</string>
     <string name="activity_manage_categories_dialog_cancel">Cancel</string>
