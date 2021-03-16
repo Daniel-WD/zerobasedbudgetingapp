@@ -26,4 +26,11 @@ class PayeeRepository @Inject constructor(
         return payeeDao.getAll()
     }
 
+    /**
+     * Get payee by [payeeId]
+     */
+    fun getPayeeById(payeeId: Long): Flow<Payee> {
+        return payeeDao.getById(payeeId)
+    }
+
 }

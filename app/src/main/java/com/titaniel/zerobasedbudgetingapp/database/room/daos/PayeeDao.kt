@@ -25,4 +25,10 @@ interface PayeeDao {
     @Query("SELECT * FROM payee")
     fun getAll(): Flow<List<Payee>>
 
+    /**
+     * Get payee by [payeeId]
+     */
+    @Query("SELECT * FROM payee WHERE payee.id = :payeeId")
+    fun getById(payeeId: Long): Flow<Payee>
+
 }

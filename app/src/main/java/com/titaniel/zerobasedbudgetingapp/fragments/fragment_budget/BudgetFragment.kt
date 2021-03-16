@@ -42,7 +42,7 @@ class BudgetViewModel @Inject constructor(
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
     private val budgetRepository: BudgetRepository
-) : ViewModel() {
+) : ViewModel() { // FIXME -> use Mediatorlivedata
 
     // FIXME -> should be private after month can be set by the user
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

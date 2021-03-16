@@ -31,6 +31,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -44,7 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    categoryRepository: CategoryRepository,
+    private val categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
     private val payeeRepository: PayeeRepository
 ) : ViewModel() {
@@ -111,28 +112,30 @@ class AddEditTransactionViewModel @Inject constructor(
      * Sets [payee] to payee with [payeeId]
      */
     fun setPayeeById(payeeId: Long) {
-        // Find payee with payeeId
-        val newPayee = allPayees.value!!.find { it.id == payeeId }
 
-        // Check newPayee not null
-        requireNotNull(newPayee)
+        viewModelScope.launch {
+            // Get payee and set it
+            payee.value = payeeRepository.getPayeeById(payeeId).first()
+        }
 
-        // Set new payee
-        payee.value = newPayee
     }
 
     /**
      * Sets [category] to payee with [categoryId]
      */
     fun setCategoryById(categoryId: Long) {
-        // Find category with categoryId
-        val newCategory = allCategories.value!!.find { it.id == categoryId }
 
-        // Check newCategory not null
-        requireNotNull(newCategory)
+        // Check if it is TO_BE_BUDGETED
+        if(categoryId == Category.TO_BE_BUDGETED.id) {
+            // Set to be budgeted as category
+            category.value = Category.TO_BE_BUDGETED
+        } else {
+            viewModelScope.launch {
+                // Get category and set it
+                category.value = categoryRepository.getCategoryById(categoryId).first()
+            }
+        }
 
-        // Set new category
-        category.value = newCategory
     }
 
     /**
@@ -304,7 +307,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Transaction observer
         viewModel.editTransaction.observe(this, {
-            // Show transaction
 
             it?.let {
                 // Change texts for edit mode
