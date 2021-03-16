@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 
 /**
  * [TransactionsListAdapter] in [context] for displaying a list of [transactionsWithCategoryAndPayee].
@@ -97,7 +97,7 @@ class TransactionsListAdapter(
                 if (transactionWithCategoryAndPayee.category == null) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transactionWithCategoryAndPayee.category.name
 
             // Set date text
-            holder.tvDate.text = Utils.convertLocalDateToString(transactionWithCategoryAndPayee.transaction.date)
+            holder.tvDate.text = convertLocalDateToString(transactionWithCategoryAndPayee.transaction.date)
 
             // Set click listener, item click callback
             holder.itemView.setOnClickListener {

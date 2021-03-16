@@ -25,7 +25,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -394,7 +394,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Set date observer
         viewModel.date.observe(this) {
             it?.let {
-                tvDate.text = Utils.convertLocalDateToString(it)
+                tvDate.text = convertLocalDateToString(it)
             }
         }
 

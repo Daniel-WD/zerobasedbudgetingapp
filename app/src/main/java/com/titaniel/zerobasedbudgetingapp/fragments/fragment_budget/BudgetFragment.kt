@@ -5,11 +5,7 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +22,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCate
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
+import com.titaniel.zerobasedbudgetingapp.utils.mediatorLiveDataBuilder
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,9 +39,9 @@ class BudgetViewModel @Inject constructor(
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
     private val budgetRepository: BudgetRepository
-) : ViewModel() { // FIXME -> use Mediatorlivedata
+) : ViewModel() {
 
-    // FIXME -> should be private after month can be set by the user
+    // FIXME -> should be private after month can be set by the user; month filter to db?
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
             /**
              * Month
@@ -93,91 +90,24 @@ class BudgetViewModel @Inject constructor(
     val availableMoney: MutableLiveData<Map<BudgetWithCategory, Long>> = MutableLiveData(emptyMap())
 
     /**
-     * ViewModel observer for categories
+     * MediatorLiveData for [budgetsWithCategoryOfMonth], [transactionsOfCategories], [budgetsOfCategories], [month]
      */
-    private val categoriesObserver: Observer<List<Category>> =
-        Observer {
-            //checkBudgets() //I
-        }
+    private val updateAvailableMoneyMediator = mediatorLiveDataBuilder(budgetsWithCategoryOfMonth, transactionsOfCategories, budgetsOfCategories, month)
 
     /**
-     * ViewModel observer for budgetsOfCategories
+     * MediatorLiveData for [transactions], [allBudgets]
      */
-    private val budgetsOfCategoriesObserver: Observer<List<BudgetsOfCategory>> =
-        Observer {
-            updateAvailableMoney()
-        }
+    private val updateToBeBudgetedMediator = mediatorLiveDataBuilder(transactions, allBudgets)
 
     /**
-     * ViewModel observer for transactionsOfCategories
+     * MediatorLiveData for [categories], [budgetsWithCategoryOfMonth], [month]
      */
-    private val transactionsOfCategoriesObserver: Observer<List<TransactionsOfCategory>> =
-        Observer {
-            updateAvailableMoney()
-        }
+    private val checkBudgetsMediator = mediatorLiveDataBuilder(budgetsWithCategoryOfMonth, month)
 
     /**
-     * ViewModel observer for transactions
+     * Observer to update [availableMoney]
      */
-    private val transactionsObserver: Observer<List<Transaction>> =
-        Observer {
-            updateToBeBudgeted()
-        }
-
-    /**
-     * ViewModel observer for budgetsWithCategoryOfMonth
-     */
-    private val budgetsWithCategoryOfMonthObserver: Observer<List<BudgetWithCategory>> =
-        Observer {
-            checkBudgets() //IIII
-            updateAvailableMoney()
-        }
-
-    /**
-     * ViewModel observer for allBudgets
-     */
-    private val allBudgetsObserver: Observer<List<Budget>> =
-        Observer {
-            updateToBeBudgeted()
-        }
-
-    /**
-     * ViewModel observer for month
-     */
-    private val monthObserver: Observer<LocalDate> =
-        Observer {
-            checkBudgets()
-            updateAvailableMoney()
-        }
-
-    init {
-        // Register all observers
-        categories.observeForever(categoriesObserver)
-        budgetsOfCategories.observeForever(budgetsOfCategoriesObserver)
-        transactionsOfCategories.observeForever(transactionsOfCategoriesObserver)
-        transactions.observeForever(transactionsObserver)
-        budgetsWithCategoryOfMonth.observeForever(budgetsWithCategoryOfMonthObserver)
-        allBudgets.observeForever(allBudgetsObserver)
-        month.observeForever(monthObserver)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        // Remove all observers
-        categories.removeObserver(categoriesObserver)
-        budgetsOfCategories.removeObserver(budgetsOfCategoriesObserver)
-        transactionsOfCategories.removeObserver(transactionsOfCategoriesObserver)
-        transactions.removeObserver(transactionsObserver)
-        budgetsWithCategoryOfMonth.removeObserver(budgetsWithCategoryOfMonthObserver)
-        month.removeObserver(monthObserver)
-        allBudgets.removeObserver(allBudgetsObserver)
-    }
-
-    /**
-     * Updates [availableMoney]
-     */
-    private fun updateAvailableMoney() {
+    private val updateAvailableMoneyObserver: Observer<Any> = Observer {
         val budsWithCatMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
@@ -198,13 +128,13 @@ class BudgetViewModel @Inject constructor(
                             .fold(0L, { acc, bud -> acc + bud.budgeted })
             }.toMap()
         }
-
     }
 
     /**
-     * Update [toBeBudgeted]
+     * Observer to update [toBeBudgeted]
      */
-    private fun updateToBeBudgeted() {
+    private val updateToBeBudgetedObserver: Observer<Any> = Observer {
+
         val trans = transactions.value
         val buds = allBudgets.value
 
@@ -216,9 +146,9 @@ class BudgetViewModel @Inject constructor(
     }
 
     /**
-     * Checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
+     * Observer to checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
      */
-    private fun checkBudgets() {
+    private val checkBudgetsObserver: Observer<Any> = Observer {
         val cats = categories.value
         val budgetsWithCategory = budgetsWithCategoryOfMonth.value
         val mon = month.value
@@ -236,6 +166,22 @@ class BudgetViewModel @Inject constructor(
                 budgetRepository.addBudgets(*missingBudgets)
             }
         }
+    }
+
+    init {
+        // Register all observers
+        updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
+        updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
+        checkBudgetsMediator.observeForever(checkBudgetsObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        // Remove all observers
+        updateAvailableMoneyMediator.removeObserver(updateAvailableMoneyObserver)
+        updateToBeBudgetedMediator.removeObserver(updateToBeBudgetedObserver)
+        checkBudgetsMediator.removeObserver(checkBudgetsObserver)
     }
 
 }
