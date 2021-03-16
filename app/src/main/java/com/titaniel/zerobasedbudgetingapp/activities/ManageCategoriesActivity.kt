@@ -136,37 +136,51 @@ class ManageCategoriesViewModel @Inject constructor(
      */
     fun saveNewCategories() {
 
-        // Get cats list that should be saved as new cats list
-        val saveCats = newCategories.value
-        requireNotNull(saveCats)
+        // Get old and new cat lists
+        val oldCatsList = categories.value
+        val newCatsList = newCategories.value
+        requireNotNull(oldCatsList)
+        requireNotNull(newCatsList)
 
         // Apply indexes to new category order
-        saveCats.forEachIndexed { i, category -> category.index = i }
+        newCatsList.forEachIndexed { i, category -> category.index = i }
 
         // Find categories that should be deleted
-        val delCats =
-            categories.value!!.filter { category -> saveCats.find { it.id == category.id } == null }
+        val delCats = oldCatsList.filter { category -> newCatsList.find { it.id == category.id } == null }
+
+        // Find new categories
+        val newCats = newCatsList.filter { it.id < 1 }
+
+        // Find cats to update
+        val updateCats = newCatsList.toMutableList().apply {
+            removeAll(delCats)
+            removeAll(newCats)
+        }
 
         viewModelScope.launch {
 
             // Update transactions that had a category that should be deleted to use Category.TO_BE_BUDGETED instead
-            val updatedTransactions = transactionRepository.getAllTransactions().first().map { transaction ->
-                // Check if category is contained in delCats
-                delCats.find { it.id == transaction.categoryId }?.let {
-                    // Set category to TO_BE_BUDGETED
-                    transaction.categoryId = Category.TO_BE_BUDGETED.id
+            val updatedTransactions =
+                transactionRepository.getAllTransactions().first().map { transaction ->
+                    // Check if category is contained in delCats
+                    delCats.find { it.id == transaction.categoryId }?.let {
+                        // Set category to TO_BE_BUDGETED
+                        transaction.categoryId = Category.TO_BE_BUDGETED.id
+                    }
+                    transaction
                 }
-                transaction
-            }
 
             // Update transactions
             transactionRepository.updateTransactions(*updatedTransactions.toTypedArray())
 
-            // Delete old categories (dependent budgets get deleted by foreign key)
+            // Delete categories (dependent budgets get deleted by foreign key)
             categoryRepository.deleteCategories(*delCats.toTypedArray())
 
-            // Add new categories
-            categoryRepository.addCategories(*saveCats.toTypedArray())
+            // Add categories
+            categoryRepository.addCategories(*newCats.toTypedArray())
+
+            // Update categories
+            categoryRepository.updateCategories(*updateCats.toTypedArray())
         }
 
     }
