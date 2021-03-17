@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 
 /**
- * TODO
+ * [ManageCategoriesViewModel] with [categoryRepository] and [transactionRepository] for ManageCategoriesFragment
  */
 @HiltViewModel
 class ManageCategoriesViewModel @Inject constructor(
