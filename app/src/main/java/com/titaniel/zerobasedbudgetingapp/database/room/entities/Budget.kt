@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * [Budget] with [categoryId], [month], [budgeted] value and [id]
@@ -15,7 +16,7 @@ import java.time.LocalDate
     onUpdate = ForeignKey.NO_ACTION)])
 data class Budget(
     val categoryId: Long,
-    val month: LocalDate,
+    val month: YearMonth,
     var budgeted: Long,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

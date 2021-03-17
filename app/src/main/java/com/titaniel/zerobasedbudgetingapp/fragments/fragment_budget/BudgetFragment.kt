@@ -17,10 +17,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryReposito
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.utils.mediatorLiveDataBuilder
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -28,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 /**
@@ -41,12 +38,12 @@ class BudgetViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
-    // FIXME -> should be private after month can be set by the user; month filter to db?
+    // FIXME -> should be private after month can be set by the user
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-            /**
-             * Month
-             */
-    val month = MutableLiveData(LocalDate.of(2021, 2, 1))
+    /**
+     * Month
+     */
+    val month = MutableLiveData(YearMonth.of(2021, 2))
 
     /**
      * All categories
@@ -61,8 +58,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Transactions by categories
      */
-    private val transactionsOfCategories =
-        categoryRepository.getTransactionsOfCategories().asLiveData()
+    private val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * All budgets
@@ -82,7 +78,8 @@ class BudgetViewModel @Inject constructor(
     /**
      * All budgetsWithCategory of selected month
      */
-    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!).map { list -> list.sortedBy { it.category.index } }.asLiveData()
+    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!)
+        .map { list -> list.sortedBy { it.category.index } }.asLiveData()
 
     /**
      * Available money per budget
@@ -92,7 +89,12 @@ class BudgetViewModel @Inject constructor(
     /**
      * MediatorLiveData for [budgetsWithCategoryOfMonth], [transactionsOfCategories], [budgetsOfCategories], [month]
      */
-    private val updateAvailableMoneyMediator = mediatorLiveDataBuilder(budgetsWithCategoryOfMonth, transactionsOfCategories, budgetsOfCategories, month)
+    private val updateAvailableMoneyMediator = mediatorLiveDataBuilder(
+        budgetsWithCategoryOfMonth,
+        transactionsOfCategories,
+        budgetsOfCategories,
+        month
+    )
 
     /**
      * MediatorLiveData for [transactions], [allBudgets]
@@ -102,7 +104,8 @@ class BudgetViewModel @Inject constructor(
     /**
      * MediatorLiveData for [categories], [budgetsWithCategoryOfMonth], [month]
      */
-    private val checkBudgetsMediator = mediatorLiveDataBuilder(budgetsWithCategoryOfMonth, month)
+    private val checkBudgetsMediator =
+        mediatorLiveDataBuilder(categories, budgetsWithCategoryOfMonth, month)
 
     /**
      * Observer to update [availableMoney]
@@ -119,7 +122,7 @@ class BudgetViewModel @Inject constructor(
                 budgetWithCategory to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.id == budgetWithCategory.category.id }?.transactions
-                            ?.filter { transaction -> transaction.date.withDayOfMonth(1) <= mon }
+                            ?.filter { transaction -> transaction.date.year <= mon.year && transaction.date.month <= mon.month }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
@@ -153,7 +156,7 @@ class BudgetViewModel @Inject constructor(
         val budgetsWithCategory = budgetsWithCategoryOfMonth.value
         val mon = month.value
 
-        if(cats != null && budgetsWithCategory != null && mon != null) {
+        if (cats != null && budgetsWithCategory != null && mon != null) {
             val missingBudgets =
                 // Find categories that have no budget in selected month
                 cats.filter { category -> budgetsWithCategory.find { budgetWithCategory -> budgetWithCategory.category == category } == null }
@@ -262,7 +265,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         )
 
         // Add horizontal dividers, if not already there
-        if(listBudgeting.itemDecorationCount == 0) {
+        if (listBudgeting.itemDecorationCount == 0) {
             listBudgeting.addItemDecoration(
                 DividerItemDecoration(
                     context,

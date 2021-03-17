@@ -5,6 +5,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 /**
@@ -52,7 +53,7 @@ class BudgetRepository @Inject constructor(
     /**
      * Get budgets with [month]
      */
-    fun getBudgetsByMonth(month: LocalDate): Flow<List<Budget>> {
+    fun getBudgetsByMonth(month: YearMonth): Flow<List<Budget>> {
         return budgetDao.getByMonth(month)
     }
 
@@ -66,7 +67,7 @@ class BudgetRepository @Inject constructor(
     /**
      * Get BudgetWithCategory with [month]
      */
-    fun getBudgetsWithCategoryByMonth(month: LocalDate): Flow<List<BudgetWithCategory>> {
+    fun getBudgetsWithCategoryByMonth(month: YearMonth): Flow<List<BudgetWithCategory>> {
         return budgetDao.getBudgetsWithCategoryByMonth(month)
     }
 
