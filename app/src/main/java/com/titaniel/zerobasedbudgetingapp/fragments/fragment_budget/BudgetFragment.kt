@@ -122,7 +122,7 @@ class BudgetViewModel @Inject constructor(
                 budgetWithCategory to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.id == budgetWithCategory.category.id }?.transactions
-                            ?.filter { transaction -> transaction.date.year <= mon.year && transaction.date.month <= mon.month }
+                            ?.filter { transaction -> transaction.date.year < mon.year || ( transaction.date.year == mon.year && transaction.date.month <= mon.month) }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
@@ -151,7 +151,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
      */
-    private val checkBudgetsObserver: Observer<Any> = Observer {
+    private val checkBudgetsObserver: Observer<Any> = Observer { // TODO is there a better place for this? Maybe after month set or after adding new categories?
         val cats = categories.value
         val budgetsWithCategory = budgetsWithCategoryOfMonth.value
         val mon = month.value

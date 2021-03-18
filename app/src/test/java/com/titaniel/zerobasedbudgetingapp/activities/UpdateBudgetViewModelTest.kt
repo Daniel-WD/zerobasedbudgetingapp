@@ -19,6 +19,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
@@ -49,7 +50,7 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Test budget
      */
-    private val budget = Budget("cat", LocalDate.now(), 234)
+    private val budget = Budget(1, YearMonth.now(), 234)
 
     @ExperimentalCoroutinesApi
     @Before

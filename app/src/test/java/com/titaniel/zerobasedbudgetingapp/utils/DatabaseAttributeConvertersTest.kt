@@ -13,7 +13,7 @@ class DatabaseAttributeConvertersTest {
 
     @Test
     fun converts_epoch_day_to_date_correctly() {
-        assertThat(converters.localDateEpochDayToDate(18678)).isEqualTo(LocalDate.of(2021, 2, 20))
+        assertThat(converters.epochDayToLocalDate(18678)).isEqualTo(LocalDate.of(2021, 2, 20))
     }
 
     @Test

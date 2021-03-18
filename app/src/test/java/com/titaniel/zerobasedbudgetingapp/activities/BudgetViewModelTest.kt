@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.activities
 
 import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
@@ -9,6 +10,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepos
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
@@ -23,6 +25,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
+import java.time.YearMonth
+import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
@@ -53,64 +57,80 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Test month
      */
-    val month: LocalDate = LocalDate.of(2020, 9, 1)
+    val month: YearMonth = YearMonth.of(2020, 9)
 
     /**
      * Fake category data
      */
     val exampleCategories = listOf(
-        Category("cat1"), // 0
-        Category("cat2"), // 1
-        Category("cat3"), // 2
-        Category("cat4"), // 3
-        Category("cat5"), // 4
-        Category("cat6") // 5
+        Category("cat1", 0, 0), // 0
+        Category("cat2", 1, 1), // 1
+        Category("cat3", 2, 2), // 2
+        Category("cat4", 3, 3), // 3
+        Category("cat5", 4, 4), // 4
+        Category("cat6", 5, 5) // 5
     )
 
     /**
      * Fake budget data
      */
     val exampleBudgets = listOf(
-        Budget("cat1", LocalDate.of(2020, 9, 1), 200), // 0
-        Budget("cat2", LocalDate.of(2020, 9, 1), 500), // 1
-        Budget("cat4", LocalDate.of(2020, 9, 1), -1000), // 2
+        Budget(0, YearMonth.of(2020, 9), 200, 0), // 0
+        Budget(1, YearMonth.of(2020, 9), 500, 1), // 1
+        Budget(3, YearMonth.of(2020, 9), -1000, 2), // 2
 
-        Budget("cat2", LocalDate.of(2020, 10, 1), 200), // 3
-        Budget("cat3", LocalDate.of(2020, 10, 1), 500), // 4
-        Budget("cat4", LocalDate.of(2020, 10, 1), -1000), // 5
-        Budget("cat5", LocalDate.of(2010, 3, 1), 200), // 6
-        Budget("cat2", LocalDate.of(2020, 1, 1), 500), // 7
-        Budget("cat4", LocalDate.of(1999, 12, 1), -1000) // 8
+        Budget(1, YearMonth.of(2020, 10), 200, 3), // 3
+        Budget(2, YearMonth.of(2020, 10), 500, 4), // 4
+        Budget(3, YearMonth.of(2020, 10), -1000, 5), // 5
+        Budget(4, YearMonth.of(2010, 3), 200, 6), // 6
+        Budget(1, YearMonth.of(2020, 1), 500, 7), // 7
+        Budget(3, YearMonth.of(1999, 12), -1000, 8) // 8
+    )
+
+    /**
+     * Fake budgets with category data
+     */
+    val exampleBudgetsWithCategory = mutableListOf(
+        BudgetWithCategory(exampleBudgets[0], exampleCategories[0]),
+        BudgetWithCategory(exampleBudgets[1], exampleCategories[1]),
+        BudgetWithCategory(exampleBudgets[2], exampleCategories[3]),
+
+        BudgetWithCategory(exampleBudgets[3], exampleCategories[1]),
+        BudgetWithCategory(exampleBudgets[4], exampleCategories[2]),
+        BudgetWithCategory(exampleBudgets[5], exampleCategories[3]),
+        BudgetWithCategory(exampleBudgets[6], exampleCategories[4]),
+        BudgetWithCategory(exampleBudgets[7], exampleCategories[1]),
+        BudgetWithCategory(exampleBudgets[8], exampleCategories[3])
     )
 
     /**
      * Fake transaction data
      */
     val exampleTransactions = listOf(
-        Transaction(-100, "payee", "cat1", "", LocalDate.of(2020, 9, 1)), // 0
-        Transaction(-190, "payee", "cat1", "", LocalDate.of(2020, 9, 23)), // 1
-        Transaction(1000, "payee", "cat1", "", LocalDate.of(2020, 9, 10)), // 2
-        Transaction(300, "payee", "cat2", "", LocalDate.of(2020, 9, 15)), // 3
-        Transaction(-50, "payee", "cat2", "", LocalDate.of(2020, 9, 10)), // 4
-        Transaction(-10, "payee", "cat5", "", LocalDate.of(2020, 9, 9)), // 5
-        Transaction(-100, "payee", "cat5", "", LocalDate.of(2020, 9, 30)), // 6
+        Transaction(-100, 1, 0, "", LocalDate.of(2020, 9, 1), 0), // 0
+        Transaction(-190, 1, 0, "", LocalDate.of(2020, 9, 23), 1), // 1
+        Transaction(1000, 1, 0, "", LocalDate.of(2020, 9, 10), 2), // 2
+        Transaction(300, 1, 1, "", LocalDate.of(2020, 9, 15), 3), // 3
+        Transaction(-50, 1, 1, "", LocalDate.of(2020, 9, 10), 4), // 4
+            Transaction(-10, 1, 4, "", LocalDate.of(2020, 9, 9), 5), // 5
+            Transaction(-100, 1, 4, "", LocalDate.of(2020, 9, 30), 6), // 6
 
-        Transaction(-100, "payee", "cat1", "", LocalDate.of(2020, 5, 1)), // 7
-        Transaction(-190, "payee", "cat2", "", LocalDate.of(2020, 4, 23)), // 8
-        Transaction(1000, "payee", "cat1", "", LocalDate.of(2020, 10, 10)), // 9
-        Transaction(300, "payee", "cat3", "", LocalDate.of(2020, 12, 15)), // 10
-        Transaction(-50, "payee", "cat2", "", LocalDate.of(2020, 6, 10)), // 11
-        Transaction(-10, "payee", "cat5", "", LocalDate.of(2010, 9, 9)), // 12
-        Transaction(-100, "payee", "cat1", "", LocalDate.of(2021, 9, 30)), // 13
-        Transaction(-100, "payee", "cat5", "", LocalDate.of(2023, 10, 1)), // 14
-        Transaction(-190, "payee", "cat2", "", LocalDate.of(2011, 6, 23)), // 15
-        Transaction(1000, "payee", "cat1", "", LocalDate.of(2020, 2, 10)), // 16
-        Transaction(300, "payee", "cat4", "", LocalDate.of(2016, 12, 15)), // 17
-        Transaction(-50, "payee", "cat5", "", LocalDate.of(2020, 11, 10)), // 18
-        Transaction(-10, "payee", "cat2", "", LocalDate.of(2035, 10, 9)), // 19
-        Transaction(-100, "payee", "cat1", "", LocalDate.of(2020, 8, 30)), // 20
-        Transaction(9999, "payee", Category.TO_BE_BUDGETED, "", LocalDate.of(2020, 8, 30)), // 21
-        Transaction(-2, "payee", Category.TO_BE_BUDGETED, "", LocalDate.of(2020, 12, 30)) // 22
+        Transaction(-100, 1, 0, "", LocalDate.of(2020, 5, 1), 7), // 7
+        Transaction(-190, 1, 1, "", LocalDate.of(2020, 4, 23), 8), // 8
+        Transaction(1000, 1, 0, "", LocalDate.of(2020, 10, 10), 9), // 9
+        Transaction(300, 1, 2, "", LocalDate.of(2020, 12, 15), 10), // 10
+        Transaction(-50, 1, 1, "", LocalDate.of(2020, 6, 10), 11), // 11
+            Transaction(-10, 1, 4, "", LocalDate.of(2010, 9, 9), 12), // 12
+        Transaction(-100, 1, 0, "", LocalDate.of(2021, 9, 30), 13), // 13
+        Transaction(-100, 1, 4, "", LocalDate.of(2023, 10, 1), 14), // 14
+        Transaction(-190, 1, 1, "", LocalDate.of(2011, 6, 23), 15), // 15
+        Transaction(1000, 1, 0, "", LocalDate.of(2020, 2, 10), 16), // 16
+        Transaction(300, 1, 3, "", LocalDate.of(2016, 12, 15), 17), // 17
+        Transaction(-50, 1, 4, "", LocalDate.of(2020, 11, 10), 18), // 18
+        Transaction(-10, 1, 1, "", LocalDate.of(2035, 10, 9), 19), // 19
+        Transaction(-100, 1, 0, "", LocalDate.of(2020, 8, 30), 20), // 20
+        Transaction(9999, 1, Category.TO_BE_BUDGETED.id, "", LocalDate.of(2020, 8, 21)), // 21
+        Transaction(-2, 1, Category.TO_BE_BUDGETED.id, "", LocalDate.of(2020, 12, 22)) // 22
     )
 
     /**
@@ -234,8 +254,8 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
         })
 
         // Stub getBudgetsByMonth()
-        `when`(budgetRepositoryMock.getBudgetsByMonth(TestUtils.any())).thenReturn(flow {
-            emit(exampleBudgets.filter { it.month == month })
+        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(TestUtils.any())).thenReturn(flow {
+            emit(exampleBudgetsWithCategory.filter { it.budget.month == month })
         })
 
         // Stub getAllBudgets()
@@ -248,6 +268,15 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
             emit(exampleTransactions)
         })
 
+        createViewModel()
+
+    }
+
+    /**
+     * Creates the test ViewModel
+     */
+    private fun createViewModel() {
+
         // Create ViewModel to test
         budgetViewModel = BudgetViewModel(
             categoryRepositoryMock,
@@ -257,18 +286,45 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Set month
         budgetViewModel.month.value = month
-
     }
 
     @Test
     fun updates_available_money_correctly() {
 
+        // Missing budgets with category
+        val missingBudgetsWithCategory =
+            listOf(
+                BudgetWithCategory(Budget(2, month, 0, 9), exampleCategories[2]),
+                BudgetWithCategory(Budget(4, month, 0, 10), exampleCategories[4]),
+                BudgetWithCategory(Budget(5, month, 0, 11), exampleCategories[5])
+            )
+
         // Expected output: transactions + budgets (with corresponding category and <= month)
         val expectedAvailableMoney = mapOf(
-            exampleBudgets[0] to 1510L + 200L,
-            exampleBudgets[1] to -180L + 1000L,
-            exampleBudgets[2] to 300L - 2000L
+            exampleBudgetsWithCategory[0] to 1510L + 200L,
+            exampleBudgetsWithCategory[1] to -180L + 1000L,
+            exampleBudgetsWithCategory[2] to 300L - 2000L,
+            missingBudgetsWithCategory[0] to 0L + 0L,
+            missingBudgetsWithCategory[1] to 0L + 80L,
+            missingBudgetsWithCategory[2] to 0L + 0L
         )
+
+        // Add missing budgets
+        exampleBudgetsWithCategory.addAll(
+            listOf(
+                BudgetWithCategory(Budget(2, month, 0, 9), exampleCategories[2]),
+                BudgetWithCategory(Budget(4, month, 0, 10), exampleCategories[4]),
+                BudgetWithCategory(Budget(5, month, 0, 11), exampleCategories[5])
+            )
+        )
+
+        // Re-Stub getBudgetsByMonth()
+        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(TestUtils.any())).thenReturn(flow {
+            emit(exampleBudgetsWithCategory.filter { it.budget.month == month })
+        })
+
+        // Re-create ViewModel
+        createViewModel()
 
         assertThat(budgetViewModel.availableMoney.value).isEqualTo(expectedAvailableMoney)
 
@@ -288,9 +344,9 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Expected missing budgets
         val expectedMissingBudgets = listOf(
-            Budget("cat3", month, 0),
-            Budget("cat5", month, 0),
-            Budget("cat6", month, 0)
+            Budget(2, month, 0),
+            Budget(4, month, 0),
+            Budget(5, month, 0)
         ).toTypedArray()
 
         // Verify addBudgets has been called

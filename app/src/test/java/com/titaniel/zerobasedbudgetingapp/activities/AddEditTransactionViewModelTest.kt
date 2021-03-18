@@ -5,8 +5,10 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
+import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,24 +48,42 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
     private lateinit var payeeRepositoryMock: PayeeRepository
 
     /**
+     * CategoryRepository mock
+     */
+    @Mock
+    private lateinit var categoryRepositoryMock: CategoryRepository
+
+    /**
      * AddEditTransactionViewModel to test
      */
     private lateinit var addEditTransactionViewModel: AddEditTransactionViewModel
 
     @ExperimentalCoroutinesApi
     @Before
-    override fun setup() {
+    override fun setup() = runBlocking {
         super.setup()
 
         // Stub getTransactionById of transaction repository
         `when`(transactionRepositoryMock.getTransactionById(-1)).thenReturn(emptyFlow())
 
+        // Stub getAllPayees of payee repository
+        `when`(payeeRepositoryMock.getAllPayees()).thenReturn(emptyFlow())
+
+        // Stub getAllPayees of payee repository
+        `when`(payeeRepositoryMock.addPayees(TestUtils.any())).thenReturn(arrayOf(1L))
+
+        // Stub getAllCategories of category repository
+        `when`(categoryRepositoryMock.getAllCategories()).thenReturn(emptyFlow())
+
         // Create ViewModel to test
-        addEditTransactionViewModel = spy(AddEditTransactionViewModel(
-            savedStateHandleMock,
-            transactionRepositoryMock,
-            payeeRepositoryMock
-        ))
+        addEditTransactionViewModel = spy(
+            AddEditTransactionViewModel(
+                savedStateHandleMock,
+                categoryRepositoryMock,
+                transactionRepositoryMock,
+                payeeRepositoryMock
+            )
+        )
 
     }
 
@@ -91,19 +111,19 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
 
         // Setup data
         val pay = 500L
-        val payeeName = "payee1"
-        val categoryName = "category1"
+        val payee = Payee("payee", 1)
+        val category = Category("category", 2)
         val description = "   Super \n cool description    \n"
         val date = LocalDate.now()
 
         addEditTransactionViewModel.pay.value = pay
-        addEditTransactionViewModel.payee.value = payeeName
-        addEditTransactionViewModel.category.value = categoryName
+        addEditTransactionViewModel.payee.value = payee
+        addEditTransactionViewModel.category.value = category
         addEditTransactionViewModel.description.value = description
         addEditTransactionViewModel.date.value = date
 
         val expectedTransaction =
-            Transaction(pay, payeeName, categoryName, description.trim(), date)
+            Transaction(pay, payee.id, category.id, description.trim(), date)
 
         // Apply data
         addEditTransactionViewModel.applyData()
@@ -112,7 +132,7 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         verify(transactionRepositoryMock).addTransactions(expectedTransaction)
 
         // Verify addPayees called
-        verify(payeeRepositoryMock).addPayees(Payee(payeeName))
+        verify(payeeRepositoryMock).addPayees(payee)
 
         // Verify checks for data validity
         verify(addEditTransactionViewModel).isDataValid()
@@ -123,32 +143,32 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
     fun checks_data_validity_correctly() {
 
         // Data case 1
-        addEditTransactionViewModel.category.value = "name"
-        addEditTransactionViewModel.payee.value = "name"
+        addEditTransactionViewModel.category.value = mock(Category::class.java)
+        addEditTransactionViewModel.payee.value = mock(Payee::class.java)
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isTrue()
 
         // Data case 2
-        addEditTransactionViewModel.category.value = ""
-        addEditTransactionViewModel.payee.value = "name"
+        addEditTransactionViewModel.category.value = null
+        addEditTransactionViewModel.payee.value = mock(Payee::class.java)
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
         // Data case 3
-        addEditTransactionViewModel.category.value = "name"
-        addEditTransactionViewModel.payee.value = ""
+        addEditTransactionViewModel.category.value = mock(Category::class.java)
+        addEditTransactionViewModel.payee.value = null
         addEditTransactionViewModel.date.value = LocalDate.now()
 
         // Apply data
         assertThat(addEditTransactionViewModel.isDataValid()).isFalse()
 
         // Data case 4
-        addEditTransactionViewModel.category.value = "name"
-        addEditTransactionViewModel.payee.value = "name"
+        addEditTransactionViewModel.category.value = mock(Category::class.java)
+        addEditTransactionViewModel.payee.value = mock(Payee::class.java)
         addEditTransactionViewModel.date.value = null
 
         // Apply data
@@ -180,6 +200,12 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
     private lateinit var payeeRepositoryMock: PayeeRepository
 
     /**
+     * CategoryRepository mock
+     */
+    @Mock
+    private lateinit var categoryRepositoryMock: CategoryRepository
+
+    /**
      * AddEditTransactionViewModel to test
      */
     private lateinit var addEditTransactionViewModel: AddEditTransactionViewModel
@@ -188,7 +214,7 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
      * Edit transaction
      */
     private val editTransaction =
-        Transaction(123, "payee", "category", "description", LocalDate.now())
+        Transaction(123, 3, 4, "description", LocalDate.now())
             .apply { id = 5 }
 
     @ObsoleteCoroutinesApi
@@ -207,9 +233,16 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
         `when`(transactionRepositoryMock.getTransactionById(editTransaction.id))
             .thenReturn(flow { emit(editTransaction) })
 
+        // Stub getAllPayees of payee repository
+        `when`(payeeRepositoryMock.getAllPayees()).thenReturn(emptyFlow())
+
+        // Stub getAllCategories of category repository
+        `when`(categoryRepositoryMock.getAllCategories()).thenReturn(emptyFlow())
+
         // Create ViewModel to test
         addEditTransactionViewModel = AddEditTransactionViewModel(
             savedStateHandleSpy,
+            categoryRepositoryMock,
             transactionRepositoryMock,
             payeeRepositoryMock
         )
@@ -241,24 +274,24 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
         addEditTransactionViewModel.editTransaction.test().awaitValue(1, TimeUnit.SECONDS)
 
         // Setup data
-        val pay = 500L
-        val payeeName = "payee1"
-        val categoryName = "category1"
-        val description = "   Super \n cool description    \n"
-        val date = LocalDate.now().plusDays(10)
+        val newPay = 500L
+        val newPayee = Payee("payee", 1)
+        val newCategory = Category("category", 34)
+        val newDescription = "   Super \n cool description    \n"
+        val newDate = LocalDate.now().plusDays(10)
 
-        addEditTransactionViewModel.pay.value = pay
-        addEditTransactionViewModel.payee.value = payeeName
-        addEditTransactionViewModel.category.value = categoryName
-        addEditTransactionViewModel.description.value = description
-        addEditTransactionViewModel.date.value = date
+        addEditTransactionViewModel.pay.value = newPay
+        addEditTransactionViewModel.payee.value = newPayee
+        addEditTransactionViewModel.category.value = newCategory
+        addEditTransactionViewModel.description.value = newDescription
+        addEditTransactionViewModel.date.value = newDate
 
         editTransaction.apply {
-            this.pay = pay
-            this.payeeName = payeeName
-            this.categoryName = categoryName
-            this.description = description
-            this.date = date
+            pay = newPay
+            payeeId = newPayee.id
+            categoryId = newCategory.id
+            description = newDescription
+            date = newDate
         }
 
         // Apply data

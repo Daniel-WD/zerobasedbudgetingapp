@@ -10,6 +10,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
+import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetRepositoryTest {
@@ -69,7 +70,7 @@ class BudgetRepositoryTest {
     @Test
     fun performs_get_budgets_by_month_correctly() {
         // Set id
-        val month = LocalDate.now()
+        val month = YearMonth.now()
 
         // Get budgets by month
         budgetRepository.getBudgetsByMonth(month)

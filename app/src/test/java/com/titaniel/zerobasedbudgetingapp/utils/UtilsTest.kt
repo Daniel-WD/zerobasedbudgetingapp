@@ -11,9 +11,9 @@ class UtilsTest {
 
     @Test
     fun converts_utc_timestamp_to_humanly_readable_date_string_correctly() {
-        assertThat(Utils.convertLocalDateToString(LocalDate.of(2021, 2, 4))).isEqualTo("04.02.2021")
+        assertThat(convertLocalDateToString(LocalDate.of(2021, 2, 4))).isEqualTo("04.02.2021")
         assertThat(
-            Utils.convertLocalDateToString(
+            convertLocalDateToString(
                 LocalDate.of(
                     2020,
                     1,
@@ -22,7 +22,7 @@ class UtilsTest {
             )
         ).isEqualTo("20.01.2020")
         assertThat(
-            Utils.convertLocalDateToString(
+            convertLocalDateToString(
                 LocalDate.of(
                     2025,
                     12,
