@@ -5,7 +5,11 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +18,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.ManageCategoriesActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -23,8 +28,8 @@ import com.titaniel.zerobasedbudgetingapp.utils.mediatorLiveDataBuilder
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.Month
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -33,22 +38,21 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
+    settingRepository: SettingRepository,
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
     private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
-    // FIXME -> should be private after month can be set by the user
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    /**
-     * Month
-     */
-    val month = MutableLiveData(YearMonth.of(2021, 2))
-
     /**
      * All categories
      */
     val categories = categoryRepository.getAllCategories().asLiveData()
+
+    /**
+     * Month
+     */
+    private val month = settingRepository.getMonth().asLiveData()
 
     /**
      * Budgets by categories
@@ -58,7 +62,8 @@ class BudgetViewModel @Inject constructor(
     /**
      * Transactions by categories
      */
-    private val transactionsOfCategories = categoryRepository.getTransactionsOfCategories().asLiveData()
+    private val transactionsOfCategories =
+        categoryRepository.getTransactionsOfCategories().asLiveData()
 
     /**
      * All budgets
@@ -76,10 +81,14 @@ class BudgetViewModel @Inject constructor(
     val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
 
     /**
+     * All budgetsWithCategory
+     */
+    private val allBudgetsWithCategory = budgetRepository.getAllBudgetsWithCategory().asLiveData()
+
+    /**
      * All budgetsWithCategory of selected month
      */
-    val budgetsWithCategoryOfMonth = budgetRepository.getBudgetsWithCategoryByMonth(month.value!!)
-        .map { list -> list.sortedBy { it.category.index } }.asLiveData()
+    val budgetsWithCategoryOfMonth: MutableLiveData<List<BudgetWithCategory>> = MutableLiveData()
 
     /**
      * Available money per budget
@@ -108,6 +117,26 @@ class BudgetViewModel @Inject constructor(
         mediatorLiveDataBuilder(categories, budgetsWithCategoryOfMonth, month)
 
     /**
+     * MediatorLiveData for [month], [allBudgetsWithCategory]
+     */
+    private val budgetsWithCategoryUpdateMediator =
+        mediatorLiveDataBuilder(month, allBudgetsWithCategory)
+
+    /**
+     * Observer to update [budgetsWithCategoryOfMonth]
+     */
+    private val budgetsWithCategoryUpdateObserver: Observer<Any> = Observer {
+
+        val mon = month.value
+        val budsWithCat = allBudgetsWithCategory.value
+
+        if(mon != null && budsWithCat != null) {
+            budgetsWithCategoryOfMonth.value = budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
+        }
+
+    }
+
+    /**
      * Observer to update [availableMoney]
      */
     private val updateAvailableMoneyObserver: Observer<Any> = Observer {
@@ -122,7 +151,7 @@ class BudgetViewModel @Inject constructor(
                 budgetWithCategory to
                         // Sum of all transactions of the category of this budget until selected month (inclusive)
                         (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.id == budgetWithCategory.category.id }?.transactions
-                            ?.filter { transaction -> transaction.date.year < mon.year || ( transaction.date.year == mon.year && transaction.date.month <= mon.month) }
+                            ?.filter { transaction -> transaction.date.year < mon.year || (transaction.date.year == mon.year && transaction.date.month <= mon.month) }
                             ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
 
                         // Added with sum of all budgets with same category before this budget (inclusive)
@@ -151,31 +180,38 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
      */
-    private val checkBudgetsObserver: Observer<Any> = Observer { // TODO is there a better place for this? Maybe after month set or after adding new categories?
-        val cats = categories.value
-        val budgetsWithCategory = budgetsWithCategoryOfMonth.value
-        val mon = month.value
+    private val checkBudgetsObserver: Observer<Any> =
+        Observer { // TODO is there a better place for this? Maybe after month set or after adding new categories?
+            val cats = categories.value
+            val budgetsWithCategory = budgetsWithCategoryOfMonth.value
+            val mon = month.value
 
-        if (cats != null && budgetsWithCategory != null && mon != null) {
-            val missingBudgets =
-                // Find categories that have no budget in selected month
-                cats.filter { category -> budgetsWithCategory.find { budgetWithCategory -> budgetWithCategory.category == category } == null }
-                    // Create budgets for filtered categories
-                    .map { category -> Budget(category.id, mon, 0) }
-                    .toTypedArray()
+            if (cats != null && budgetsWithCategory != null && mon != null) {
+                val missingBudgets =
+                    // Find categories that have no budget in selected month
+                    cats.filter { category -> budgetsWithCategory.find { budgetWithCategory -> budgetWithCategory.category == category } == null }
+                        // Create budgets for filtered categories
+                        .map { category -> Budget(category.id, mon, 0) }
+                        .toTypedArray()
 
-            // Add missing budgets
-            viewModelScope.launch {
-                budgetRepository.addBudgets(*missingBudgets)
+                // Add missing budgets
+                viewModelScope.launch {
+                    budgetRepository.addBudgets(*missingBudgets)
+                }
             }
         }
-    }
 
     init {
         // Register all observers
         updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
         checkBudgetsMediator.observeForever(checkBudgetsObserver)
+        budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
+
+        // Set month
+        viewModelScope.launch {
+            settingRepository.setMonth(YearMonth.of(2021, Month.MARCH))
+        }
     }
 
     override fun onCleared() {
@@ -185,6 +221,7 @@ class BudgetViewModel @Inject constructor(
         updateAvailableMoneyMediator.removeObserver(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.removeObserver(updateToBeBudgetedObserver)
         checkBudgetsMediator.removeObserver(checkBudgetsObserver)
+        budgetsWithCategoryUpdateMediator.removeObserver(budgetsWithCategoryUpdateObserver)
     }
 
 }
