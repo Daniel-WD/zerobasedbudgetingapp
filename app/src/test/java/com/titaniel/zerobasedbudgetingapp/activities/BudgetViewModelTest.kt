@@ -64,12 +64,12 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Test month
      */
-    val month: YearMonth = YearMonth.of(2020, 9)
+    private val month: YearMonth = YearMonth.of(2020, 9)
 
     /**
      * Fake category data
      */
-    val exampleCategories = listOf(
+    private val exampleCategories = listOf(
         Category("cat1", 0, 0), // 0
         Category("cat2", 1, 1), // 1
         Category("cat3", 2, 2), // 2
@@ -81,7 +81,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Fake budget data
      */
-    val exampleBudgets = listOf(
+    private val exampleBudgets = listOf(
         Budget(0, YearMonth.of(2020, 9), 200, 0), // 0
         Budget(1, YearMonth.of(2020, 9), 500, 1), // 1
         Budget(3, YearMonth.of(2020, 9), -1000, 2), // 2
@@ -97,7 +97,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Fake budgets with category data
      */
-    val exampleBudgetsWithCategory = mutableListOf(
+    private val exampleBudgetsWithCategory = mutableListOf(
         BudgetWithCategory(exampleBudgets[0], exampleCategories[0]),
         BudgetWithCategory(exampleBudgets[1], exampleCategories[1]),
         BudgetWithCategory(exampleBudgets[2], exampleCategories[3]),
@@ -113,7 +113,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Fake transaction data
      */
-    val exampleTransactions = listOf(
+    private val exampleTransactions = listOf(
         Transaction(-100, 1, 0, "", LocalDate.of(2020, 9, 1), 0), // 0
         Transaction(-190, 1, 0, "", LocalDate.of(2020, 9, 23), 1), // 1
         Transaction(1000, 1, 0, "", LocalDate.of(2020, 9, 10), 2), // 2
@@ -143,7 +143,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Fake budgetsOfCategories data
      */
-    val exampleBudgetsOfCategories = listOf(
+    private val exampleBudgetsOfCategories = listOf(
         BudgetsOfCategory(
             exampleCategories[0],
             listOf(
@@ -187,7 +187,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Fake transactionsOfCategories data
      */
-    val exampleTransactionsOfCategories = listOf(
+    private val exampleTransactionsOfCategories = listOf(
         TransactionsOfCategory(
             exampleCategories[0],
             listOf(
@@ -245,11 +245,6 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     override fun setup() {
         super.setup()
 
-        // Stub getAllCategories()
-        `when`(categoryRepositoryMock.getAllCategories()).thenReturn(flow {
-            emit(exampleCategories)
-        })
-
         // Stub getBudgetsOfCategories()
         `when`(categoryRepositoryMock.getBudgetsOfCategories()).thenReturn(flow {
             emit(exampleBudgetsOfCategories)
@@ -261,8 +256,8 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
         })
 
         // Stub getBudgetsByMonth()
-        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(TestUtils.any())).thenReturn(flow {
-            emit(exampleBudgetsWithCategory.filter { it.budget.month == month })
+        `when`(budgetRepositoryMock.getAllBudgetsWithCategory()).thenReturn(flow {
+            emit(exampleBudgetsWithCategory)
         })
 
         // Stub getAllBudgets()
@@ -275,7 +270,10 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
             emit(exampleTransactions)
         })
 
-        // Stub getMonth
+        // Stub getMonth()
+        `when`(settingRepositoryMock.getMonth()).thenReturn(flow {
+            emit(month)
+        })
 
         createViewModel()
 
@@ -326,8 +324,8 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
         )
 
         // Re-Stub getBudgetsByMonth()
-        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(TestUtils.any())).thenReturn(flow {
-            emit(exampleBudgetsWithCategory.filter { it.budget.month == month })
+        `when`(budgetRepositoryMock.getAllBudgetsWithCategory()).thenReturn(flow {
+            emit(exampleBudgetsWithCategory)
         })
 
         // Re-create ViewModel
@@ -344,20 +342,6 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
         val expectedToBeBudgeted = 9997L + 900L
 
         assertThat(budgetViewModel.toBeBudgeted.value).isEqualTo(expectedToBeBudgeted)
-    }
-
-    @Test
-    fun checks_budgets_correctly() = runBlocking {
-
-        // Expected missing budgets
-        val expectedMissingBudgets = listOf(
-            Budget(2, month, 0),
-            Budget(4, month, 0),
-            Budget(5, month, 0)
-        ).toTypedArray()
-
-        // Verify addBudgets has been called
-        verify(budgetRepositoryMock).addBudgets(*expectedMissingBudgets)
     }
 
 }

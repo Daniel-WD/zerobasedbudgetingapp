@@ -5,6 +5,8 @@ import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,9 +49,9 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
     private val budgetId = 1029L
 
     /**
-     * Test budget
+     * Test budgetWithCategory
      */
-    private val budget = Budget(1, YearMonth.now(), 234)
+    private val budgetWithCategory = BudgetWithCategory(Budget(1, YearMonth.now(), 234), Category("cat", 2, 1))
 
     @ExperimentalCoroutinesApi
     @Before
@@ -60,7 +62,7 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
         savedStateHandleSpy.set(UpdateBudgetFragment.BUDGET_ID_KEY, budgetId)
 
         // Stub getBudgetById
-        `when`(budgetRepositoryMock.getBudgetById(budgetId)).thenReturn(flow { emit(budget) })
+        `when`(budgetRepositoryMock.getBudgetWithCategoryById(budgetId)).thenReturn(flow { emit(budgetWithCategory) })
 
         // Create ViewModel instance
         updateBudgetViewModel = UpdateBudgetViewModel(
@@ -71,7 +73,7 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
     }
 
     @Test
-    fun performs_update_budget_correctly() = runBlocking {
+    fun performs_update_budget_correctly(): Unit = runBlocking {
 
         // New budgeted value
         val newBudgeted = 42L
@@ -83,7 +85,10 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
         updateBudgetViewModel.updateBudget(newBudgeted)
 
         // Expected budget
-        val expectedBudgetToUpdate = budget.copy(budgeted = newBudgeted)
+        val expectedBudgetToUpdate = budgetWithCategory.budget.let {
+            it.budgeted = newBudgeted
+            it
+        }
 
         // Verify updateBudgets() called
         verify(budgetRepositoryMock).updateBudgets(expectedBudgetToUpdate)
