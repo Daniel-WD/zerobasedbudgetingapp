@@ -7,10 +7,12 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOf
 import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository to interact with category data
  */
+@Singleton
 class CategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao
 ) {
@@ -18,22 +20,22 @@ class CategoryRepository @Inject constructor(
     /**
      * Add [categories]
      */
-    suspend fun addCategories(vararg categories: Category) {
-        categoryDao.add(*categories)
+    suspend fun addCategories(vararg categories: Category): Array<Long> {
+        return categoryDao.add(*categories)
     }
 
     /**
      * Delete [categories]
      */
-    suspend fun deleteCategories(vararg categories: Category) {
-        categoryDao.delete(*categories)
+    suspend fun deleteCategories(vararg categories: Category): Int {
+        return categoryDao.delete(*categories)
     }
 
     /**
      * Update [categories]
      */
-    suspend fun updateCategories(vararg categories: Category) {
-        categoryDao.update(*categories)
+    suspend fun updateCategories(vararg categories: Category): Int {
+        return categoryDao.update(*categories)
     }
 
     /**

@@ -11,7 +11,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -20,7 +19,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * [UpdateBudgetViewModel] with [savedStateHandle] and [budgetRepository]
+ * [UpdateBudgetViewModel] for [UpdateBudgetFragment].
  */
 @HiltViewModel
 class UpdateBudgetViewModel @Inject constructor(
@@ -37,10 +35,10 @@ class UpdateBudgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
-     * Budget to edit
+     * BudgetWithCategory to edit
      */
-    val budget =
-        budgetRepository.getBudgetById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
+    val budgetWithCategory =
+        budgetRepository.getBudgetWithCategoryById(savedStateHandle[UpdateBudgetFragment.BUDGET_ID_KEY]!!)
             .asLiveData()
 
     /**
@@ -49,13 +47,13 @@ class UpdateBudgetViewModel @Inject constructor(
     fun updateBudget(budgeted: Long) {
 
         // Get budget, check non-null
-        val bud = budget.value!!
+        val budWithCat = budgetWithCategory.value!!
 
         // Set budget
-        bud.budgeted = budgeted
+        budWithCat.budget.budgeted = budgeted
         viewModelScope.launch {
             // Update budget in repo
-            budgetRepository.updateBudgets(bud)
+            budgetRepository.updateBudgets(budWithCat.budget)
         }
 
     }
@@ -98,11 +96,6 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: UpdateBudgetViewModel by provideViewModel()
 
-    /**
-     * Parent ViewModel
-     */
-    private val parentViewModel: BudgetViewModel by provideViewModel({requireParentFragment()})
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -121,16 +114,16 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
         ivDone = requireView().findViewById(R.id.ivDone)
 
         // Budget observer
-        viewModel.budget.observe(viewLifecycleOwner) { budget ->
+        viewModel.budgetWithCategory.observe(viewLifecycleOwner) { budgetWithCategory ->
 
             // Check budget non-null
-            budget?.let { bud ->
+            budgetWithCategory?.let { budWithCat ->
 
                 // Set category name
-                tvCategory.text = parentViewModel.categories.value!!.find { it.id == bud.categoryId }!!.name
+                tvCategory.text = budWithCat.category.name
 
                 // Set budgeted value
-                etBudgeted.setText(bud.budgeted.toString())
+                etBudgeted.setText(budWithCat.budget.budgeted.toString())
 
                 // Select budget text
                 etBudgeted.selectAll()
@@ -139,7 +132,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
                 etBudgeted.requestFocus()
 
             }
-}
+        }
 
         // Setup done listener
         ivDone.setOnClickListener {

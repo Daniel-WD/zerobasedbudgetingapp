@@ -18,19 +18,19 @@ interface CategoryDao {
      * Add [categories]
      */
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg categories: Category)
+    suspend fun add(vararg categories: Category): Array<Long>
 
     /**
      * Update [categories]
      */
     @Update
-    suspend fun update(vararg categories: Category)
+    suspend fun update(vararg categories: Category): Int
 
     /**
      * Delete [categories]
      */
     @Delete
-    suspend fun delete(vararg categories: Category)
+    suspend fun delete(vararg categories: Category): Int
 
     /**
      * Get all categories

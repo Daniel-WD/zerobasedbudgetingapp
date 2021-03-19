@@ -7,10 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository to interact with budgeting data
  */
+@Singleton
 class BudgetRepository @Inject constructor(
     private val budgetDao: BudgetDao
 ) {
@@ -18,22 +20,22 @@ class BudgetRepository @Inject constructor(
     /**
      * Add [budgets] to database
      */
-    suspend fun addBudgets(vararg budgets: Budget) {
-        budgetDao.add(*budgets)
+    suspend fun addBudgets(vararg budgets: Budget): Array<Long> {
+        return budgetDao.add(*budgets)
     }
 
     /**
      * Updates [budgets] in database
      */
-    suspend fun updateBudgets(vararg budgets: Budget) {
-        budgetDao.update(*budgets)
+    suspend fun updateBudgets(vararg budgets: Budget): Int {
+        return budgetDao.update(*budgets)
     }
 
     /**
      * Delete [budgets] in database
      */
-    suspend fun deleteBudgets(vararg budgets: Budget) {
-        budgetDao.delete(*budgets)
+    suspend fun deleteBudgets(vararg budgets: Budget): Int {
+        return budgetDao.delete(*budgets)
     }
 
     /**

@@ -18,7 +18,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDate
 import java.time.YearMonth
 import java.util.concurrent.TimeUnit
 
@@ -78,7 +77,7 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
         val newBudgeted = 42L
 
         // Wait for budget to be present
-        updateBudgetViewModel.budget.test().awaitValue(1000, TimeUnit.SECONDS)
+        updateBudgetViewModel.budgetWithCategory.test().awaitValue(1000, TimeUnit.SECONDS)
 
         // Call updateBudget()
         updateBudgetViewModel.updateBudget(newBudgeted)

@@ -7,15 +7,21 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.YearMonth
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Class to persist simple values.
  */
-class PreferenceStore @Inject constructor(@ApplicationContext private val context: Context) {
+@Singleton
+class SettingStore @Inject constructor(@ApplicationContext private val context: Context) {
 
+    /**
+     * DataStore
+     */
     private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore("settings")
 
     companion object {
@@ -35,14 +41,16 @@ class PreferenceStore @Inject constructor(@ApplicationContext private val contex
     /**
      * Gets selected month.
      */
-    fun getMonth() = context.settingsStore.data
-        .map { preferences ->
-            // Create YearMonth, return null when at least one atomic value is null
-            YearMonth.of(
-                preferences[MONTH_Y_KEY] ?: return@map null,
-                preferences[MONTH_M_KEY] ?: return@map null
-            )
-        }
+    fun getMonth(): Flow<YearMonth?> {
+        return context.settingsStore.data
+            .map { preferences ->
+                // Create YearMonth, return null when at least one atomic value is null
+                YearMonth.of(
+                    preferences[MONTH_Y_KEY] ?: return@map null,
+                    preferences[MONTH_M_KEY] ?: return@map null
+                )
+            }
+    }
 
     /**
      * Sets selected [month].

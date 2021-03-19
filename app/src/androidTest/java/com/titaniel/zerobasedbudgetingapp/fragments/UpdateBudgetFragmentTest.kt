@@ -43,7 +43,7 @@ class UpdateBudgetFragmentTest {
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.budget).thenReturn(MutableLiveData(exampleBudget))
+        `when`(mockViewModel.budgetWithCategory).thenReturn(MutableLiveData(exampleBudget))
 
         // Launch scenario
         launchFragmentInHiltContainer<UpdateBudgetFragment> {

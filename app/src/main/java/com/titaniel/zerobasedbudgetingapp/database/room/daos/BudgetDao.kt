@@ -17,19 +17,19 @@ interface BudgetDao {
      * Add [budgets]
      */
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg budgets: Budget)
+    suspend fun add(vararg budgets: Budget): Array<Long>
 
     /**
      * Update [budgets]
      */
     @Update
-    suspend fun update(vararg budgets: Budget)
+    suspend fun update(vararg budgets: Budget): Int
 
     /**
      * Delete [budgets]
      */
     @Delete
-    suspend fun delete(vararg budgets: Budget)
+    suspend fun delete(vararg budgets: Budget): Int
 
     /**
      * Get budget with [id]

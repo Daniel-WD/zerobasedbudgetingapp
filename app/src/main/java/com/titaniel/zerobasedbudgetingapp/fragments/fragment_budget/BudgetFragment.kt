@@ -34,20 +34,15 @@ import java.time.YearMonth
 import javax.inject.Inject
 
 /**
- * [BudgetViewModel] with [categoryRepository], [transactionsRepository] and [budgetRepository]
+ * [BudgetViewModel] for [BudgetFragment].
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     settingRepository: SettingRepository,
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
-    private val budgetRepository: BudgetRepository
+    budgetRepository: BudgetRepository
 ) : ViewModel() {
-
-    /**
-     * All categories
-     */
-    val categories = categoryRepository.getAllCategories().asLiveData()
 
     /**
      * Month
@@ -76,14 +71,14 @@ class BudgetViewModel @Inject constructor(
     private val transactions = transactionRepository.getAllTransactions().asLiveData()
 
     /**
-     * To be budgeted
-     */
-    val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
-
-    /**
      * All budgetsWithCategory
      */
     private val allBudgetsWithCategory = budgetRepository.getAllBudgetsWithCategory().asLiveData()
+
+    /**
+     * To be budgeted
+     */
+    val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
 
     /**
      * All budgetsWithCategory of selected month
@@ -111,12 +106,6 @@ class BudgetViewModel @Inject constructor(
     private val updateToBeBudgetedMediator = mediatorLiveDataBuilder(transactions, allBudgets)
 
     /**
-     * MediatorLiveData for [categories], [budgetsWithCategoryOfMonth], [month]
-     */
-    private val checkBudgetsMediator =
-        mediatorLiveDataBuilder(categories, budgetsWithCategoryOfMonth, month)
-
-    /**
      * MediatorLiveData for [month], [allBudgetsWithCategory]
      */
     private val budgetsWithCategoryUpdateMediator =
@@ -126,11 +115,12 @@ class BudgetViewModel @Inject constructor(
      * Observer to update [budgetsWithCategoryOfMonth]
      */
     private val budgetsWithCategoryUpdateObserver: Observer<Any> = Observer {
-
         val mon = month.value
         val budsWithCat = allBudgetsWithCategory.value
 
+        // Check non null
         if(mon != null && budsWithCat != null) {
+            // Filter all budgetsWithCategory of currently selected month
             budgetsWithCategoryOfMonth.value = budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
         }
 
@@ -166,46 +156,22 @@ class BudgetViewModel @Inject constructor(
      * Observer to update [toBeBudgeted]
      */
     private val updateToBeBudgetedObserver: Observer<Any> = Observer {
-
         val trans = transactions.value
         val buds = allBudgets.value
 
+        // Check non null
         if (trans != null && buds != null) {
+            // Filter all transaction for to be budgeted, sum pays up. Subtract all budget values.
             toBeBudgeted.value = trans.filter { it.categoryId == Category.TO_BE_BUDGETED.id }
                 .fold(0L, { acc, transaction -> acc + transaction.pay }) -
                     buds.fold(0L, { acc, budget -> acc + budget.budgeted })
         }
     }
 
-    /**
-     * Observer to checks if for every category in [categories] and [month] combination, exists a budget. If not, then create missing [Budget]s.
-     */
-    private val checkBudgetsObserver: Observer<Any> =
-        Observer { // TODO is there a better place for this? Maybe after month set or after adding new categories?
-            val cats = categories.value
-            val budgetsWithCategory = budgetsWithCategoryOfMonth.value
-            val mon = month.value
-
-            if (cats != null && budgetsWithCategory != null && mon != null) {
-                val missingBudgets =
-                    // Find categories that have no budget in selected month
-                    cats.filter { category -> budgetsWithCategory.find { budgetWithCategory -> budgetWithCategory.category == category } == null }
-                        // Create budgets for filtered categories
-                        .map { category -> Budget(category.id, mon, 0) }
-                        .toTypedArray()
-
-                // Add missing budgets
-                viewModelScope.launch {
-                    budgetRepository.addBudgets(*missingBudgets)
-                }
-            }
-        }
-
     init {
         // Register all observers
         updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
-        checkBudgetsMediator.observeForever(checkBudgetsObserver)
         budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
 
         // Set month
@@ -220,7 +186,6 @@ class BudgetViewModel @Inject constructor(
         // Remove all observers
         updateAvailableMoneyMediator.removeObserver(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.removeObserver(updateToBeBudgetedObserver)
-        checkBudgetsMediator.removeObserver(checkBudgetsObserver)
         budgetsWithCategoryUpdateMediator.removeObserver(budgetsWithCategoryUpdateObserver)
     }
 

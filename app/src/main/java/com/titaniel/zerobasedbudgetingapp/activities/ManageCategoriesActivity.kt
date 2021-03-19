@@ -15,8 +15,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_add_edit_category.AddEditCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -28,14 +31,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 /**
- * [ManageCategoriesViewModel] with [categoryRepository] and [transactionRepository] for ManageCategoriesFragment
+ * [ManageCategoriesViewModel] for [ManageCategoriesActivity].
  */
 @HiltViewModel
 class ManageCategoriesViewModel @Inject constructor(
+    private val settingRepository: SettingRepository,
     private val categoryRepository: CategoryRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
@@ -44,6 +48,11 @@ class ManageCategoriesViewModel @Inject constructor(
     private val categories =
         categoryRepository.getAllCategories().map { list -> list.sortedBy { it.index } }
             .asLiveData()
+
+    /**
+     * Month
+     */
+    private val month = settingRepository.getMonth().asLiveData()
 
     /**
      * New categories, copy of first [categories] value with changes by the user. NOTE: Needed so that changes don't get discarded when [categories] gets changed.
@@ -142,6 +151,7 @@ class ManageCategoriesViewModel @Inject constructor(
         requireNotNull(oldCatsList)
         requireNotNull(newCatsList)
 
+
         // Apply indexes to new category order
         newCatsList.forEachIndexed { i, category -> category.index = i }
 
@@ -177,10 +187,21 @@ class ManageCategoriesViewModel @Inject constructor(
             categoryRepository.deleteCategories(*delCats.toTypedArray())
 
             // Add categories
-            categoryRepository.addCategories(*newCats.toTypedArray())
+            val newCatIds = categoryRepository.addCategories(*newCats.toTypedArray())
 
             // Update categories
             categoryRepository.updateCategories(*updateCats.toTypedArray())
+
+            // Get month
+            val mon = settingRepository.getMonth().first()
+            requireNotNull(mon)
+
+            // Create new budgets
+            val newBudgets = newCatIds.map { id -> Budget(id, mon, 0) }
+
+            // Insert new budgets
+            budgetRepository.addBudgets(*newBudgets.toTypedArray())
+
         }
 
     }

@@ -16,19 +16,19 @@ interface TransactionDao {
      * Add [transactions]
      * */
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg transactions: Transaction)
+    suspend fun add(vararg transactions: Transaction): Array<Long>
 
     /**
      * Delete [transactions]
      */
     @Delete
-    suspend fun delete(vararg transactions: Transaction)
+    suspend fun delete(vararg transactions: Transaction): Int
 
     /**
      * Update [transactions]
      */
     @Update
-    suspend fun update(vararg transactions: Transaction)
+    suspend fun update(vararg transactions: Transaction): Int
 
     /**
      * Get transaction with [transactionId]

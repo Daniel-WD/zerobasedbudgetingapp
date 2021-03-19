@@ -1,26 +1,31 @@
 package com.titaniel.zerobasedbudgetingapp.database.repositories
 
-import com.titaniel.zerobasedbudgetingapp.database.datastore.PreferenceStore
+import com.titaniel.zerobasedbudgetingapp.database.datastore.SettingStore
 import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth
 import javax.inject.Inject
+import javax.inject.Singleton
 
+/**
+ * Repository to interact with simple app data
+ */
+@Singleton
 class SettingRepository @Inject constructor(
-    private val preferenceStore: PreferenceStore
+    private val settingStore: SettingStore
 ) {
 
     /**
      * Gets selected month
      */
     fun getMonth(): Flow<YearMonth?> {
-        return preferenceStore.getMonth()
+        return settingStore.getMonth()
     }
 
     /**
      * Sets selected [month]
      */
     suspend fun setMonth(month: YearMonth) {
-        preferenceStore.setMonth(month)
+        settingStore.setMonth(month)
     }
 
 }
