@@ -6,6 +6,7 @@ import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -30,6 +31,12 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
+
+    /**
+     * SettingRepository mock
+     */
+    @Mock
+    private lateinit var settingRepositoryMock: SettingRepository
 
     /**
      * CategoryRepository mock
@@ -268,6 +275,8 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
             emit(exampleTransactions)
         })
 
+        // Stub getMonth
+
         createViewModel()
 
     }
@@ -279,13 +288,11 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Create ViewModel to test
         budgetViewModel = BudgetViewModel(
+            settingRepositoryMock,
             categoryRepositoryMock,
             transactionRepositoryMock,
             budgetRepositoryMock
         )
-
-        // Set month
-        budgetViewModel.month.value = month
     }
 
     @Test

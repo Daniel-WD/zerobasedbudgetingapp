@@ -7,8 +7,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.time.YearMonth
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,13 +41,22 @@ class SettingStore @Inject constructor(@ApplicationContext private val context: 
 
     }
 
+    init {
+        // Set default values
+        GlobalScope.launch {
+            // Set current month as default month
+            getMonth().first() ?:
+            setMonth(YearMonth.now())
+        }
+    }
+
     /**
      * Gets selected month.
      */
     fun getMonth(): Flow<YearMonth?> {
         return context.settingsStore.data
             .map { preferences ->
-                // Create YearMonth, return null when at least one atomic value is null
+                // Create YearMonth, return  when at least one atomic value is null
                 YearMonth.of(
                     preferences[MONTH_Y_KEY] ?: return@map null,
                     preferences[MONTH_M_KEY] ?: return@map null

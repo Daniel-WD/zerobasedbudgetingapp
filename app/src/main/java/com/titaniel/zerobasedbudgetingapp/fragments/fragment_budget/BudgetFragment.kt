@@ -173,11 +173,6 @@ class BudgetViewModel @Inject constructor(
         updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
         budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
-
-        // Set month
-        viewModelScope.launch {
-            settingRepository.setMonth(YearMonth.of(2021, Month.MARCH))
-        }
     }
 
     override fun onCleared() {
