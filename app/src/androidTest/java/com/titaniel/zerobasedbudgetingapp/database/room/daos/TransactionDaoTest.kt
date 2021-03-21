@@ -27,14 +27,10 @@ class TransactionDaoTest {
     /**
      * Example transactions
      */
-    private val transaction1 = Transaction(1, "payee1", "cat1", "", LocalDate.now())
-        .apply { id = 1 }
-    private val transaction2 = Transaction(2, "payee1", "cat2", "", LocalDate.now())
-        .apply { id = 2 }
-    private val transaction3 = Transaction(3, "payee1", "cat2", "", LocalDate.now())
-        .apply { id = 3 }
-    private val transaction4 = Transaction(4, "payee1", "cat1", "", LocalDate.now())
-        .apply { id = 4 }
+    private val transaction1 = Transaction(1, 0, 0, "", LocalDate.now(), 1)
+    private val transaction2 = Transaction(2, 0, 1, "", LocalDate.now(), 2)
+    private val transaction3 = Transaction(3, 0, 1, "", LocalDate.now(), 3)
+    private val transaction4 = Transaction(4, 0, 0, "", LocalDate.now(), 4)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -83,7 +79,7 @@ class TransactionDaoTest {
     fun updates_transactions_correctly(): Unit = runBlocking {
 
         // Change some transactions
-        transaction1.categoryName = "cat99"
+        transaction1.categoryId = 99
         transaction1.description = "description"
         transaction3.date = LocalDate.of(1989, 3, 23)
 

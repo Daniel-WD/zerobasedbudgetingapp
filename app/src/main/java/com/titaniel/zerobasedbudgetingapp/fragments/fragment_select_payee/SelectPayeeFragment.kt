@@ -17,6 +17,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
+import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,7 +54,8 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     /**
      * Parent ViewModel
      */
-    private val parentViewModel: AddEditTransactionViewModel by activityViewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val parentViewModel: AddEditTransactionViewModel by provideActivityViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,

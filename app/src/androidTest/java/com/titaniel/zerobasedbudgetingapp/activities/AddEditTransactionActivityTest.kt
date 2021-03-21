@@ -15,10 +15,13 @@ import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
@@ -50,12 +53,12 @@ class AddEditTransactionActivityTest {
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.payee).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.payee).thenReturn(MutableLiveData())
         `when`(mockViewModel.pay).thenReturn(MutableLiveData(0L))
-        `when`(mockViewModel.category).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.category).thenReturn(MutableLiveData())
         `when`(mockViewModel.description).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.date).thenReturn(MutableLiveData())
-        `when`(mockViewModel.editTransaction).thenReturn(MutableLiveData(null))
+        `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(MutableLiveData(null))
 
         // Add lifecycle callback
         ActivityLifecycleMonitorRegistry.getInstance()
@@ -109,15 +112,18 @@ class AddEditTransactionActivityTest {
 
         // Create editTransaction data
         val pay = -120L
-        val payeeName = "payee"
-        val categoryName = "category"
+        val payee = Payee("payee", 1)
+        val category = Category("category", 0, 1)
         val description = "description"
         val date = LocalDate.of(1998, 1, 12)
 
         // Set editTransaction
-        `when`(mockViewModel.editTransaction).thenReturn(
+        `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(
             MutableLiveData(
-                Transaction(pay, payeeName, categoryName, description, date)
+                TransactionWithCategoryAndPayee(
+                    Transaction(pay, payee.id, category.id, description, date),
+                    category, payee
+                )
             )
         )
 
@@ -132,13 +138,13 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.etPay)).check(matches(withText(pay.toString())))
 
         // Check payeeName
-        onView(withId(R.id.tvPayee)).check(matches(withText(payeeName)))
+        onView(withId(R.id.tvPayee)).check(matches(withText(payee.name)))
 
         // Check categoryName
-        onView(withId(R.id.tvCategory)).check(matches(withText(categoryName)))
+        onView(withId(R.id.tvCategory)).check(matches(withText(category.name)))
 
         // Check date
-        onView(withId(R.id.tvDate)).check(matches(withText(Utils.convertLocalDateToString(date))))
+        onView(withId(R.id.tvDate)).check(matches(withText(convertLocalDateToString(date))))
 
         // Check description
         onView(withId(R.id.etDescription)).check(matches(withText(description)))
@@ -158,15 +164,15 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values in ViewModel correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payee.value).isEqualTo(payeeName)
-        assertThat(mockViewModel.category.value).isEqualTo(categoryName)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(date)
 
         ownScenario.close()
     }
 
-     @Test
+    @Test
     fun handles_delete_click_correctly_on_new_transaction_mode() = runBlocking {
 
         // Click delete
@@ -193,7 +199,7 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.confirm_button)).perform(click())
 
         // Check if correct date is selected, and is correctly formatted
-        val dateString = Utils.convertLocalDateToString(LocalDate.now())
+        val dateString = convertLocalDateToString(LocalDate.now())
         onView(withId(R.id.tvDate)).check(matches(withText(dateString)))
 
     }

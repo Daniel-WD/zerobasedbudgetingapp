@@ -49,4 +49,11 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction`")
     fun getAllTransactionsWithCategoryAndPayee(): Flow<List<TransactionWithCategoryAndPayee>>
 
+    /**
+     * Get TransactionWithCategoryAndPayee by [transactionId]
+     */
+    @androidx.room.Transaction
+    @Query("SELECT * FROM `transaction` WHERE `transaction`.id == :transactionId")
+    fun getTransactionWithCategoryAndPayeeById(transactionId: Long): Flow<TransactionWithCategoryAndPayee>
+
 }

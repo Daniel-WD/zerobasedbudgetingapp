@@ -5,20 +5,18 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.CategoriesListAdapter
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryViewModel
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,28 +36,28 @@ class SelectCategoryFragmentTest {
      * Mock ViewModel
      */
     @Mock
-    private lateinit var mockViewModel: SelectCategoryViewModel
+    private lateinit var mockParentViewModel: AddEditTransactionViewModel
 
     /**
      * Example categories
      */
     private val exampleCategories = mutableListOf(
-        Category("cat1"),
-        Category("cat2"),
-        Category("cat3"),
-        Category("cat4"),
-        Category("cat5")
+        Category("cat1", 0),
+        Category("cat2", 1),
+        Category("cat3", 2),
+        Category("cat4", 3),
+        Category("cat5", 4)
     )
 
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.categories).thenReturn(MutableLiveData(exampleCategories))
+        `when`(mockParentViewModel.allCategories).thenReturn(MutableLiveData(exampleCategories))
 
         // Launch scenario
         launchFragmentInHiltContainer<SelectCategoryFragment> {
             (this as SelectCategoryFragment).apply {
-                replace(SelectCategoryFragment::viewModel, mockViewModel)
+                replace(SelectCategoryFragment::parentViewModel, mockParentViewModel)
                 testFragment = this
             }
         }
@@ -76,7 +74,10 @@ class SelectCategoryFragmentTest {
     fun handles_data_change_correctly() {
 
         // Change data
-        exampleCategories.add(Category("newCat"))
+        exampleCategories.add(Category("newCat", 0))
+
+        // Sort list
+        exampleCategories.sortBy { it.index }
 
         checkCategoryListContent()
 

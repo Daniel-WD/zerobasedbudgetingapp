@@ -19,6 +19,7 @@ import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,7 +51,8 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     /**
      * Parent ViewModel
      */
-    private val parentViewModel: AddEditTransactionViewModel by activityViewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val parentViewModel: AddEditTransactionViewModel by provideActivityViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,

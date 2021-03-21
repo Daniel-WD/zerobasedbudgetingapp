@@ -31,7 +31,6 @@ import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -45,7 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val categoryRepository: CategoryRepository,
+    categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
     private val payeeRepository: PayeeRepository
 ) : ViewModel() {
@@ -86,9 +85,9 @@ class AddEditTransactionViewModel @Inject constructor(
     val date: MutableLiveData<LocalDate> = MutableLiveData()
 
     /**
-     * Contains [editTransaction]. Presence indicates that [editTransaction] should be edited
+     * Contains [editTransactionWithCategoryAndPayee]. Presence indicates that [editTransactionWithCategoryAndPayee] should be edited.
      */
-    val editTransaction = transactionRepository.getTransactionById(
+    val editTransactionWithCategoryAndPayee = transactionRepository.getTransactionWithCategoryAndPayeeById(
         savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
     ).asLiveData()
 
@@ -109,66 +108,39 @@ class AddEditTransactionViewModel @Inject constructor(
     }
 
     /**
-     * Sets [payee] to payee with [payeeId]
-     */
-    fun setPayeeById(payeeId: Long) {
-
-        viewModelScope.launch {
-            // Get payee and set it
-            payee.value = payeeRepository.getPayeeById(payeeId).first()
-        }
-
-    }
-
-    /**
-     * Sets [category] to payee with [categoryId]
-     */
-    fun setCategoryById(categoryId: Long) {
-
-        // Check if it is TO_BE_BUDGETED
-        if(categoryId == Category.TO_BE_BUDGETED.id) {
-            // Set to be budgeted as category
-            category.value = Category.TO_BE_BUDGETED
-        } else {
-            viewModelScope.launch {
-                // Get category and set it
-                category.value = categoryRepository.getCategoryById(categoryId).first()
-            }
-        }
-
-    }
-
-    /**
-     * Deletes [editTransaction]
+     * Deletes [editTransactionWithCategoryAndPayee]
      */
     fun deleteEditTransaction() {
-        editTransaction.value?.let {
+        editTransactionWithCategoryAndPayee.value?.let {
             viewModelScope.launch {
-                transactionRepository.deleteTransactions(it)
+                transactionRepository.deleteTransactions(it.transaction)
             }
         }
     }
 
     /**
-     * When [editTransaction] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
+     * When [editTransactionWithCategoryAndPayee] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
      */
     fun applyData() {
         // Validate data
         require(isDataValid())
 
+        // Get editTransaction
+        val eTransWRest = editTransactionWithCategoryAndPayee.value
+
         // Check if should edit transaction
-        if (editTransaction.value != null) { // Edit transaction
+        if (eTransWRest != null) { // Edit transaction
 
             // Apply new values
-            editTransaction.value!!.pay = pay.value!!
-            editTransaction.value!!.payeeId = payee.value!!.id
-            editTransaction.value!!.categoryId = category.value!!.id
-            editTransaction.value!!.date = date.value!!
-            editTransaction.value!!.description = description.value!!.trim()
+            eTransWRest.transaction.pay = pay.value!!
+            eTransWRest.transaction.payeeId = payee.value!!.id
+            eTransWRest.transaction.categoryId = category.value!!.id
+            eTransWRest.transaction.date = date.value!!
+            eTransWRest.transaction.description = description.value!!.trim()
 
             // Update transaction
             viewModelScope.launch {
-                transactionRepository.updateTransactions(editTransaction.value!!)
+                transactionRepository.updateTransactions(eTransWRest.transaction)
             }
 
         } else { // Create new transaction
@@ -306,25 +278,25 @@ class AddEditTransactionActivity : AppCompatActivity() {
         lDescription = findViewById(R.id.layoutDescription)
 
         // Transaction observer
-        viewModel.editTransaction.observe(this, {
+        viewModel.editTransactionWithCategoryAndPayee.observe(this, {
 
             it?.let {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
                 // Set pay text (ViewModel value gets set when pay text changes)
-                etPay.setText(it.pay.toString())
+                etPay.setText(it.transaction.pay.toString())
 
                 // Set value text cursor to end
                 etPay.setSelection(etPay.text.length)
 
                 // Set description text (ViewModel value gets set when description text changes)
-                etDescription.setText(it.description)
+                etDescription.setText(it.transaction.description)
 
                 // Set ViewModel values
-                viewModel.setPayeeById(it.payeeId)
-                viewModel.setCategoryById(it.categoryId)
-                viewModel.date.value = it.date
+                viewModel.payee.value = it.payee
+                viewModel.category.value = it.category
+                viewModel.date.value = it.transaction.date
 
                 // Update save btn enabled
                 updateCreateApplyEnabled()
@@ -337,7 +309,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             // If edit transaction exists, set its timestamp as selected date
             builder.setSelection(
-                it?.date?.let { date ->
+                it?.transaction?.date?.let { date ->
                     date.atStartOfDay(ZoneId.of("GMT"))!!.toInstant()!!.toEpochMilli() + 1
                 } ?: MaterialDatePicker.todayInUtcMilliseconds())
 

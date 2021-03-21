@@ -11,6 +11,8 @@ import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHas
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetListAdapter
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
@@ -20,7 +22,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDate
+import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetFragmentTest {
@@ -44,30 +46,30 @@ class BudgetFragmentTest {
     /**
      * BudgetsOfMonth example data
      */
-    private val exampleBudgetsOfMonth = listOf(
-        Budget("sex", LocalDate.of(2020, 10, 1), 20),
-        Budget("girlfriend", LocalDate.of(2020, 10, 1), 100),
-        Budget("computer", LocalDate.of(2020, 10, 1), 202342),
-        Budget("ide", LocalDate.of(2020, 10, 1), 203),
-        Budget("groceries", LocalDate.of(2020, 10, 1), 21230)
+    private val exampleBudgetsWithCategoryOfMonth = listOf(
+        BudgetWithCategory(Budget(0, YearMonth.of(2020, 10), 20), Category("a", 0, 0)),
+        BudgetWithCategory(Budget(1, YearMonth.of(2020, 10), 100), Category("b", 1, 1)),
+        BudgetWithCategory(Budget(2, YearMonth.of(2020, 10), 202342), Category("c", 2, 2)),
+        BudgetWithCategory(Budget(3, YearMonth.of(2020, 10), 203), Category("d", 3, 3)),
+        BudgetWithCategory(Budget(4, YearMonth.of(2020, 10), 21230), Category("e", 4, 4))
     )
 
     /**
      * AvailableMoney example data
      */
     private var exampleAvailableMoney = mutableMapOf(
-        exampleBudgetsOfMonth[0] to 100L,
-        exampleBudgetsOfMonth[1] to 200L,
-        exampleBudgetsOfMonth[2] to 0L,
-        exampleBudgetsOfMonth[3] to 4L,
-        exampleBudgetsOfMonth[4] to -10000L
+        exampleBudgetsWithCategoryOfMonth[0] to 100L,
+        exampleBudgetsWithCategoryOfMonth[1] to 200L,
+        exampleBudgetsWithCategoryOfMonth[2] to 0L,
+        exampleBudgetsWithCategoryOfMonth[3] to 4L,
+        exampleBudgetsWithCategoryOfMonth[4] to -10000L
     )
 
     @Before
     fun setup() {
         // Set ViewModel properties
         `when`(mockViewModel.toBeBudgeted).thenReturn(MutableLiveData(toBeBudgeted))
-        `when`(mockViewModel.budgetsWithCategoryOfMonth).thenReturn(MutableLiveData(exampleBudgetsOfMonth))
+        `when`(mockViewModel.budgetsWithCategoryOfMonth).thenReturn(MutableLiveData(exampleBudgetsWithCategoryOfMonth))
         `when`(mockViewModel.availableMoney).thenReturn(MutableLiveData(exampleAvailableMoney))
 
         // Launch scenario
@@ -130,16 +132,16 @@ class BudgetFragmentTest {
         val newBudgetedValue = 234234L
 
         // Set new values
-        exampleBudgetsOfMonth[2].categoryName = newCat
-        exampleBudgetsOfMonth[2].budgeted = newBudgetedValue
+        exampleBudgetsWithCategoryOfMonth[2].category.name = newCat
+        exampleBudgetsWithCategoryOfMonth[2].budget.budgeted = newBudgetedValue
 
         // Reset available money
         exampleAvailableMoney = mutableMapOf(
-            exampleBudgetsOfMonth[0] to 100L,
-            exampleBudgetsOfMonth[1] to 200L,
-            exampleBudgetsOfMonth[2] to 0L,
-            exampleBudgetsOfMonth[3] to 4L,
-            exampleBudgetsOfMonth[4] to -10000L
+            exampleBudgetsWithCategoryOfMonth[0] to 100L,
+            exampleBudgetsWithCategoryOfMonth[1] to 200L,
+            exampleBudgetsWithCategoryOfMonth[2] to 0L,
+            exampleBudgetsWithCategoryOfMonth[3] to 4L,
+            exampleBudgetsWithCategoryOfMonth[4] to -10000L
         )
 
         // Set budgetsOfMonth value in ViewModel
@@ -158,16 +160,16 @@ class BudgetFragmentTest {
         val newAvailableMoneyValue = 234234999L
 
         // Set new values
-        exampleAvailableMoney[exampleBudgetsOfMonth[2]] = newAvailableMoneyValue
+        exampleAvailableMoney[exampleBudgetsWithCategoryOfMonth[2]] = newAvailableMoneyValue
 
         checkBudgetListContent()
 
     }
 
     private fun checkBudgetListContent() {
-        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleBudgetsOfMonth,
-            { hasDescendant(withText(it.budgeted.toString())) },
-            { hasDescendant(withText(it.categoryName)) })
+        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleBudgetsWithCategoryOfMonth,
+            { hasDescendant(withText(it.budget.budgeted.toString())) },
+            { hasDescendant(withText(it.category.name)) })
         checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleAvailableMoney.toList(),
             { hasDescendant(withText(it.second.toString())) })
     }

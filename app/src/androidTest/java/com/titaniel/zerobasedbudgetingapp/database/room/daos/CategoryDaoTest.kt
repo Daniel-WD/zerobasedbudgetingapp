@@ -15,6 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
+import java.time.YearMonth
 
 class CategoryDaoTest {
 
@@ -31,10 +32,10 @@ class CategoryDaoTest {
     /**
      * Example categories
      */
-    private val category1 = Category("cat1")
-    private val category2 = Category("cat2")
-    private val category3 = Category("cat3")
-    private val category4 = Category("cat4")
+    private val category1 = Category("cat1", 0)
+    private val category2 = Category("cat2", 1)
+    private val category3 = Category("cat3", 2)
+    private val category4 = Category("cat4", 3)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -74,12 +75,12 @@ class CategoryDaoTest {
     fun gets_transactions_of_categories_correctly(): Unit = runBlocking {
 
         // Create example transactions
-        val transaction1 = Transaction(1, "payee1", "cat1", "", LocalDate.now())
-        val transaction2 = Transaction(2, "payee1", "cat2", "", LocalDate.now())
-        val transaction3 = Transaction(3, "payee1", "cat2", "", LocalDate.now())
-        val transaction4 = Transaction(4, "payee1", "cat1", "", LocalDate.now())
-        val transaction5 = Transaction(5, "payee1", "cat3", "", LocalDate.now())
-        val transaction6 = Transaction(6, "payee1", "cat5", "", LocalDate.now())
+        val transaction1 = Transaction(1, 0, 0, "", LocalDate.now())
+        val transaction2 = Transaction(2, 0, 1, "", LocalDate.now())
+        val transaction3 = Transaction(3, 0, 1, "", LocalDate.now())
+        val transaction4 = Transaction(4, 0, 0, "", LocalDate.now())
+        val transaction5 = Transaction(5, 0, 2, "", LocalDate.now())
+        val transaction6 = Transaction(6, 0, 4, "", LocalDate.now())
 
         // Define expected TransactionsOfCategories
         val transactionsOfCategory1 =
@@ -107,12 +108,12 @@ class CategoryDaoTest {
     fun gets_budgets_of_categories_correctly(): Unit = runBlocking {
 
         // Create example budgets
-        val budget1 = Budget("cat1", LocalDate.now(), 1)
-        val budget2 = Budget("cat2", LocalDate.now(), 2)
-        val budget3 = Budget("cat2", LocalDate.now(), 3)
-        val budget4 = Budget("cat1", LocalDate.now(), 4)
-        val budget5 = Budget("cat3", LocalDate.now(), 5)
-        val budget6 = Budget("cat5", LocalDate.now(), 6)
+        val budget1 = Budget(0, YearMonth.now(), 1)
+        val budget2 = Budget(1, YearMonth.now(), 2)
+        val budget3 = Budget(1, YearMonth.now(), 3)
+        val budget4 = Budget(0, YearMonth.now(), 4)
+        val budget5 = Budget(2, YearMonth.now(), 5)
+        val budget6 = Budget(4, YearMonth.now(), 6)
 
         // Define expected BudgetsOfCategories
         val budgetsOfCategory1 = BudgetsOfCategory(category1, listOf(budget1, budget4))

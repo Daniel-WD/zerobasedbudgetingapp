@@ -11,6 +11,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
+import java.time.YearMonth
 
 class BudgetDaoTest {
 
@@ -27,12 +28,9 @@ class BudgetDaoTest {
     /**
      * Example budgets
      */
-    private val budget1 = Budget("cat1", LocalDate.of(1999, 5, 1), 100)
-        .apply { id = 1 }
-    private val budget2 = Budget("cat99", LocalDate.of(1999, 5, 1), 100)
-        .apply { id = 2 }
-    private val budget3 = Budget("cat2", LocalDate.of(2000, 12, 1), 100)
-        .apply { id = 3 }
+    private val budget1 = Budget(0, YearMonth.of(1999, 5), 100, 1)
+    private val budget2 = Budget(1, YearMonth.of(1999, 5), 100, 2)
+    private val budget3 = Budget(2, YearMonth.of(2000, 12), 100, 3)
 
     @Before
     fun setup() = runBlocking {
@@ -66,7 +64,6 @@ class BudgetDaoTest {
 
         // Change budget1
         budget1.budgeted = 5000
-        budget1.categoryName = "cat10"
 
         // Update budget1
         budgetDao.update(budget1)
@@ -83,9 +80,9 @@ class BudgetDaoTest {
 
     @Test
     fun gets_budgets_by_month_correctly(): Unit = runBlocking {
-        assertThat(budgetDao.getByMonth(LocalDate.of(1999, 5, 1)).first())
+        assertThat(budgetDao.getByMonth(YearMonth.of(1999, 5)).first())
             .isEqualTo(listOf(budget1, budget2))
-        assertThat(budgetDao.getByMonth(LocalDate.of(2000, 12, 1)).first())
+        assertThat(budgetDao.getByMonth(YearMonth.of(2000, 12)).first())
             .isEqualTo(listOf(budget3))
     }
 

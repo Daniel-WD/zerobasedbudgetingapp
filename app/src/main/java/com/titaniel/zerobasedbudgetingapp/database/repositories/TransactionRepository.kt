@@ -51,10 +51,17 @@ class TransactionRepository @Inject constructor(
     }
 
     /**
-     * Get all TransactionWithCategory
+     * Get all TransactionWithCategoryAndPayee
      */
     fun getAllTransactionsWithCategoryAndPayee(): Flow<List<TransactionWithCategoryAndPayee>> {
         return transactionDao.getAllTransactionsWithCategoryAndPayee()
+    }
+
+    /**
+     * Get TransactionWithCategoryAndPayee by [transactionId]
+     */
+    fun getTransactionWithCategoryAndPayeeById(transactionId: Long): Flow<TransactionWithCategoryAndPayee> {
+        return transactionDao.getTransactionWithCategoryAndPayeeById(transactionId)
     }
 
 }

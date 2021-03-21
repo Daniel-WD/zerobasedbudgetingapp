@@ -97,7 +97,7 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
     @Test
     fun deletes_edit_transaction_correctly(): Unit = runBlocking {
         // Wait for editTransaction value
-        addEditTransactionViewModel.editTransaction.test().awaitValue(1, TimeUnit.SECONDS)
+        addEditTransactionViewModel.editTransactionWithCategoryAndPayee.test().awaitValue(1, TimeUnit.SECONDS)
 
         // Delete editTransaction
         addEditTransactionViewModel.deleteEditTransaction()
@@ -259,7 +259,7 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
     @Test
     fun deletes_edit_transaction_correctly(): Unit = runBlocking {
         // Wait for editTransaction value
-        addEditTransactionViewModel.editTransaction.test().awaitValue(1, TimeUnit.SECONDS)
+        addEditTransactionViewModel.editTransactionWithCategoryAndPayee.test().awaitValue(1, TimeUnit.SECONDS)
 
         // Delete editTransaction
         addEditTransactionViewModel.deleteEditTransaction()
@@ -271,7 +271,7 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
     @Test
     fun applies_data_correctly(): Unit = runBlocking {
         // Wait for editTransaction value
-        addEditTransactionViewModel.editTransaction.test().awaitValue(1, TimeUnit.SECONDS)
+        addEditTransactionViewModel.editTransactionWithCategoryAndPayee.test().awaitValue(1, TimeUnit.SECONDS)
 
         // Setup data
         val newPay = 500L

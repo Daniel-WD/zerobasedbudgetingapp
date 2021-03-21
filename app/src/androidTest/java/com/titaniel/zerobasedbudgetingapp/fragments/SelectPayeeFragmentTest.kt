@@ -5,21 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp._testutils.atPosition
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.PayeesListAdapter
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeViewModel
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +36,7 @@ class SelectPayeeFragmentTest {
      * Mock ViewModel
      */
     @Mock
-    private lateinit var mockViewModel: SelectPayeeViewModel
+    private lateinit var mockParentViewModel: AddEditTransactionViewModel
 
     /**
      * Example categories
@@ -55,12 +52,12 @@ class SelectPayeeFragmentTest {
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.payees).thenReturn(MutableLiveData(examplePayees))
+        `when`(mockParentViewModel.allPayees).thenReturn(MutableLiveData(examplePayees))
 
         // Launch scenario
         launchFragmentInHiltContainer<SelectPayeeFragment> {
             (this as SelectPayeeFragment).apply {
-                replace(SelectPayeeFragment::viewModel, mockViewModel)
+                replace(SelectPayeeFragment::parentViewModel, mockParentViewModel)
                 testFragment = this
             }
         }
