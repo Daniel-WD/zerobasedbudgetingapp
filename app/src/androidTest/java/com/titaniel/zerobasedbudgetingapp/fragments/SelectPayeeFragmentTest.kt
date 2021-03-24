@@ -21,7 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -53,12 +53,13 @@ class SelectPayeeFragmentTest {
     fun setup() {
         // Set ViewModel properties
         `when`(mockParentViewModel.allPayees).thenReturn(MutableLiveData(examplePayees))
+        `when`(mockParentViewModel.payee).thenReturn(MutableLiveData())
 
         // Launch scenario
         launchFragmentInHiltContainer<SelectPayeeFragment> {
             (this as SelectPayeeFragment).apply {
                 replace(SelectPayeeFragment::parentViewModel, mockParentViewModel)
-                testFragment = this
+                testFragment = spy(this)
             }
         }
     }
@@ -83,13 +84,6 @@ class SelectPayeeFragmentTest {
     @Test
     fun performs_item_click_correctly() {
 
-        // Set fragment result listener
-        testFragment.requireActivity().runOnUiThread {
-            testFragment.setFragmentResultListener(AddEditTransactionActivity.PAYEE_REQUEST_KEY) { _, bundle ->
-                assertThat(bundle[SelectPayeeFragment.PAYEE_KEY]).isEqualTo("payee5")
-            }
-        }
-
         // Click item
         onView(withId(R.id.listPayees))
             .perform(
@@ -102,6 +96,9 @@ class SelectPayeeFragmentTest {
         // Check if fragment finishes
         assertThat(testFragment.isAdded).isFalse()
 
+        // Check payee value in view model
+        assertThat(mockParentViewModel.payee.value).isEqualTo(examplePayees[4])
+
     }
 
     @Test
@@ -110,21 +107,14 @@ class SelectPayeeFragmentTest {
         // Expected new payee
         val newPayee = "newPayee"
 
-        // Set fragment result listener
-        testFragment.requireActivity().runOnUiThread {
-            testFragment.setFragmentResultListener(AddEditTransactionActivity.PAYEE_REQUEST_KEY) { _, bundle ->
-                assertThat(bundle[SelectPayeeFragment.PAYEE_KEY]).isEqualTo(newPayee)
-            }
-        }
-
         // Type new payee
         onView(withId(R.id.etNewPayee)).perform(typeText(newPayee))
 
         // Confirm new payee
         onView(withId(R.id.ivAddPayee)).perform(click())
 
-        // Check if fragment finishes
-        assertThat(testFragment.isAdded).isFalse()
+        // Check payee value in view model
+        verify(mockParentViewModel).setNewPayee(newPayee)
 
     }
 

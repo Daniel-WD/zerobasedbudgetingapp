@@ -26,10 +26,10 @@ class PayeeDaoTest {
     /**
      * Example payees
      */
-    private val payee1 = Payee("payee1")
-    private val payee2 = Payee("payee2")
-    private val payee3 = Payee("payee3")
-    private val payee4 = Payee("payee4")
+    private val payee1 = Payee("payee1", 1)
+    private val payee2 = Payee("payee2", 2)
+    private val payee3 = Payee("payee3", 3)
+    private val payee4 = Payee("payee4", 4)
 
     @Before
     fun setup(): Unit = runBlocking {

@@ -53,6 +53,7 @@ class SelectCategoryFragmentTest {
     fun setup() {
         // Set ViewModel properties
         `when`(mockParentViewModel.allCategories).thenReturn(MutableLiveData(exampleCategories))
+        `when`(mockParentViewModel.category).thenReturn(MutableLiveData())
 
         // Launch scenario
         launchFragmentInHiltContainer<SelectCategoryFragment> {

@@ -1,10 +1,12 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -28,12 +30,19 @@ class BudgetDaoTest {
     /**
      * Example budgets
      */
-    private val budget1 = Budget(0, YearMonth.of(1999, 5), 100, 1)
-    private val budget2 = Budget(1, YearMonth.of(1999, 5), 100, 2)
-    private val budget3 = Budget(2, YearMonth.of(2000, 12), 100, 3)
+    private val budget1 = Budget(1, YearMonth.of(1999, 5), 100, 1)
+    private val budget2 = Budget(2, YearMonth.of(1999, 5), 100, 2)
+    private val budget3 = Budget(3, YearMonth.of(2000, 12), 100, 3)
+
+    /**
+     * Categories to meet foreign key constraints.
+     */
+    private val category1 = Category("name", 0, 1)
+    private val category2 = Category("name", 1, 2)
+    private val category3 = Category("name", 2, 3)
 
     @Before
-    fun setup() = runBlocking {
+    fun setup(): Unit = runBlocking {
 
         // Create database
         database = Room.inMemoryDatabaseBuilder(
@@ -41,11 +50,15 @@ class BudgetDaoTest {
             Database::class.java
         ).build()
 
+        // Add categories
+        database.categoryDao().add(category1, category2, category3)
+
         // Set budget dao
         budgetDao = database.budgetDao()
 
         // Add example budgets
         budgetDao.add(budget1, budget2, budget3)
+
     }
 
     @After
@@ -84,6 +97,25 @@ class BudgetDaoTest {
             .isEqualTo(listOf(budget1, budget2))
         assertThat(budgetDao.getByMonth(YearMonth.of(2000, 12)).first())
             .isEqualTo(listOf(budget3))
+    }
+
+    @Test(expected = SQLiteConstraintException::class)
+    fun throws_exception_when_no_category_for_budget_exists(): Unit = runBlocking {
+
+        // Add budget that has no category
+        budgetDao.add(Budget(4, YearMonth.of(2000, 12), 100, 4))
+
+    }
+
+    @Test
+    fun budget_gets_deleted_when_its_category_gets_deleted(): Unit = runBlocking {
+
+        // Delete category
+        database.categoryDao().delete(category2)
+
+        // Check if respective budget is missing
+        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget3))
+
     }
 
 }

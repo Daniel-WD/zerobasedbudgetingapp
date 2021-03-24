@@ -87,9 +87,10 @@ class AddEditTransactionViewModel @Inject constructor(
     /**
      * Contains [editTransactionWithCategoryAndPayee]. Presence indicates that [editTransactionWithCategoryAndPayee] should be edited.
      */
-    val editTransactionWithCategoryAndPayee = transactionRepository.getTransactionWithCategoryAndPayeeById(
-        savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
-    ).asLiveData()
+    val editTransactionWithCategoryAndPayee =
+        transactionRepository.getTransactionWithCategoryAndPayeeById(
+            savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
+        ).asLiveData()
 
     /**
      * Creates a new payee with [payeeName] and sets it, if [payeeName] is not blank and does'nt already exist.
@@ -349,7 +350,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Set payee observer
         viewModel.payee.observe(this) {
             // Set payee text
-            tvPayee.text = it.name
+            tvPayee.text = it?.name ?: ""
 
             updateCreateApplyEnabled()
         }
@@ -357,8 +358,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
         // Set category observer
         viewModel.category.observe(this) {
             // Set category text
-            tvCategory.text =
+            tvCategory.text = it?.let {
                 if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it.name
+            } ?: ""
 
             updateCreateApplyEnabled()
         }

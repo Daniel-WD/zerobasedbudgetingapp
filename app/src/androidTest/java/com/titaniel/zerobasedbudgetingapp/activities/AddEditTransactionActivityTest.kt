@@ -205,16 +205,13 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun displays_correct_payee_on_valid_fragment_result() {
+    fun shows_correct_payee_when_new_payee_is_set() {
 
         val expectedPayee = "aPayee"
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to expectedPayee)
-            )
+        // Change payee
+        scenario.onActivity {
+            mockViewModel.payee.value = Payee(expectedPayee)
         }
 
         // Check correct payee
@@ -223,74 +220,56 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun displays_correct_payee_on_invalid_fragment_result() {
+    fun shows_nothing_when_payee_null() {
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to null)
-            )
+        // Change payee
+        scenario.onActivity {
+            mockViewModel.payee.value = null
         }
 
-        // Payee text empty
-        onView(withId(R.id.tvPayee)).check(matches(withText("")))
-
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker, empty
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to "")
-            )
-        }
-
-        // Payee text empty
-        onView(withId(R.id.tvPayee)).check(matches(withText("")))
+        // Check payee text empty
+        onView(withId(R.id.tvPayee)).check(matches(withText(isEmptyString())))
 
     }
 
     @Test
-    fun displays_correct_category_on_valid_fragment_result() {
+    fun shows_correct_category_when_new_category_is_set() {
 
         val expectedCategory = "aCategory"
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to expectedCategory)
-            )
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = Category(expectedCategory, 0)
         }
 
-        // Correct category text
+        // Check correct category
         onView(withId(R.id.tvCategory)).check(matches(withText(expectedCategory)))
 
     }
 
     @Test
-    fun displays_correct_category_on_invalid_fragment_result() {
+    fun shows_nothing_when_category_null() {
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to null)
-            )
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = null
         }
 
-        // Category text empty
-        onView(withId(R.id.tvCategory)).check(matches(withText("")))
+        // Check category text empty
+        onView(withId(R.id.tvCategory)).check(matches(withText(isEmptyString())))
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to "")
-            )
+    }
+
+    @Test
+    fun shows_to_be_budgeted_text_when_category_is_to_be_budgeted() {
+
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = Category.TO_BE_BUDGETED
         }
 
-        // Category text empty
-        onView(withId(R.id.tvCategory)).check(matches(withText("")))
+        // Check category text
+        onView(withId(R.id.tvCategory)).check(matches(withText(R.string.activity_add_edit_transaction_to_be_budgeted)))
 
     }
 
@@ -321,27 +300,21 @@ class AddEditTransactionActivityTest {
 
         // Setup expected values
         val pay = -1234L
-        val payee = "fakePayee"
-        val category = "fakeCategory"
+        val payee = Payee("fakePayee")
+        val category = Category("fakeCategory", 1)
         val description = ""
 
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
 
         // Select payee
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to payee)
-            )
+        scenario.onActivity {
+            mockViewModel.payee.value = payee
         }
 
         // Select category
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to category)
-            )
+        scenario.onActivity {
+            mockViewModel.category.value = category
         }
 
         // Create btn not enabled
@@ -377,8 +350,8 @@ class AddEditTransactionActivityTest {
 
         // Setup expected values
         val pay = 1234L
-        val payee = "fakePayee"
-        val category = "fakeCategory"
+        val payee = Payee("fakePayee")
+        val category = Category("fakeCategory", 1)
         val description = "     fake Desc ription   "
 
         // Type value
@@ -388,11 +361,8 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.etDescription)).perform(typeText(description))
 
         // Select payee
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to payee)
-            )
+        scenario.onActivity {
+            mockViewModel.payee.value = payee
         }
 
         // Select today as date
@@ -406,11 +376,8 @@ class AddEditTransactionActivityTest {
         `when`(mockViewModel.isDataValid()).thenReturn(true)
 
         // Select category
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to category)
-            )
+        scenario.onActivity {
+            mockViewModel.category.value = category
         }
 
         // Check create enabled
