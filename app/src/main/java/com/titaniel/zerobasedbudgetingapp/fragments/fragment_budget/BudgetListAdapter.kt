@@ -68,7 +68,7 @@ class BudgetListAdapter(
         val availableMoney = availableMoney.value
 
         // Budgets and available money present?
-        if (budgetsWithCategory != null && availableMoney != null && budgetsWithCategory.size == availableMoney.size/*TODO ASSERT THAT*/) {
+        if (budgetsWithCategory != null && availableMoney != null) {
 
             // Get category
             val bWithCat = budgetsWithCategory[position]
