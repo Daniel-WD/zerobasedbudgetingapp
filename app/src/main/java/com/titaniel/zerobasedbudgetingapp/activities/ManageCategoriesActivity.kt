@@ -50,11 +50,6 @@ class ManageCategoriesViewModel @Inject constructor(
             .asLiveData()
 
     /**
-     * Month
-     */
-    private val month = settingRepository.getMonth().asLiveData()
-
-    /**
      * New categories, copy of first [categories] value with changes by the user. NOTE: Needed so that changes don't get discarded when [categories] gets changed.
      */
     val newCategories: MutableLiveData<MutableList<Category>> = MutableLiveData()
@@ -246,7 +241,7 @@ class ManageCategoriesActivity : AppCompatActivity() {
                     val pos1 = viewHolder.adapterPosition
                     val pos2 = target.adapterPosition
 
-                    // Get categories as mutable list
+                    // Get categories
                     val cats = viewModel.newCategories.value
                     requireNotNull(cats)
 
