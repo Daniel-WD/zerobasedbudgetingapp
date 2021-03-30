@@ -14,7 +14,7 @@ fun <E, P> MutableList<E>.addUnique(element: E, uniquePropertyDelegate: (E) -> P
 }
 
 /**
- * Re emits value.
+ * Re emits value, so that all observers get called again.
  */
 fun <T> MutableLiveData<T>.reEmit() {
     this.value = this.value

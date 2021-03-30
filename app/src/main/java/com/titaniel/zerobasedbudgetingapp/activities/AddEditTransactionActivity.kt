@@ -94,7 +94,7 @@ class AddEditTransactionViewModel @Inject constructor(
 
     /**
      * Creates a new payee with [payeeName] and sets it, if [payeeName] is not blank and does'nt already exist.
-     * Returns true if new payee could successfully be set, false otherwise.
+     * Returns true if [payeeName] meets the requirements, false otherwise.
      */
     fun setNewPayee(payeeName: String): Boolean {
         // Check payee name not blank and does'nt exist in existing payees
@@ -103,7 +103,7 @@ class AddEditTransactionViewModel @Inject constructor(
         }
 
         // Create and set new payee
-        payee.value = Payee(payeeName)
+        payee.value = Payee(payeeName.trim())
 
         return true
     }
