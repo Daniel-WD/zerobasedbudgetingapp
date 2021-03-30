@@ -77,20 +77,13 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         // Add payee listener
         ivAddPayee.setOnClickListener {
             // Try set new payee, dismiss if successful
-            parentViewModel.setNewPayee(etNewPayee.text.toString()).let {
-                if(it) {
-                    dismiss()
-                }
-            }
+            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if(it) dismiss() }
         }
+
         // Keyboard 'OK' click listener
         etNewPayee.setOnEditorActionListener { _, _, _ ->
             // Try set new payee, dismiss if successful
-            parentViewModel.setNewPayee(etNewPayee.text.toString()).let {
-                if(it) {
-                    dismiss()
-                }
-            }
+            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if (it) dismiss() }
             true
         }
 
