@@ -134,4 +134,41 @@ class CategoryDaoTest {
         )
     }
 
+    @Test
+    fun gets_category_by_id_correctly(): Unit = runBlocking {
+        assertThat(categoryDao.getById(1).first()).isEqualTo(category1)
+        assertThat(categoryDao.getById(2).first()).isEqualTo(category2)
+        assertThat(categoryDao.getById(3).first()).isEqualTo(category3)
+        assertThat(categoryDao.getById(4).first()).isEqualTo(category4)
+        assertThat(categoryDao.getById(5).first()).isEqualTo(null)
+    }
+
+    @Test
+    fun updates_categories_correctly(): Unit = runBlocking {
+
+        // Change categories
+        category4.name = "aölskjfalskdföa"
+        category2.index = 10
+        category3.index = 1
+
+        // Update changed categories in db
+        categoryDao.update(category2, category3, category4)
+
+        assertThat(categoryDao.getById(1).first()).isEqualTo(category1)
+        assertThat(categoryDao.getById(2).first()).isEqualTo(category2)
+        assertThat(categoryDao.getById(3).first()).isEqualTo(category3)
+
+    }
+
+    @Test
+    fun deletes_categories_correctly(): Unit = runBlocking {
+
+        // Delete cats
+        categoryDao.delete(category4, category1)
+
+        assertThat(categoryDao.getById(1).first()).isEqualTo(null)
+        assertThat(categoryDao.getById(4).first()).isEqualTo(null)
+
+    }
+
 }
