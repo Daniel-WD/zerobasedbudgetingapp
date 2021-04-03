@@ -27,7 +27,7 @@ class BudgetRepositoryTest {
     private lateinit var budgetRepository: BudgetRepository
 
     /**
-     * Example budget mock
+     * Example budget mocks
      */
     @Mock
     private lateinit var budgetMock: Budget
@@ -39,6 +39,7 @@ class BudgetRepositoryTest {
 
     @Test
     fun performs_add_budgets_correctly(): Unit = runBlocking {
+
         // Add budget
         budgetRepository.addBudgets(budgetMock)
 
@@ -87,6 +88,54 @@ class BudgetRepositoryTest {
 
         // Verify get budgets on dao
         verify(budgetDaoMock).getAll()
+
+    }
+
+    @Test
+    fun performs_delete_budgets_correctly(): Unit = runBlocking {
+
+        // Call method
+        budgetRepository.deleteBudgets(budgetMock)
+
+        // Verify dao call
+        verify(budgetDaoMock).delete(budgetMock)
+
+    }
+
+    @Test
+    fun performs_get_all_budgets_with_category_correctly() {
+
+        // Call method
+        budgetRepository.getAllBudgetsWithCategory()
+
+        // Verify dao call
+        verify(budgetDaoMock).getAllBudgetsWithCategory()
+
+    }
+
+    @Test
+    fun performs_get_budgets_with_category_by_month_correctly() {
+
+        val month = YearMonth.now()
+
+        // Call method
+        budgetRepository.getBudgetsWithCategoryByMonth(month)
+
+        // Verify dao call
+        verify(budgetDaoMock).getBudgetsWithCategoryByMonth(month)
+
+    }
+
+    @Test
+    fun performs_get_budgets_with_category_by_id_correctly() {
+
+        val id = 98076234L
+
+        // Call method
+        budgetRepository.getBudgetWithCategoryById(id)
+
+        // Verify dao call
+        verify(budgetDaoMock).getBudgetWithCategoryById(id)
 
     }
 

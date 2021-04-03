@@ -43,13 +43,26 @@ class PayeeRepositoryTest {
     }
 
     @Test
-    fun performs_get_all_payees_correctly(): Unit = runBlocking {
+    fun performs_get_all_payees_correctly() {
 
         // Get all payees
         payeeRepository.getAllPayees()
 
         // Verify get all payees on dao
         verify(payeeDaoMock).getAll()
+    }
+
+    @Test
+    fun performs_get_payee_by_id_correctly() {
+
+        val id = 234L
+
+        // Call method
+        payeeRepository.getPayeeById(id)
+
+        // Verify method call on dao
+        verify(payeeDaoMock).getById(id)
+
     }
 
 }
