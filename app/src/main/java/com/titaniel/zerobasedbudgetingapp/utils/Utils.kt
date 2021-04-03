@@ -16,7 +16,7 @@ fun convertLocalDateToString(localDate: LocalDate): String {
 /**
  * Builds a MediatorLiveData that fires when on of [liveData] gets changed
  */
-fun mediatorLiveDataBuilder(vararg liveData: LiveData<*>): MediatorLiveData<*> {
+fun createSimpleMediatorLiveData(vararg liveData: LiveData<*>): MediatorLiveData<*> {
     val mediator: MediatorLiveData<Unit> = MediatorLiveData()
     liveData.forEach {
         mediator.addSource(it) { mediator.value = Unit}

@@ -7,7 +7,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -20,17 +19,13 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
-import com.titaniel.zerobasedbudgetingapp.utils.mediatorLiveDataBuilder
+import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import java.time.Month
-import java.time.YearMonth
 import javax.inject.Inject
 
 /**
@@ -93,7 +88,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * MediatorLiveData for [budgetsWithCategoryOfMonth], [transactionsOfCategories], [budgetsOfCategories], [month]
      */
-    private val updateAvailableMoneyMediator = mediatorLiveDataBuilder(
+    private val updateAvailableMoneyMediator = createSimpleMediatorLiveData(
         budgetsWithCategoryOfMonth,
         transactionsOfCategories,
         budgetsOfCategories,
@@ -103,13 +98,13 @@ class BudgetViewModel @Inject constructor(
     /**
      * MediatorLiveData for [transactions], [allBudgets]
      */
-    private val updateToBeBudgetedMediator = mediatorLiveDataBuilder(transactions, allBudgets)
+    private val updateToBeBudgetedMediator = createSimpleMediatorLiveData(transactions, allBudgets)
 
     /**
      * MediatorLiveData for [month], [allBudgetsWithCategory]
      */
     private val budgetsWithCategoryUpdateMediator =
-        mediatorLiveDataBuilder(month, allBudgetsWithCategory)
+        createSimpleMediatorLiveData(month, allBudgetsWithCategory)
 
     /**
      * Observer to update [budgetsWithCategoryOfMonth]
