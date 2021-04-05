@@ -90,11 +90,11 @@ class ManageCategoriesViewModel @Inject constructor(
     /**
      * Returns if [newCategories] is different from [categories]
      */
-    fun hasChanges() =
+    fun categoriesChanged() =
         categories.value != newCategories.value
 
     /**
-     * Give category with [categoryId] new [name]. Returns true if name is valid, false otherwise
+     * Give category with [categoryId] new [name], create new category when [categoryId] is null. Returns true if name is valid or the same(on edit), false otherwise.
      */
     fun addEditCategory(
         categoryId: Long?,
@@ -146,19 +146,18 @@ class ManageCategoriesViewModel @Inject constructor(
         requireNotNull(oldCatsList)
         requireNotNull(newCatsList)
 
-
         // Apply indexes to new category order
         newCatsList.forEachIndexed { i, category -> category.index = i }
 
         // Find categories that should be deleted
-        val delCats = oldCatsList.filter { category -> newCatsList.find { it.id == category.id } == null }
+        val delCats =
+            oldCatsList.filter { category -> newCatsList.find { it.id == category.id } == null }
 
         // Find new categories
         val newCats = newCatsList.filter { it.id < 1 }
 
         // Find cats to update
         val updateCats = newCatsList.toMutableList().apply {
-            removeAll(delCats)
             removeAll(newCats)
         }
 
@@ -166,14 +165,10 @@ class ManageCategoriesViewModel @Inject constructor(
 
             // Update transactions that had a category that should be deleted to use Category.TO_BE_BUDGETED instead
             val updatedTransactions =
-                transactionRepository.getAllTransactions().first().map { transaction ->
-                    // Check if category is contained in delCats
-                    delCats.find { it.id == transaction.categoryId }?.let {
-                        // Set category to TO_BE_BUDGETED
-                        transaction.categoryId = Category.TO_BE_BUDGETED.id
-                    }
-                    transaction
-                }
+                transactionRepository.getAllTransactions().first()
+                        // Filter transactions that have category that will be deleted
+                    .filter { transaction -> delCats.find { it.id == transaction.categoryId } != null }
+                    .onEach { it.categoryId = Category.TO_BE_BUDGETED.id }
 
             // Update transactions
             transactionRepository.updateTransactions(*updatedTransactions.toTypedArray())
@@ -397,7 +392,7 @@ class ManageCategoriesActivity : AppCompatActivity() {
      */
     private fun close() {
         // Create and show alert dialog for discard changes, if changes have been made
-        if (viewModel.hasChanges()) {
+        if (viewModel.categoriesChanged()) {
             MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.activity_manage_categories_discard_dialog_title))
                 .setMessage(getString(R.string.activity_manage_categories_discard_dialog_content))
