@@ -11,11 +11,15 @@ import java.time.YearMonth
 
 class SettingsStoreTest {
 
+    /**
+     * SettingStore to test
+     */
     private lateinit var settingStore: SettingStore
 
     @Before
     fun setup() {
 
+        // Initialize SettingStore
         settingStore = SettingStore(InstrumentationRegistry.getInstrumentation().targetContext, "testSettings")
 
     }
