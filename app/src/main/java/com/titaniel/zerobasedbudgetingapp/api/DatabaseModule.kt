@@ -2,6 +2,7 @@ package com.titaniel.zerobasedbudgetingapp.api
 
 import android.content.Context
 import androidx.room.Room
+import com.titaniel.zerobasedbudgetingapp.database.datastore.SettingStore
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.BudgetDao
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
@@ -23,6 +24,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideSettingStore(@ApplicationContext context: Context): SettingStore {
+        return SettingStore(context, "settings")
+    }
 
     /**
      * Provide transaction dao of [database]

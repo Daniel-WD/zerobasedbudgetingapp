@@ -6,26 +6,22 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.YearMonth
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
- * Class to persist simple values.
+ * Class to persist simple values. Needs [applicationContext].
  */
-@Singleton
-class SettingStore @Inject constructor(@ApplicationContext private val context: Context) {
+class SettingStore constructor(private val applicationContext: Context, dataStoreName: String) {
 
     /**
      * DataStore
      */
-    private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore("settings")
+    private val Context.settingsStore: DataStore<Preferences> by preferencesDataStore(dataStoreName)
 
     companion object {
 
@@ -45,8 +41,7 @@ class SettingStore @Inject constructor(@ApplicationContext private val context: 
         // Set default values
         GlobalScope.launch {
             // Set current month as default month
-            getMonth().first() ?:
-            setMonth(YearMonth.now())
+            getMonth().first() ?: setMonth(YearMonth.now())
         }
     }
 
@@ -54,7 +49,7 @@ class SettingStore @Inject constructor(@ApplicationContext private val context: 
      * Gets selected month.
      */
     fun getMonth(): Flow<YearMonth?> {
-        return context.settingsStore.data
+        return applicationContext.settingsStore.data
             .map { preferences ->
                 // Create YearMonth, return  when at least one atomic value is null
                 YearMonth.of(
@@ -68,7 +63,7 @@ class SettingStore @Inject constructor(@ApplicationContext private val context: 
      * Sets selected [month].
      */
     suspend fun setMonth(month: YearMonth) {
-        context.settingsStore.edit { settings ->
+        applicationContext.settingsStore.edit { settings ->
             // Set month values in settings
             settings[MONTH_M_KEY] = month.monthValue
             settings[MONTH_Y_KEY] = month.year
