@@ -179,7 +179,7 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.delete)).perform(click())
 
         // (Makes it work on GitHub actions :D)
-        delay(1000)
+//        delay(1000)
 
         // Check activity finishing
         assertThat(scenario.state == Lifecycle.State.DESTROYED).isTrue()

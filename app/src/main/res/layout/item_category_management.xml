@@ -11,9 +11,9 @@
     <ImageView
         android:id="@+id/ivDragHandle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="@dimen/fragment_budget_category_margin"
+        android:paddingHorizontal="16dp"
         android:src="@drawable/ic_baseline_drag_handle_24" />
 
     <!-- Category name -->
@@ -31,18 +31,20 @@
     <ImageView
         android:id="@+id/ivEdit"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="48dp"
+        android:padding="8dp"
         android:src="@drawable/ic_baseline_edit_24" />
 
     <!-- Delete btn -->
     <ImageView
         android:id="@+id/ivDelete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
         android:src="@drawable/ic_baseline_delete_24" />
 
 </FrameLayout>
