@@ -17,12 +17,18 @@ interface PayeeDao {
      * Add [payees]
      */
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg payees: Payee)
+    suspend fun add(vararg payees: Payee): Array<Long>
 
     /**
      * Get all payees
      */
     @Query("SELECT * FROM payee")
     fun getAll(): Flow<List<Payee>>
+
+    /**
+     * Get payee by [payeeId]
+     */
+    @Query("SELECT * FROM payee WHERE payee.id = :payeeId")
+    fun getById(payeeId: Long): Flow<Payee>
 
 }

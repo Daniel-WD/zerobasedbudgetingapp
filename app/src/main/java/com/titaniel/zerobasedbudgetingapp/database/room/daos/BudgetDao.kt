@@ -1,13 +1,11 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.daos
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import androidx.room.Query
-import androidx.room.Update
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * Data access object for everything concerning budgets
@@ -19,13 +17,19 @@ interface BudgetDao {
      * Add [budgets]
      */
     @Insert(onConflict = REPLACE)
-    suspend fun add(vararg budgets: Budget)
+    suspend fun add(vararg budgets: Budget): Array<Long>
 
     /**
      * Update [budgets]
      */
     @Update
-    suspend fun update(vararg budgets: Budget)
+    suspend fun update(vararg budgets: Budget): Int
+
+    /**
+     * Delete [budgets]
+     */
+    @Delete
+    suspend fun delete(vararg budgets: Budget): Int
 
     /**
      * Get budget with [id]
@@ -37,12 +41,33 @@ interface BudgetDao {
      * Get budgets with [month]
      */
     @Query("SELECT * FROM budget WHERE month = :month")
-    fun getByMonth(month: LocalDate): Flow<List<Budget>>
+    fun getByMonth(month: YearMonth): Flow<List<Budget>>
 
     /**
      * Get all budgets
      */
     @Query("SELECT * FROM budget")
     fun getAll(): Flow<List<Budget>>
+
+    /**
+     * Get all BudgetWithCategory
+     */
+    @Transaction
+    @Query("SELECT * FROM budget")
+    fun getAllBudgetsWithCategory(): Flow<List<BudgetWithCategory>>
+
+    /**
+     * Get BudgetWithCategory with [month]
+     */
+    @Transaction
+    @Query("SELECT * FROM budget WHERE month = :month")
+    fun getBudgetsWithCategoryByMonth(month: YearMonth): Flow<List<BudgetWithCategory>>
+
+    /**
+     * Get BudgetWithCategory by [id]
+     */
+    @Transaction
+    @Query("SELECT * FROM budget WHERE budget.id = :id")
+    fun getBudgetWithCategoryById(id: Long): Flow<BudgetWithCategory>
 
 }

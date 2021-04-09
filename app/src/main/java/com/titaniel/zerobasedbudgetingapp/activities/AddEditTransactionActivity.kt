@@ -17,6 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -24,7 +25,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -43,9 +44,20 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditTransactionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
     private val payeeRepository: PayeeRepository
 ) : ViewModel() {
+
+    /**
+     * All payees
+     */
+    val allPayees = payeeRepository.getAllPayees().asLiveData()
+
+    /**
+     * All categories
+     */
+    val allCategories = categoryRepository.getAllCategories().asLiveData()
 
     /**
      * [pay] of transaction
@@ -53,14 +65,14 @@ class AddEditTransactionViewModel @Inject constructor(
     val pay = MutableLiveData(0L)
 
     /**
-     * [payeeName] of transaction
+     * [payee] of transaction
      */
-    val payeeName = MutableLiveData<String>()
+    val payee: MutableLiveData<Payee> = MutableLiveData()
 
     /**
-     * [categoryName] of transaction
+     * [category] of transaction
      */
-    val categoryName = MutableLiveData("")
+    val category: MutableLiveData<Category> = MutableLiveData()
 
     /**
      * [description] of transaction
@@ -73,57 +85,77 @@ class AddEditTransactionViewModel @Inject constructor(
     val date: MutableLiveData<LocalDate> = MutableLiveData()
 
     /**
-     * Contains [editTransaction]. Presence indicates that [editTransaction] should be edited
+     * Contains [editTransactionWithCategoryAndPayee]. Presence indicates that [editTransactionWithCategoryAndPayee] should be edited.
      */
-    val editTransaction = transactionRepository.getTransactionById(
-        savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
-    ).asLiveData()
+    val editTransactionWithCategoryAndPayee =
+        transactionRepository.getTransactionWithCategoryAndPayeeById(
+            savedStateHandle[AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY] ?: -1
+        ).asLiveData()
 
     /**
-     * Deletes [editTransaction]
+     * Creates a new payee with [payeeName] and sets it, if [payeeName] is not blank and does'nt already exist.
+     * Returns true if [payeeName] meets the requirements, false otherwise.
+     */
+    fun setNewPayee(payeeName: String): Boolean {
+        // Check payee name not blank and does'nt exist in existing payees
+        if (payeeName.isBlank() || allPayees.value!!.find { it.name == payeeName } != null) {
+            return false
+        }
+
+        // Create and set new payee
+        payee.value = Payee(payeeName.trim())
+
+        return true
+    }
+
+    /**
+     * Deletes [editTransactionWithCategoryAndPayee]
      */
     fun deleteEditTransaction() {
-        editTransaction.value?.let {
+        editTransactionWithCategoryAndPayee.value?.let {
             viewModelScope.launch {
-                transactionRepository.deleteTransactions(it)
+                transactionRepository.deleteTransactions(it.transaction)
             }
         }
     }
 
     /**
-     * When [editTransaction] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
+     * When [editTransactionWithCategoryAndPayee] is present, it gets updated. Otherwise adds a new transaction to [transactionRepository]
      */
     fun applyData() {
         // Validate data
         require(isDataValid())
 
+        // Get editTransaction
+        val eTransWRest = editTransactionWithCategoryAndPayee.value
+
         // Check if should edit transaction
-        if (editTransaction.value != null) { // Edit transaction
+        if (eTransWRest != null) { // Edit transaction
 
             // Apply new values
-            editTransaction.value!!.pay = pay.value!!
-            editTransaction.value!!.payeeName = payeeName.value!!
-            editTransaction.value!!.categoryName = categoryName.value!!
-            editTransaction.value!!.date = date.value!!
-            editTransaction.value!!.description = description.value!!.trim()
+            eTransWRest.transaction.pay = pay.value!!
+            eTransWRest.transaction.payeeId = payee.value!!.id
+            eTransWRest.transaction.categoryId = category.value!!.id
+            eTransWRest.transaction.date = date.value!!
+            eTransWRest.transaction.description = description.value!!.trim()
 
             // Update transaction
             viewModelScope.launch {
-                transactionRepository.updateTransactions(editTransaction.value!!)
+                transactionRepository.updateTransactions(eTransWRest.transaction)
             }
 
         } else { // Create new transaction
 
             viewModelScope.launch {
                 // Add payee if new
-                payeeRepository.addPayees(Payee(payeeName.value!!))
+                val payeeId = payeeRepository.addPayees(payee.value!!)[0]
 
                 // Save new transaction
                 transactionRepository.addTransactions(
                     Transaction(
                         pay.value!!,
-                        payeeName.value!!,
-                        categoryName.value!!,
+                        payeeId,
+                        category.value!!.id,
                         description.value!!.trim(),
                         date.value!!
                     )
@@ -135,7 +167,7 @@ class AddEditTransactionViewModel @Inject constructor(
     /**
      * Checks if essential data for a transaction is present
      */
-    fun isDataValid() = payeeName.value!!.isNotBlank() && categoryName.value!!.isNotBlank() && date.value != null
+    fun isDataValid() = payee.value != null && category.value != null && date.value != null
 
 }
 
@@ -247,26 +279,25 @@ class AddEditTransactionActivity : AppCompatActivity() {
         lDescription = findViewById(R.id.layoutDescription)
 
         // Transaction observer
-        viewModel.editTransaction.observe(this, {
-            // Show transaction
+        viewModel.editTransactionWithCategoryAndPayee.observe(this, {
 
             it?.let {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
-                // Set pay test
-                etPay.setText(it.pay.toString())
+                // Set pay text (ViewModel value gets set when pay text changes)
+                etPay.setText(it.transaction.pay.toString())
 
                 // Set value text cursor to end
                 etPay.setSelection(etPay.text.length)
 
-                // Set description text
-                etDescription.setText(it.description)
+                // Set description text (ViewModel value gets set when description text changes)
+                etDescription.setText(it.transaction.description)
 
                 // Set ViewModel values
-                viewModel.payeeName.value = it.payeeName
-                viewModel.categoryName.value = it.categoryName
-                viewModel.date.value = it.date
+                viewModel.payee.value = it.payee
+                viewModel.category.value = it.category
+                viewModel.date.value = it.transaction.date
 
                 // Update save btn enabled
                 updateCreateApplyEnabled()
@@ -279,7 +310,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             // If edit transaction exists, set its timestamp as selected date
             builder.setSelection(
-                it?.date?.let { date ->
+                it?.transaction?.date?.let { date ->
                     date.atStartOfDay(ZoneId.of("GMT"))!!.toInstant()!!.toEpochMilli() + 1
                 } ?: MaterialDatePicker.todayInUtcMilliseconds())
 
@@ -317,20 +348,27 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Set payee observer
-        viewModel.payeeName.observe(this) {
-            tvPayee.text = it
+        viewModel.payee.observe(this) {
+            // Set payee text
+            tvPayee.text = it?.name ?: ""
+
+            updateCreateApplyEnabled()
         }
 
-        // Set model observer
-        viewModel.categoryName.observe(this) {
-            tvCategory.text =
-                if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it
+        // Set category observer
+        viewModel.category.observe(this) {
+            // Set category text
+            tvCategory.text = it?.let {
+                if (it == Category.TO_BE_BUDGETED) getString(R.string.activity_add_edit_transaction_to_be_budgeted) else it.name
+            } ?: ""
+
+            updateCreateApplyEnabled()
         }
 
         // Set date observer
         viewModel.date.observe(this) {
             it?.let {
-                tvDate.text = Utils.convertLocalDateToString(it)
+                tvDate.text = convertLocalDateToString(it)
             }
         }
 
@@ -389,23 +427,6 @@ class AddEditTransactionActivity : AppCompatActivity() {
             etDescription.clearFocus()
             datePicker.show(supportFragmentManager, "DatePicker")
         }
-
-        // Fragment result listeners
-        // Set payee on payee fragment result
-        supportFragmentManager
-            .setFragmentResultListener(PAYEE_REQUEST_KEY, this) { _, bundle ->
-                val payee = bundle.getString(SelectPayeeFragment.PAYEE_KEY)
-                payee?.let { viewModel.payeeName.value = it }
-                updateCreateApplyEnabled()
-            }
-
-        // Set category on category fragment result
-        supportFragmentManager
-            .setFragmentResultListener(CATEGORY_REQUEST_KEY, this) { _, bundle ->
-                val category = bundle.getString(SelectCategoryFragment.CATEGORY_KEY)
-                category?.let { viewModel.categoryName.value = it }
-                updateCreateApplyEnabled()
-            }
 
         // Focus value text
         etPay.requestFocus()

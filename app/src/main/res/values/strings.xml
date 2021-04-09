@@ -9,7 +9,25 @@
     <string name="navigation_tab_add_transaction">Add transaction</string>
     <string name="navigation_tab_transactions">Transactions</string>
 
-    <!-- Activity add/edit transaction -->
+    <!-- ManageCategoriesActivity -->
+    <string name="activity_manage_categories_title">Manage Categories</string>
+
+    <string name="activity_manage_categories_add_category">Add Category</string>
+
+    <string name="activity_manage_categories_delete_dialog_title">Delete Category?</string>
+    <string name="activity_manage_categories_delete_dialog_content">
+        Do you really want to delete %s? All transactions that use this category will be set to \"To be Budgeted\" and its budgets will be deleted.
+    </string>
+    <string name="activity_manage_categories_dialog_confirm">Yes</string>
+    <string name="activity_manage_categories_dialog_cancel">Cancel</string>
+
+    <string name="activity_manage_categories_discard_dialog_title">Discard Changes?</string>
+    <string name="activity_manage_categories_discard_dialog_content">
+        Do you really want to discard all changes?
+    </string>
+    <string name="activity_manage_categories_new_category">New Category</string>
+
+    <!-- AddEditTransactionActivity -->
     <string name="activity_add_edit_transaction_create_transaction">Create Transaction</string>
     <string name="activity_add_edit_transaction_edit_transaction">Edit Transaction</string>
 
@@ -38,7 +56,7 @@
     <string name="activity_add_edit_transaction_to_be_budgeted">To be budgeted</string>
 
     <!-- Fragment budget -->
-    <string name="fragment_budget_search_category">Search category</string>
+    <string name="fragment_budget_search_category">Manage categories</string>
 
     <string name="fragment_budget_category">Category</string>
     <string name="fragment_budget_budgeted">Budgeted</string>

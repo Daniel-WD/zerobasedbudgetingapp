@@ -4,11 +4,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Search -->
+    <!-- Open category management -->
     <item
-        android:id="@+id/search"
-        android:enabled="true"
-        android:icon="@drawable/ic_baseline_search_24"
+        android:id="@+id/categoryManagement"
         android:title="@string/fragment_budget_search_category"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+
 </menu>

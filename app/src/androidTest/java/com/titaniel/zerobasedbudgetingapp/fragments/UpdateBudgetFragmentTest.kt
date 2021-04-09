@@ -10,6 +10,8 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetViewModel
 import org.junit.Before
@@ -19,7 +21,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDate
+import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
 class UpdateBudgetFragmentTest {
@@ -38,12 +40,15 @@ class UpdateBudgetFragmentTest {
     /**
      * Example budget
      */
-    private val exampleBudget = Budget("sex", LocalDate.of(2020, 12, 1), 100)
+    private val exampleBudgetWithCategory = BudgetWithCategory(
+        Budget(1, YearMonth.of(2020, 12), 100),
+        Category("sex",  0, 1)
+    )
 
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.budget).thenReturn(MutableLiveData(exampleBudget))
+        `when`(mockViewModel.budgetWithCategory).thenReturn(MutableLiveData(exampleBudgetWithCategory))
 
         // Launch scenario
         launchFragmentInHiltContainer<UpdateBudgetFragment> {
@@ -58,10 +63,10 @@ class UpdateBudgetFragmentTest {
     fun starts_correctly() {
 
         // Category text correct
-        onView(withId(R.id.tvCategory)).check(matches(withText(exampleBudget.categoryName)))
+        onView(withId(R.id.tvCategory)).check(matches(withText(exampleBudgetWithCategory.category.name)))
 
         // Budgeted text correct
-        onView(withId(R.id.etBudgeted)).check(matches(withText(exampleBudget.budgeted.toString())))
+        onView(withId(R.id.etBudgeted)).check(matches(withText(exampleBudgetWithCategory.budget.budgeted.toString())))
 
         // Budgeted text is focused
         onView(withId(R.id.etBudgeted)).check(matches(hasFocus()))

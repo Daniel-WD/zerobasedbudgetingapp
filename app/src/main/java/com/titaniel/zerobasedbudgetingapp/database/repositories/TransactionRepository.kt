@@ -2,12 +2,15 @@ package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository to interact with transaction data
  */
+@Singleton
 class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao
 ) {
@@ -15,22 +18,22 @@ class TransactionRepository @Inject constructor(
     /**
      * Add [transactions]
      */
-    suspend fun addTransactions(vararg transactions: Transaction) {
-        transactionDao.add(*transactions)
+    suspend fun addTransactions(vararg transactions: Transaction): Array<Long> {
+        return transactionDao.add(*transactions)
     }
 
     /**
      * Delete [transactions]
      */
-    suspend fun deleteTransactions(vararg transactions: Transaction) {
-        transactionDao.delete(*transactions)
+    suspend fun deleteTransactions(vararg transactions: Transaction): Int {
+        return transactionDao.delete(*transactions)
     }
 
     /**
      * Update [transactions]
      */
-    suspend fun updateTransactions(vararg transactions: Transaction) {
-        transactionDao.update(*transactions)
+    suspend fun updateTransactions(vararg transactions: Transaction): Int {
+        return transactionDao.update(*transactions)
     }
 
     /**
@@ -45,6 +48,20 @@ class TransactionRepository @Inject constructor(
      */
     fun getAllTransactions(): Flow<List<Transaction>> {
         return transactionDao.getAll()
+    }
+
+    /**
+     * Get all TransactionWithCategoryAndPayee
+     */
+    fun getAllTransactionsWithCategoryAndPayee(): Flow<List<TransactionWithCategoryAndPayee>> {
+        return transactionDao.getAllTransactionsWithCategoryAndPayee()
+    }
+
+    /**
+     * Get TransactionWithCategoryAndPayee by [transactionId]
+     */
+    fun getTransactionWithCategoryAndPayeeById(transactionId: Long): Flow<TransactionWithCategoryAndPayee> {
+        return transactionDao.getTransactionWithCategoryAndPayeeById(transactionId)
     }
 
 }

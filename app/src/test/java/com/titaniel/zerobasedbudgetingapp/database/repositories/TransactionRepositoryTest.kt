@@ -84,4 +84,28 @@ class TransactionRepositoryTest {
         verify(transactionDaoMock).getAll()
     }
 
+    @Test
+    fun performs_get_all_transactions_with_category_and_payee_correctly() {
+
+        // Call method
+        transactionRepository.getAllTransactionsWithCategoryAndPayee()
+
+        // Very dao call
+        verify(transactionDaoMock).getAllTransactionsWithCategoryAndPayee()
+
+    }
+
+    @Test
+    fun performs_get_transaction_with_category_and_payee_by_id_correctly() {
+
+        val id = 32L
+
+        // Call method
+        transactionRepository.getTransactionWithCategoryAndPayeeById(id)
+
+        // Very dao call
+        verify(transactionDaoMock).getTransactionWithCategoryAndPayeeById(id)
+
+    }
+
 }

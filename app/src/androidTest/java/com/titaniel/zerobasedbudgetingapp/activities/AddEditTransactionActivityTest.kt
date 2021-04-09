@@ -13,13 +13,15 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
-import com.google.common.util.concurrent.Service
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
+import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.Utils
+import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
@@ -51,12 +53,12 @@ class AddEditTransactionActivityTest {
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.payeeName).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.payee).thenReturn(MutableLiveData())
         `when`(mockViewModel.pay).thenReturn(MutableLiveData(0L))
-        `when`(mockViewModel.categoryName).thenReturn(MutableLiveData(""))
+        `when`(mockViewModel.category).thenReturn(MutableLiveData())
         `when`(mockViewModel.description).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.date).thenReturn(MutableLiveData())
-        `when`(mockViewModel.editTransaction).thenReturn(MutableLiveData(null))
+        `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(MutableLiveData(null))
 
         // Add lifecycle callback
         ActivityLifecycleMonitorRegistry.getInstance()
@@ -110,15 +112,18 @@ class AddEditTransactionActivityTest {
 
         // Create editTransaction data
         val pay = -120L
-        val payeeName = "payee"
-        val categoryName = "category"
+        val payee = Payee("payee", 1)
+        val category = Category("category", 0, 1)
         val description = "description"
         val date = LocalDate.of(1998, 1, 12)
 
         // Set editTransaction
-        `when`(mockViewModel.editTransaction).thenReturn(
+        `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(
             MutableLiveData(
-                Transaction(pay, payeeName, categoryName, description, date)
+                TransactionWithCategoryAndPayee(
+                    Transaction(pay, payee.id, category.id, description, date),
+                    category, payee
+                )
             )
         )
 
@@ -133,13 +138,13 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.etPay)).check(matches(withText(pay.toString())))
 
         // Check payeeName
-        onView(withId(R.id.tvPayee)).check(matches(withText(payeeName)))
+        onView(withId(R.id.tvPayee)).check(matches(withText(payee.name)))
 
         // Check categoryName
-        onView(withId(R.id.tvCategory)).check(matches(withText(categoryName)))
+        onView(withId(R.id.tvCategory)).check(matches(withText(category.name)))
 
         // Check date
-        onView(withId(R.id.tvDate)).check(matches(withText(Utils.convertLocalDateToString(date))))
+        onView(withId(R.id.tvDate)).check(matches(withText(convertLocalDateToString(date))))
 
         // Check description
         onView(withId(R.id.etDescription)).check(matches(withText(description)))
@@ -159,22 +164,22 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values in ViewModel correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payeeName)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(categoryName)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(date)
 
         ownScenario.close()
     }
 
-     @Test
+    @Test
     fun handles_delete_click_correctly_on_new_transaction_mode() = runBlocking {
 
         // Click delete
         onView(withId(R.id.delete)).perform(click())
 
         // (Makes it work on GitHub actions :D)
-        delay(1000)
+//        delay(1000)
 
         // Check activity finishing
         assertThat(scenario.state == Lifecycle.State.DESTROYED).isTrue()
@@ -194,22 +199,19 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.confirm_button)).perform(click())
 
         // Check if correct date is selected, and is correctly formatted
-        val dateString = Utils.convertLocalDateToString(LocalDate.now())
+        val dateString = convertLocalDateToString(LocalDate.now())
         onView(withId(R.id.tvDate)).check(matches(withText(dateString)))
 
     }
 
     @Test
-    fun displays_correct_payee_on_valid_fragment_result() {
+    fun shows_correct_payee_when_new_payee_is_set() {
 
         val expectedPayee = "aPayee"
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to expectedPayee)
-            )
+        // Change payee
+        scenario.onActivity {
+            mockViewModel.payee.value = Payee(expectedPayee)
         }
 
         // Check correct payee
@@ -218,74 +220,56 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun displays_correct_payee_on_invalid_fragment_result() {
+    fun shows_nothing_when_payee_null() {
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to null)
-            )
+        // Change payee
+        scenario.onActivity {
+            mockViewModel.payee.value = null
         }
 
-        // Payee text empty
-        onView(withId(R.id.tvPayee)).check(matches(withText("")))
-
-        scenario.onActivity { activity ->
-            // Fake fragment result from payee picker, empty
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to "")
-            )
-        }
-
-        // Payee text empty
-        onView(withId(R.id.tvPayee)).check(matches(withText("")))
+        // Check payee text empty
+        onView(withId(R.id.tvPayee)).check(matches(withText(isEmptyString())))
 
     }
 
     @Test
-    fun displays_correct_category_on_valid_fragment_result() {
+    fun shows_correct_category_when_new_category_is_set() {
 
         val expectedCategory = "aCategory"
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to expectedCategory)
-            )
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = Category(expectedCategory, 0)
         }
 
-        // Correct category text
+        // Check correct category
         onView(withId(R.id.tvCategory)).check(matches(withText(expectedCategory)))
 
     }
 
     @Test
-    fun displays_correct_category_on_invalid_fragment_result() {
+    fun shows_nothing_when_category_null() {
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to null)
-            )
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = null
         }
 
-        // Category text empty
-        onView(withId(R.id.tvCategory)).check(matches(withText("")))
+        // Check category text empty
+        onView(withId(R.id.tvCategory)).check(matches(withText(isEmptyString())))
 
-        scenario.onActivity { activity ->
-            // Fake fragment result from category picker, invalid
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to "")
-            )
+    }
+
+    @Test
+    fun shows_to_be_budgeted_text_when_category_is_to_be_budgeted() {
+
+        // Change category
+        scenario.onActivity {
+            mockViewModel.category.value = Category.TO_BE_BUDGETED
         }
 
-        // Category text empty
-        onView(withId(R.id.tvCategory)).check(matches(withText("")))
+        // Check category text
+        onView(withId(R.id.tvCategory)).check(matches(withText(R.string.activity_add_edit_transaction_to_be_budgeted)))
 
     }
 
@@ -316,27 +300,21 @@ class AddEditTransactionActivityTest {
 
         // Setup expected values
         val pay = -1234L
-        val payee = "fakePayee"
-        val category = "fakeCategory"
+        val payee = Payee("fakePayee")
+        val category = Category("fakeCategory", 1)
         val description = ""
 
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
 
         // Select payee
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to payee)
-            )
+        scenario.onActivity {
+            mockViewModel.payee.value = payee
         }
 
         // Select category
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to category)
-            )
+        scenario.onActivity {
+            mockViewModel.category.value = category
         }
 
         // Create btn not enabled
@@ -360,8 +338,8 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payee)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(category)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
 
@@ -372,8 +350,8 @@ class AddEditTransactionActivityTest {
 
         // Setup expected values
         val pay = 1234L
-        val payee = "fakePayee"
-        val category = "fakeCategory"
+        val payee = Payee("fakePayee")
+        val category = Category("fakeCategory", 1)
         val description = "     fake Desc ription   "
 
         // Type value
@@ -383,11 +361,8 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.etDescription)).perform(typeText(description))
 
         // Select payee
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(SelectPayeeFragment.PAYEE_KEY to payee)
-            )
+        scenario.onActivity {
+            mockViewModel.payee.value = payee
         }
 
         // Select today as date
@@ -401,11 +376,8 @@ class AddEditTransactionActivityTest {
         `when`(mockViewModel.isDataValid()).thenReturn(true)
 
         // Select category
-        scenario.onActivity { activity ->
-            activity.supportFragmentManager.setFragmentResult(
-                AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-                bundleOf(SelectCategoryFragment.CATEGORY_KEY to category)
-            )
+        scenario.onActivity {
+            mockViewModel.category.value = category
         }
 
         // Check create enabled
@@ -419,8 +391,8 @@ class AddEditTransactionActivityTest {
 
         // Assert transaction values correct
         assertThat(mockViewModel.pay.value).isEqualTo(pay)
-        assertThat(mockViewModel.payeeName.value).isEqualTo(payee)
-        assertThat(mockViewModel.categoryName.value).isEqualTo(category)
+        assertThat(mockViewModel.payee.value).isEqualTo(payee)
+        assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
     }

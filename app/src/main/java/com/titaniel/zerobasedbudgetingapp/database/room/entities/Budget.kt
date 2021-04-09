@@ -1,19 +1,23 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
- * [Budget] with [categoryName], [month] and [budgeted] value
+ * [Budget] with [categoryId], [month], [budgeted] value and [id]
  */
-@Entity
+@Entity(foreignKeys = [ForeignKey(entity = Category::class,
+    parentColumns = arrayOf("id"),
+    childColumns = arrayOf("categoryId"),
+    onDelete = ForeignKey.CASCADE,
+    onUpdate = ForeignKey.NO_ACTION)])
 data class Budget(
-    var categoryName: String,
-    val month: LocalDate,
-    var budgeted: Long
-) {
-    /** [id] of this [Budget] */
+    val categoryId: Long,
+    val month: YearMonth,
+    var budgeted: Long,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-}
+)

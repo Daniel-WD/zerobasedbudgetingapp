@@ -1,6 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +23,12 @@ class CategoryRepositoryTest {
      * CategoryRepository to test
      */
     private lateinit var categoryRepository: CategoryRepository
+
+    /**
+     * Example categories
+     */
+    @Mock
+    private lateinit var category1: Category
 
     @Before
     fun setup() {
@@ -52,6 +60,52 @@ class CategoryRepositoryTest {
 
         // Verify get all BudgetsOfCategories on dao
         verify(categoryDaoMock).getBudgetsOfCategories()
+    }
+
+    @Test
+    fun performs_add_categories_correctly(): Unit = runBlocking {
+
+        // Call method
+        categoryRepository.addCategories(category1)
+
+        // Verify correct dao method called
+        verify(categoryDaoMock).add(category1)
+
+    }
+
+    @Test
+    fun performs_delete_categories_correctly(): Unit = runBlocking {
+
+        // Call method
+        categoryRepository.deleteCategories(category1)
+
+        // Verify correct dao method called
+        verify(categoryDaoMock).delete(category1)
+
+    }
+
+    @Test
+    fun performs_update_categories_correctly(): Unit = runBlocking {
+
+        // Call method
+        categoryRepository.updateCategories(category1)
+
+        // Verify correct dao method called
+        verify(categoryDaoMock).update(category1)
+
+    }
+
+    @Test
+    fun performs_get_category_by_id_correctly() {
+
+        val id = 213423L
+
+        // Call method
+        categoryRepository.getCategoryById(id)
+
+        // Verify correct dao method called
+        verify(categoryDaoMock).getById(id)
+
     }
 
 }

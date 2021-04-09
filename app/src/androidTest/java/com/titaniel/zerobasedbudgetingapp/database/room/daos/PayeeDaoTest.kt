@@ -26,10 +26,10 @@ class PayeeDaoTest {
     /**
      * Example payees
      */
-    private val payee1 = Payee("payee1")
-    private val payee2 = Payee("payee2")
-    private val payee3 = Payee("payee3")
-    private val payee4 = Payee("payee4")
+    private val payee1 = Payee("payee1", 1)
+    private val payee2 = Payee("payee2", 2)
+    private val payee3 = Payee("payee3", 3)
+    private val payee4 = Payee("payee4", 4)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -56,6 +56,15 @@ class PayeeDaoTest {
     @Test
     fun gets_payees_correctly(): Unit = runBlocking {
         assertThat(payeeDao.getAll().first()).isEqualTo(listOf(payee1, payee2, payee3, payee4))
+    }
+
+    @Test
+    fun gets_payee_by_id_correctly(): Unit = runBlocking {
+        assertThat(payeeDao.getById(1).first()).isEqualTo(payee1)
+        assertThat(payeeDao.getById(2).first()).isEqualTo(payee2)
+        assertThat(payeeDao.getById(3).first()).isEqualTo(payee3)
+        assertThat(payeeDao.getById(4).first()).isEqualTo(payee4)
+        assertThat(payeeDao.getById(5).first()).isEqualTo(null)
     }
 
 }

@@ -6,6 +6,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -53,3 +54,11 @@ inline fun <reified VM : ViewModel> AppCompatActivity.provideViewModel(
 ): Lazy<VM> =
     OverridableLazy(viewModels(factoryProducer))
 
+/**
+ * Like [viewModels], with replaceable lazy
+ * (source: https://proandroiddev.com/testing-the-untestable-the-case-of-the-viewmodel-delegate-975c09160993)
+ */
+inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
+    noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
+): Lazy<VM> =
+    OverridableLazy(activityViewModels(factoryProducer))

@@ -7,35 +7,21 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
+import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-
-/**
- * [SelectPayeeViewModel] with [payeeRepository].
- */
-@HiltViewModel
-class SelectPayeeViewModel @Inject constructor(
-    payeeRepository: PayeeRepository
-) : ViewModel() {
-
-    /**
-     * All payees
-     */
-    val payees = payeeRepository.getAllPayees().asLiveData()
-
-}
 
 /**
  * Bottom sheet dialog fragment for payee selection
@@ -66,10 +52,10 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
     private lateinit var listPayees: RecyclerView
 
     /**
-     * View model
+     * Parent ViewModel
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val viewModel: SelectPayeeViewModel by provideViewModel()
+    val parentViewModel: AddEditTransactionViewModel by provideActivityViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,11 +76,14 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Add payee listener
         ivAddPayee.setOnClickListener {
-            returnPayee(etNewPayee.text.toString())
+            // Try set new payee, dismiss if successful
+            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if(it) dismiss() }
         }
+
         // Keyboard 'OK' click listener
         etNewPayee.setOnEditorActionListener { _, _, _ ->
-            returnPayee(etNewPayee.text.toString())
+            // Try set new payee, dismiss if successful
+            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if (it) dismiss() }
             true
         }
 
@@ -107,32 +96,18 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listPayees.adapter = PayeesListAdapter(
-            viewModel.payees,
+            parentViewModel.allPayees,
             { payee -> // Payee click callback
-                returnPayee(payee.name)
+
+                // Set payee
+                parentViewModel.payee.value = payee
+
+                dismiss()
             },
             requireContext(),
             viewLifecycleOwner
         )
 
-    }
-
-    /**
-     * Returns [payeeName] to [AddEditTransactionActivity] and dismisses dialog, if [payeeName] is not blank.
-     */
-    private fun returnPayee(payeeName: String) {
-        // Payee string not blank?
-        if (payeeName.isNotBlank()) {
-
-            // Return fragment result
-            setFragmentResult(
-                AddEditTransactionActivity.PAYEE_REQUEST_KEY,
-                bundleOf(PAYEE_KEY to payeeName)
-            )
-
-            // Close fragment
-            dismiss()
-        }
     }
 
 }

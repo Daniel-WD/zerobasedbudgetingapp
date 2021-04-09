@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -15,27 +16,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-
-/**
- * [SelectCategoryViewModel] with [categoryRepository].
- */
-@HiltViewModel
-class SelectCategoryViewModel @Inject constructor(
-    categoryRepository: CategoryRepository
-) : ViewModel() {
-
-    /**
-     * All categories
-     */
-    val categories = categoryRepository.getAllCategories().asLiveData()
-
-}
 
 /**
  * [SelectCategoryFragment] for category selection
@@ -61,10 +49,10 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
     private lateinit var tvToBeBudgeted: TextView
 
     /**
-     * View model
+     * Parent ViewModel
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val viewModel: SelectCategoryViewModel by provideViewModel()
+    val parentViewModel: AddEditTransactionViewModel by provideActivityViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,9 +79,14 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // Set adapter
         listCategories.adapter = CategoriesListAdapter(
-            viewModel.categories,
+            parentViewModel.allCategories,
             { category -> // Category click callback
-                returnCategory(category.name)
+
+                // Set category
+                parentViewModel.category.value = category
+
+                dismiss()
+
             },
             requireContext(),
             viewLifecycleOwner
@@ -101,22 +94,12 @@ class SelectCategoryFragment : BottomSheetDialogFragment() {
 
         // To be budgeted text click listener
         tvToBeBudgeted.setOnClickListener {
-            returnCategory(Category.TO_BE_BUDGETED)
+
+            // Set category to "To be budgeted"
+            parentViewModel.category.value = Category.TO_BE_BUDGETED
+
+            dismiss()
         }
-    }
-
-    /**
-     * Return [categoryName] to [AddEditTransactionActivity].
-     */
-    private fun returnCategory(categoryName: String) {
-        // Return fragment result
-        setFragmentResult(
-            AddEditTransactionActivity.CATEGORY_REQUEST_KEY,
-            bundleOf(CATEGORY_KEY to categoryName)
-        )
-
-        // Close fragment
-        dismiss()
     }
 
 }

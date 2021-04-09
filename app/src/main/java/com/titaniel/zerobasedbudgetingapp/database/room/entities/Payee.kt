@@ -4,9 +4,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * [Payee] with [name]
+ * [Payee] with [name] and [id]
  */
 @Entity
 data class Payee(
-    @PrimaryKey val name: String
+    var name: String,
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
 )
