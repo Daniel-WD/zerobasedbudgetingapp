@@ -15,6 +15,8 @@
         android:layout_marginStart="@dimen/fragment_budget_category_margin"
         android:gravity="center_vertical"
         android:includeFontPadding="false"
+        android:inputType="text"
+        android:singleLine="true"
         android:textSize="16sp"
         tools:text="Category 1" />
 
