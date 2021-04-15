@@ -28,4 +28,11 @@ class SettingRepository @Inject constructor(
         settingStore.setMonth(month)
     }
 
+    /**
+     * Gets start month
+     */
+    fun getStartMonth(): Flow<YearMonth?> {
+        return settingStore.getStartMonth()
+    }
+
 }

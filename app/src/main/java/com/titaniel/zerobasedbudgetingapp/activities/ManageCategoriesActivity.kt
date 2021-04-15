@@ -190,7 +190,7 @@ class ManageCategoriesViewModel @Inject constructor(
             val newBudgets = newCatIds.map { id -> Budget(id, mon, 0) }
 
             // Insert new budgets
-            budgetRepository.addBudgets(*newBudgets.toTypedArray())
+            budgetRepository.addBudgets(*newBudgets.toTypedArray()) // TODO REMOVE
 
         }
 

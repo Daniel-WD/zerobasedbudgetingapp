@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +31,11 @@ import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import javax.inject.Inject
 
 /**
@@ -37,11 +43,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    settingRepository: SettingRepository,
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
-    budgetRepository: BudgetRepository
+    budgetRepository: BudgetRepository,
+    private val settingRepository: SettingRepository
 ) : ViewModel() {
+
+    /**
+     * Selectable months
+     */
+    val selectableMonths: MutableLiveData<List<YearMonth>> = MutableLiveData()
 
     /**
      * Month
@@ -118,9 +129,10 @@ class BudgetViewModel @Inject constructor(
         val budsWithCat = allBudgetsWithCategory.value
 
         // Check non null
-        if(mon != null && budsWithCat != null) {
+        if (mon != null && budsWithCat != null) {
             // Filter all budgetsWithCategory of currently selected month
-            budgetsWithCategoryOfMonth.value = budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
+            budgetsWithCategoryOfMonth.value =
+                budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
         }
 
     }
@@ -128,7 +140,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [availableMoney]
      */
-    private val updateAvailableMoneyObserver: Observer<Any> = Observer {
+    private val updateAvailableMoneyObserver: Observer<Any> = Observer { // TODO any to unit
         val budsWithCatMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
@@ -167,11 +179,54 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set new month that has [index] in [selectableMonths].
+     */
+    fun setMonth(index: Int) {
+        // Set month
+        viewModelScope.launch {
+            settingRepository.setMonth(selectableMonths.value!![index])
+        }
+
+        // TODO ADD NEW BUDGETS
+    }
+
     init {
         // Register all observers
         updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
         budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
+
+        viewModelScope.launch {
+
+            settingRepository.getStartMonth().first().let { startMonth ->
+                // Check non null
+                if (startMonth == null) { // TODO
+                    return@let
+                }
+
+                // Get nextMonth
+                val nextMonth = YearMonth.now().plusMonths(1)
+
+                // Set last month to startMonth
+                var last = startMonth!!
+
+                // List for result
+                val result = mutableListOf<YearMonth>()
+
+                while (last <= nextMonth) {
+
+                    // Add last
+                    result.add(last)
+
+                    // Increase last by 1 month
+                    last = last.plusMonths(1)
+
+                }
+
+                selectableMonths.value = result
+            }
+        }
     }
 
     override fun onCleared() {
@@ -239,30 +294,33 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
             }
         }
 
-        // Set spinner adapter spinner
-        ArrayAdapter(requireContext(), R.layout.spinner_month, arrayOf("September 2020", "Oktober 2020", "November 2020", "Dezember 2020")).apply {
+        viewModel.selectableMonths.observe(viewLifecycleOwner) { selectableMonths ->
 
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Set spinner adapter
+            ArrayAdapter(requireContext(), R.layout.spinner_month, selectableMonths.map {
+                DateTimeFormatter.ofPattern("MMMM y").format(it)
+            }).apply {
 
-            // Set adapter
-            spSelectMonth.adapter = this
-        }
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        spSelectMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-//                TODO("Not yet implemented")
+                // Set adapter
+                spSelectMonth.adapter = this
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-//                TODO("Not yet implemented")
-            }
+            spSelectMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    viewModel.setMonth(position)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            }
         }
 
         // Init list categories
