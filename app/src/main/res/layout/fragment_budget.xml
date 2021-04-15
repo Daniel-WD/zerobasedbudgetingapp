@@ -21,9 +21,16 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:menu="@menu/menu_budget"
-            app:navigationIcon="@drawable/ic_baseline_menu_24"
-            app:title="September" />
+            app:menu="@menu/menu_budget">
+
+            <!-- Dropdown for setting the month -->
+            <Spinner
+                android:id="@+id/spSelectMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:dropDownWidth="wrap_content"/>
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <!-- To be budgeted value -->
         <TextView

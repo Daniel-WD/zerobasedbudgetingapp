@@ -1,6 +1,10 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.content.Intent
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
@@ -193,6 +197,11 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     private lateinit var toolbar: MaterialToolbar
 
     /**
+     * Select month spinner
+     */
+    private lateinit var spSelectMonth: Spinner
+
+    /**
      * "To be budgeted" Text
      */
     private lateinit var tvToBeBudgeted: TextView
@@ -215,6 +224,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         toolbar = requireView().findViewById(R.id.toolbar)
         tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
         listBudgeting = requireView().findViewById(R.id.listBudgeting)
+        spSelectMonth = requireView().findViewById(R.id.spSelectMonth)
 
         // Setup menu item click listener
         toolbar.setOnMenuItemClickListener { item ->
@@ -227,6 +237,32 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
                 }
                 else -> false
             }
+        }
+
+        // Set spinner adapter spinner
+        ArrayAdapter(requireContext(), R.layout.spinner_month, arrayOf("September 2020", "Oktober 2020", "November 2020", "Dezember 2020")).apply {
+
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+            // Set adapter
+            spSelectMonth.adapter = this
+        }
+
+        spSelectMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+//                TODO("Not yet implemented")
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+//                TODO("Not yet implemented")
+            }
+
         }
 
         // Init list categories
