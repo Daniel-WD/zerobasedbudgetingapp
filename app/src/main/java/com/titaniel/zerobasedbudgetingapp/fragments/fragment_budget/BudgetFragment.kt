@@ -50,11 +50,6 @@ class BudgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
-     * Selectable months
-     */
-    val selectableMonths: MutableLiveData<List<YearMonth>> = MutableLiveData()
-
-    /**
      * Month
      */
     private val month = settingRepository.getMonth().asLiveData()
@@ -179,79 +174,32 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Set new month that has [index] in [selectableMonths].
-     */
-    fun setMonth(index: Int) {
-
-        val selectedMonth = selectableMonths.value!![index]
-
-        // Set month
-        viewModelScope.launch {
-            settingRepository.setMonth(selectedMonth)
-        }
-
-        addMissingBudgets(selectedMonth)
-    }
-
-    /**
-     * Adds budgets for those categories that have no budget in [month].
-     */
-    fun addMissingBudgets(month: YearMonth) {
-
-        viewModelScope.launch {
-
-            val categories = categoryRepository.getAllCategories().first()
-            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
-
-            // Calc for which categories there are no budgets for month
-            val missingBudgets =
-                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
-                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
-
-            budgetRepository.addBudgets(*missingBudgets)
-
-        }
-
-    }
+//    /**
+//     * Adds budgets for those categories that have no budget in [month].
+//     */
+//    fun addMissingBudgets(month: YearMonth) {
+//
+//        viewModelScope.launch {
+//
+//            val categories = categoryRepository.getAllCategories().first()
+//            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
+//
+//            // Calc for which categories there are no budgets for month
+//            val missingBudgets =
+//                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
+//                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
+//
+//            budgetRepository.addBudgets(*missingBudgets)
+//
+//        }
+//
+//    }
 
     init {
         // Register all observers
         updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
         budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
-
-        // Calculate selectableMonths
-        viewModelScope.launch {
-
-            settingRepository.getStartMonth().first().let { startMonth ->
-                // Check non null
-                if (startMonth == null) { // TODO
-                    return@let
-                }
-
-                // Get nextMonth
-                val nextMonth = YearMonth.now().plusMonths(1)
-
-                // Set last month to startMonth
-                var last = startMonth!!
-
-                // List for result
-                val result = mutableListOf<YearMonth>()
-
-                while (last <= nextMonth) {
-
-                    // Add last
-                    result.add(last)
-
-                    // Increase last by 1 month
-                    last = last.plusMonths(1)
-
-                }
-
-                selectableMonths.value = result
-            }
-        }
     }
 
     override fun onCleared() {
@@ -277,11 +225,6 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     private lateinit var toolbar: MaterialToolbar
 
     /**
-     * Select month spinner
-     */
-    private lateinit var spSelectMonth: Spinner
-
-    /**
      * "To be budgeted" Text
      */
     private lateinit var tvToBeBudgeted: TextView
@@ -304,7 +247,6 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         toolbar = requireView().findViewById(R.id.toolbar)
         tvToBeBudgeted = requireView().findViewById(R.id.tvToBeBudgeted)
         listBudgeting = requireView().findViewById(R.id.listBudgeting)
-        spSelectMonth = requireView().findViewById(R.id.spSelectMonth)
 
         // Setup menu item click listener
         toolbar.setOnMenuItemClickListener { item ->
@@ -316,35 +258,6 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
                     true
                 }
                 else -> false
-            }
-        }
-
-        viewModel.selectableMonths.observe(viewLifecycleOwner) { selectableMonths ->
-
-            // Set spinner adapter
-            ArrayAdapter(requireContext(), R.layout.spinner_month, selectableMonths.map {
-                DateTimeFormatter.ofPattern("MMMM y").format(it)
-            }).apply {
-
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-                // Set adapter
-                spSelectMonth.adapter = this
-            }
-
-            spSelectMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    viewModel.setMonth(position)
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-
             }
         }
 
