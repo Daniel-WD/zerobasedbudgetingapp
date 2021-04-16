@@ -24,6 +24,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import javax.inject.Inject
 
 /**
@@ -43,9 +43,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
-    budgetRepository: BudgetRepository,
+    private val categoryRepository: CategoryRepository,
+    private val budgetRepository: BudgetRepository,
     private val settingRepository: SettingRepository
 ) : ViewModel() {
 
@@ -131,7 +131,7 @@ class BudgetViewModel @Inject constructor(
         // Check non null
         if (mon != null && budsWithCat != null) {
             // Filter all budgetsWithCategory of currently selected month
-            budgetsWithCategoryOfMonth.value =
+            budgetsWithCategoryOfMonth.value = // TODO --> why not query by month directly?
                 budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
         }
 
@@ -183,12 +183,36 @@ class BudgetViewModel @Inject constructor(
      * Set new month that has [index] in [selectableMonths].
      */
     fun setMonth(index: Int) {
+
+        val selectedMonth = selectableMonths.value!![index]
+
         // Set month
         viewModelScope.launch {
-            settingRepository.setMonth(selectableMonths.value!![index])
+            settingRepository.setMonth(selectedMonth)
         }
 
-        // TODO ADD NEW BUDGETS
+        addMissingBudgets(selectedMonth)
+    }
+
+    /**
+     * Adds budgets for those categories that have no budget in [month].
+     */
+    fun addMissingBudgets(month: YearMonth) {
+
+        viewModelScope.launch {
+
+            val categories = categoryRepository.getAllCategories().first()
+            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
+
+            // Calc for which categories there are no budgets for month
+            val missingBudgets =
+                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
+                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
+
+            budgetRepository.addBudgets(*missingBudgets)
+
+        }
+
     }
 
     init {
@@ -197,6 +221,7 @@ class BudgetViewModel @Inject constructor(
         updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
         budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
 
+        // Calculate selectableMonths
         viewModelScope.launch {
 
             settingRepository.getStartMonth().first().let { startMonth ->

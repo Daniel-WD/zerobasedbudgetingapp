@@ -36,10 +36,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManageCategoriesViewModel @Inject constructor(
-    private val settingRepository: SettingRepository,
     private val categoryRepository: CategoryRepository,
-    private val transactionRepository: TransactionRepository,
-    private val budgetRepository: BudgetRepository
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     /**
@@ -177,20 +175,10 @@ class ManageCategoriesViewModel @Inject constructor(
             categoryRepository.deleteCategories(*delCats.toTypedArray())
 
             // Add categories
-            val newCatIds = categoryRepository.addCategories(*newCats.toTypedArray())
+            categoryRepository.addCategories(*newCats.toTypedArray())
 
             // Update categories
             categoryRepository.updateCategories(*updateCats.toTypedArray())
-
-            // Get month
-            val mon = settingRepository.getMonth().first()
-            requireNotNull(mon)
-
-            // Create new budgets
-            val newBudgets = newCatIds.map { id -> Budget(id, mon, 0) }
-
-            // Insert new budgets
-            budgetRepository.addBudgets(*newBudgets.toTypedArray()) // TODO REMOVE
 
         }
 
