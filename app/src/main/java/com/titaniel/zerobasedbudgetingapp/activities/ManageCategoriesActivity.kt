@@ -26,6 +26,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.reEmit
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -159,7 +160,8 @@ class ManageCategoriesViewModel @Inject constructor(
             removeAll(newCats)
         }
 
-        viewModelScope.launch {
+        // GlobalScope???
+        GlobalScope.launch {
 
             // Update transactions that had a category that should be deleted to use Category.TO_BE_BUDGETED instead
             val updatedTransactions =

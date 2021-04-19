@@ -10,10 +10,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.YearMonth
@@ -25,7 +29,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SetMonthViewModel @Inject constructor(
-    private val settingRepository: SettingRepository
+    private val settingRepository: SettingRepository,
+    private val categoryRepository: CategoryRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
@@ -81,7 +87,29 @@ class SetMonthViewModel @Inject constructor(
             settingRepository.setMonth(selectedMonth)
         }
 
-//        addMissingBudgets(selectedMonth)
+        addMissingBudgets(selectedMonth)
+    }
+
+    /**
+     * Adds budgets for those categories that have no budget in [month].
+     */
+    private fun addMissingBudgets(month: YearMonth) {
+
+        // GlobalScope ????
+        GlobalScope.launch {
+
+            val categories = categoryRepository.getAllCategories().first()
+            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
+
+            // Calc for which categories there are no budgets for month
+            val missingBudgets =
+                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
+                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
+
+            budgetRepository.addBudgets(*missingBudgets)
+
+        }
+
     }
 
 }
@@ -122,6 +150,7 @@ class SetMonthFragment : Fragment(R.layout.fragment_set_month) {
                 spSelectMonth.adapter = this
             }
 
+            // Set ItemSelectedListener
             spSelectMonth.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                 override fun onItemSelected(
