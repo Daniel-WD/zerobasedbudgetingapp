@@ -38,9 +38,9 @@ import javax.inject.Inject
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository,
-    private val budgetRepository: BudgetRepository,
-    private val settingRepository: SettingRepository
+    categoryRepository: CategoryRepository,
+    budgetRepository: BudgetRepository,
+    settingRepository: SettingRepository
 ) : ViewModel() {
 
     /**
@@ -120,7 +120,7 @@ class BudgetViewModel @Inject constructor(
         // Check non null
         if (mon != null && budsWithCat != null) {
             // Filter all budgetsWithCategory of currently selected month
-            budgetsWithCategoryOfMonth.value = // TODO --> why not query by month directly?
+            budgetsWithCategoryOfMonth.value =
                 budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
         }
 

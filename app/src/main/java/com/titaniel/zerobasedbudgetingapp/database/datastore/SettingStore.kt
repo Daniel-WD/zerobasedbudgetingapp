@@ -45,60 +45,42 @@ class SettingStore constructor(private val applicationContext: Context, dataStor
          * Key for saving year value of start month
          */
         private val START_MONTH_Y_KEY = intPreferencesKey("year_of_start_month")
-
-        /**
-         * Key for saving if this app is started the first time
-         */
-        private val FIRST_START_KEY = booleanPreferencesKey("first_start")
+//
+//        /**
+//         * Key for saving if this app is started the first time
+//         */
+//        private val FIRST_START_KEY = booleanPreferencesKey("first_start")
 
     }
 
     init {
 
-        val curYearMonth = YearMonth.now()
-
-        // Set default values
-        GlobalScope.launch {
-
-            // If this is the first start of the application...
-            if(firstStart()) {
-
-                // Set current month as default month
-                setMonth(curYearMonth)
-
-                // Set current month as start month, when no start month is existing
-                applicationContext.settingsStore.edit { settings ->
-                    // Set start month values
-                    settings[START_MONTH_M_KEY] = curYearMonth.monthValue
-                    settings[START_MONTH_Y_KEY] = curYearMonth.year
-                }
-
-            }
-
-            setFirstStartFalse()
-        }
+        // First call to make sure default values get set correctly
+        getMonth()
+        getStartMonth()
 
     }
 
-    /**
-     * Returns if the app is started fot the first time.
-     */
-    private suspend fun firstStart(): Boolean {
-        return applicationContext.settingsStore.data
-            .map { preferences ->
-                preferences[FIRST_START_KEY] ?: true
-            }.first()
-    }
-
-    /**
-     * Sets value of [FIRST_START_KEY] to false
-     */
-    private suspend fun setFirstStartFalse() {
-        applicationContext.settingsStore.edit { settings ->
-            // Set month values in settings
-            settings[FIRST_START_KEY] = false
-        }
-    }
+//
+//    /**
+//     * Returns if the app is started fot the first time.
+//     */
+//    private suspend fun firstStart(): Boolean {
+//        return applicationContext.settingsStore.data
+//            .map { preferences ->
+//                preferences[FIRST_START_KEY] ?: true
+//            }.first()
+//    }
+//
+//    /**
+//     * Sets value of [FIRST_START_KEY] to false
+//     */
+//    private suspend fun setFirstStartFalse() {
+//        applicationContext.settingsStore.edit { settings ->
+//            // Set month values in settings
+//            settings[FIRST_START_KEY] = false
+//        }
+//    }
 
     /**
      * Gets selected month.
@@ -106,11 +88,27 @@ class SettingStore constructor(private val applicationContext: Context, dataStor
     fun getMonth(): Flow<YearMonth> {
         return applicationContext.settingsStore.data
             .map { preferences ->
-                // Create YearMonth
-                YearMonth.of(
-                    preferences[MONTH_Y_KEY]!!,
-                    preferences[MONTH_M_KEY]!!
-                )
+
+                // Gather year and month
+                val year = preferences[MONTH_Y_KEY]
+                val month = preferences[MONTH_M_KEY]
+
+                // Check year or month null
+                if (year == null || month == null) {
+
+                    // Set current real world month and return it
+                    YearMonth.now().let {
+                        setMonth(it)
+                        it
+                    }
+
+                } else {
+
+                    // Create YearMonth
+                    YearMonth.of(year, month)
+                }
+
+
             }
     }
 
@@ -128,15 +126,35 @@ class SettingStore constructor(private val applicationContext: Context, dataStor
     /**
      * Gets start month.
      */
-    suspend fun getStartMonth(): YearMonth {
+    fun getStartMonth(): Flow<YearMonth> {
         return applicationContext.settingsStore.data
             .map { preferences ->
-                // Create YearMonth
-                YearMonth.of(
-                    preferences[START_MONTH_Y_KEY]!!,
-                    preferences[START_MONTH_M_KEY]!!
-                )
-            }.first()
+
+                // Gather year and month
+                val year = preferences[START_MONTH_Y_KEY]
+                val month = preferences[START_MONTH_M_KEY]
+
+                // Check year or month null
+                if (year == null || month == null) {
+
+                    // Set current real world month and return it
+                    YearMonth.now().let {
+
+                        // Set current month as start month
+                        applicationContext.settingsStore.edit { settings ->
+                            settings[START_MONTH_M_KEY] = it.monthValue
+                            settings[START_MONTH_Y_KEY] = it.year
+                        }
+
+                        it
+                    }
+
+                } else {
+
+                    // Create YearMonth
+                    YearMonth.of(year, month)
+                }
+            }
     }
 
 }

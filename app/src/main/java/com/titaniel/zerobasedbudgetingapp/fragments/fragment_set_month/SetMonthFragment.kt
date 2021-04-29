@@ -41,19 +41,17 @@ class SetMonthViewModel @Inject constructor(
 
     init {
 
-        // Calculate selectableMonths
-        viewModelScope.launch { // TODO can we do this better?
+        viewModelScope.launch {
 
-            // Get months
-            settingRepository.getAvailableMonths().let { months ->
+            // Calculate selectableMonths
+            settingRepository.availableMonths.first().let { months ->
 
                 // Add missing budgets for each month
-                months.forEach(::addMissingBudgets) // TODO can we do this only for the new months
+                months.forEach(::addMissingBudgets)
 
                 // Set selectable months
                 selectableMonths.value = months
             }
-
         }
 
     }
@@ -93,7 +91,10 @@ class SetMonthViewModel @Inject constructor(
         }
     }
 
-    suspend fun getIndexOfSelectedMonth(): Int {
+    /**
+     * Returns index of the currently selected month in [selectableMonths].
+     */
+    suspend fun getIndexOfMonth(): Int {
         return selectableMonths.value!!.indexOf(settingRepository.getMonth().first())
     }
 
@@ -138,7 +139,7 @@ class SetMonthFragment : Fragment(R.layout.fragment_set_month) {
 
             // Set current selection, when fragment is created
             lifecycleScope.launch {
-                spSelectMonth.setSelection(viewModel.getIndexOfSelectedMonth())
+                spSelectMonth.setSelection(viewModel.getIndexOfMonth())
             }
 
             // Set ItemSelectedListener
