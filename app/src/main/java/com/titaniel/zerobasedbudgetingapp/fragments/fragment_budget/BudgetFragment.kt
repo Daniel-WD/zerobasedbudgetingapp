@@ -113,7 +113,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [budgetsWithCategoryOfMonth]
      */
-    private val budgetsWithCategoryUpdateObserver: Observer<Any> = Observer {
+    private val budgetsWithCategoryUpdateObserver: Observer<Unit> = Observer {
         val mon = month.value
         val budsWithCat = allBudgetsWithCategory.value
 
@@ -129,7 +129,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [availableMoney]
      */
-    private val updateAvailableMoneyObserver: Observer<Any> = Observer { // TODO any to unit
+    private val updateAvailableMoneyObserver: Observer<Unit> = Observer {
         val budsWithCatMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
@@ -155,7 +155,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [toBeBudgeted]
      */
-    private val updateToBeBudgetedObserver: Observer<Any> = Observer {
+    private val updateToBeBudgetedObserver: Observer<Unit> = Observer {
         val trans = transactions.value
         val buds = allBudgets.value
 
@@ -167,27 +167,6 @@ class BudgetViewModel @Inject constructor(
                     buds.fold(0L, { acc, budget -> acc + budget.budgeted })
         }
     }
-
-//    /**
-//     * Adds budgets for those categories that have no budget in [month].
-//     */
-//    fun addMissingBudgets(month: YearMonth) {
-//
-//        viewModelScope.launch {
-//
-//            val categories = categoryRepository.getAllCategories().first()
-//            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
-//
-//            // Calc for which categories there are no budgets for month
-//            val missingBudgets =
-//                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
-//                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
-//
-//            budgetRepository.addBudgets(*missingBudgets)
-//
-//        }
-//
-//    }
 
     init {
         // Register all observers

@@ -26,7 +26,6 @@ import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.reEmit
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -37,8 +36,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManageCategoriesViewModel @Inject constructor(
+    private val settingRepository: SettingRepository,
     private val categoryRepository: CategoryRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
     /**
@@ -160,8 +161,7 @@ class ManageCategoriesViewModel @Inject constructor(
             removeAll(newCats)
         }
 
-        // GlobalScope???
-        GlobalScope.launch {
+        viewModelScope.launch {
 
             // Update transactions that had a category that should be deleted to use Category.TO_BE_BUDGETED instead
             val updatedTransactions =
@@ -177,10 +177,24 @@ class ManageCategoriesViewModel @Inject constructor(
             categoryRepository.deleteCategories(*delCats.toTypedArray())
 
             // Add categories
-            categoryRepository.addCategories(*newCats.toTypedArray())
+            val newCatIds = categoryRepository.addCategories(*newCats.toTypedArray())
 
             // Update categories
             categoryRepository.updateCategories(*updateCats.toTypedArray())
+
+            // Get month
+            val months = settingRepository.getAvailableMonths()
+
+            // Create new budgets for every month
+            val newBudgets = months.map { month ->
+
+                // Create new budgets for month
+                newCatIds.map { id -> Budget(id, month, 0) }
+
+            }.fold(mutableListOf<Budget>(), { a, b -> a.apply { addAll(b) } })
+
+            // Insert new budgets
+            budgetRepository.addBudgets(*newBudgets.toTypedArray())
 
         }
 

@@ -2,6 +2,7 @@ package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.datastore.SettingStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.time.YearMonth
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,10 +30,35 @@ class SettingRepository @Inject constructor(
     }
 
     /**
-     * Gets start month
+     * Get months that are selectable by the user
      */
-    fun getStartMonth(): Flow<YearMonth?> {
-        return settingStore.getStartMonth()
+    suspend fun getAvailableMonths(): List<YearMonth> { // TODO Do we need to calculate this everytime the function gets called?
+
+        // List for result
+        val result = mutableListOf<YearMonth>()
+
+        // Get nextMonth
+        val nextMonth = YearMonth.now().plusMonths(1)
+
+        settingStore.getStartMonth().let { startMonth ->
+
+            // Set last month to startMonth
+            var last = startMonth
+
+            // Iterate from startMonth to nextMonth
+            while (last <= nextMonth) {
+
+                // Add last
+                result.add(last)
+
+                // Increase last by 1 month
+                last = last.plusMonths(1)
+
+            }
+
+        }
+
+        return result
     }
 
 }

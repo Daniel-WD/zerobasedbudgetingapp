@@ -8,6 +8,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
@@ -17,7 +18,6 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.YearMonth
@@ -42,38 +42,43 @@ class SetMonthViewModel @Inject constructor(
     init {
 
         // Calculate selectableMonths
-        viewModelScope.launch {
+        viewModelScope.launch { // TODO can we do this better?
 
-            settingRepository.getStartMonth().first().let { startMonth ->
-                // Check non null
-                if (startMonth == null) { // TODO
-                    return@let
-                }
+            // Get months
+            settingRepository.getAvailableMonths().let { months ->
 
-                // Get nextMonth
-                val nextMonth = YearMonth.now().plusMonths(1)
+                // Add missing budgets for each month
+                months.forEach(::addMissingBudgets) // TODO can we do this only for the new months
 
-                // Set last month to startMonth
-                var last = startMonth!!
-
-                // List for result
-                val result = mutableListOf<YearMonth>()
-
-                while (last <= nextMonth) {
-
-                    // Add last
-                    result.add(last)
-
-                    // Increase last by 1 month
-                    last = last.plusMonths(1)
-
-                }
-
-                selectableMonths.value = result
+                // Set selectable months
+                selectableMonths.value = months
             }
+
         }
+
     }
 
+    /**
+     * Adds budgets for those categories that have no budget in [month].
+     */
+    private fun addMissingBudgets(month: YearMonth) {
+
+        viewModelScope.launch {
+
+            val categories = categoryRepository.getAllCategories().first()
+            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
+
+            // Calc for which categories there are no budgets for month
+            val missingBudgets =
+                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
+                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
+
+            // Add missing budgets
+            budgetRepository.addBudgets(*missingBudgets)
+
+        }
+
+    }
 
     /**
      * Set new month that has [index] in [selectableMonths].
@@ -86,30 +91,10 @@ class SetMonthViewModel @Inject constructor(
         viewModelScope.launch {
             settingRepository.setMonth(selectedMonth)
         }
-
-        addMissingBudgets(selectedMonth)
     }
 
-    /**
-     * Adds budgets for those categories that have no budget in [month].
-     */
-    private fun addMissingBudgets(month: YearMonth) {
-
-        // GlobalScope ????
-        GlobalScope.launch {
-
-            val categories = categoryRepository.getAllCategories().first()
-            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
-
-            // Calc for which categories there are no budgets for month
-            val missingBudgets =
-                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
-                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
-
-            budgetRepository.addBudgets(*missingBudgets)
-
-        }
-
+    suspend fun getIndexOfSelectedMonth(): Int {
+        return selectableMonths.value!!.indexOf(settingRepository.getMonth().first())
     }
 
 }
@@ -148,6 +133,12 @@ class SetMonthFragment : Fragment(R.layout.fragment_set_month) {
 
                 // Set adapter
                 spSelectMonth.adapter = this
+
+            }
+
+            // Set current selection, when fragment is created
+            lifecycleScope.launch {
+                spSelectMonth.setSelection(viewModel.getIndexOfSelectedMonth())
             }
 
             // Set ItemSelectedListener
