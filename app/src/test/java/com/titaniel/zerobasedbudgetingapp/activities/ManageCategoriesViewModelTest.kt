@@ -56,9 +56,15 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
     private lateinit var testViewModel: ManageCategoriesViewModel
 
     /**
-     * Test month
+     * Test availableMonths
      */
-    private val month: YearMonth = YearMonth.of(2020, 9)
+    private val availableMonths = listOf(
+        YearMonth.of(2020, 9),
+        YearMonth.of(2020, 10),
+        YearMonth.of(2020, 11),
+        YearMonth.of(2020, 12),
+        YearMonth.of(2021, 1)
+    )
 
     /**
      * Fake category data
@@ -94,8 +100,8 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
         super.setup()
 
         // Stub getMonth()
-        `when`(settingRepositoryMock.getMonth()).thenReturn(flow {
-            emit(month)
+        `when`(settingRepositoryMock.availableMonths).thenReturn(flow {
+            emit(availableMonths)
         })
 
         // Stub getAllCategories()
@@ -258,7 +264,11 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
             Category("newnamecat5", 5, 5)
         )
 
-        verify(budgetRepositoryMock).addBudgets(Budget(7, month, 0))
+        val expectedNewBudgets = availableMonths.map { month ->
+            Budget(7, month, 0)
+        }.toTypedArray()
+
+        verify(budgetRepositoryMock).addBudgets(*expectedNewBudgets)
 
     }
 

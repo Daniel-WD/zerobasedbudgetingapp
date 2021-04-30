@@ -286,10 +286,10 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Create ViewModel to test
         budgetViewModel = BudgetViewModel(
-            settingRepositoryMock,
-            categoryRepositoryMock,
             transactionRepositoryMock,
-            budgetRepositoryMock
+            categoryRepositoryMock,
+            budgetRepositoryMock,
+            settingRepositoryMock
         )
     }
 
