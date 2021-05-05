@@ -1,11 +1,13 @@
 package com.titaniel.zerobasedbudgetingapp.database.repositories
 
 import com.titaniel.zerobasedbudgetingapp.database.datastore.SettingStore
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.YearMonth
@@ -24,8 +26,17 @@ class SettingRepositoryTest {
      */
     private lateinit var settingRepository: SettingRepository
 
+    /**
+     * Test start month
+     */
+    private val startMonth = YearMonth.of(2020, 1)
+
     @Before
     fun setup() {
+
+        // Mock getStartMonth()
+        `when`(settingStoreMock.getStartMonth()).thenReturn(flow { emit(startMonth) })
+
         settingRepository = SettingRepository(settingStoreMock)
     }
 
