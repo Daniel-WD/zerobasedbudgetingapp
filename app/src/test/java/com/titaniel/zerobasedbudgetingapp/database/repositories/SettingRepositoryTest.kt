@@ -26,17 +26,10 @@ class SettingRepositoryTest {
      */
     private lateinit var settingRepository: SettingRepository
 
-    /**
-     * Test start month
-     */
-    private val startMonth = YearMonth.of(2020, 1)
-
     @Before
     fun setup() {
 
-        // Mock getStartMonth()
-        `when`(settingStoreMock.getStartMonth()).thenReturn(flow { emit(startMonth) })
-
+        // Create test object
         settingRepository = SettingRepository(settingStoreMock)
     }
 

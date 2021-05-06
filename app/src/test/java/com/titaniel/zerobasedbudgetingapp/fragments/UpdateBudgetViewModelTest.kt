@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.activities
+package com.titaniel.zerobasedbudgetingapp.fragments
 
 import androidx.lifecycle.SavedStateHandle
 import com.jraska.livedata.test

@@ -1,9 +1,7 @@
-package com.titaniel.zerobasedbudgetingapp.activities
+package com.titaniel.zerobasedbudgetingapp.fragments
 
 import com.google.common.truth.Truth.assertThat
-import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
-import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
@@ -17,17 +15,14 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOf
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetViewModelTest : CoroutinesAndLiveDataTest() {

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import org.junit.Test
+import java.time.YearMonth
 
 class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
 
@@ -114,6 +115,52 @@ class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
 
         // Check that observer has been called
         assertThat(observerCalledCount).isEqualTo(2)
+
+    }
+
+    @Test
+    fun year_month_iterator_works_correctly() {
+
+        // Iterator to test
+        val iterator = YearMonthIterator(YearMonth.of(1999, 10), YearMonth.of(2000, 3), 2)
+
+        // Expected output
+        val expectedList = listOf(
+            YearMonth.of(1999, 10),
+            YearMonth.of(1999, 12),
+            YearMonth.of(2000, 2)
+        )
+
+        assertThat(iterator.asSequence().toList()).isEqualTo(expectedList)
+
+    }
+
+    @Test
+    fun year_month_progression_works_correctly() {
+
+        val start = YearMonth.of(1999, 10)
+        val end = YearMonth.of(2000, 3)
+
+        // Progression to test
+        val progression = YearMonthProgression(start, end)
+
+        // progression has expected iterator
+        assertThat(progression.iterator()).isEqualTo(YearMonthIterator(start, end))
+
+        val secondProgression = progression step 10
+
+        // secondProgression has expected iterator
+        assertThat(secondProgression.iterator()).isEqualTo(YearMonthIterator(start, end, 10))
+
+    }
+
+    @Test
+    fun year_month_range_to_works_correctly() {
+
+        val start = YearMonth.of(1999, 10)
+        val end = YearMonth.of(2000, 3)
+
+        assertThat(start..end).isEqualTo(YearMonthProgression(start, end))
 
     }
 

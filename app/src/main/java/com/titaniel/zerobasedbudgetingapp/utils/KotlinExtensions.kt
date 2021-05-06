@@ -25,7 +25,7 @@ fun <T> MutableLiveData<T>.reEmit() {
 /**
  * Iterator for [YearMonth] to iterate form [startMonth] to [endMonthInclusive] by [monthStep].
  */
-class YearMonthIterator(
+data class YearMonthIterator(
     private val startMonth: YearMonth,
     private val endMonthInclusive: YearMonth,
     private val monthStep: Long = 1
@@ -45,7 +45,7 @@ class YearMonthIterator(
 /**
  * Progression for [YearMonth] with [start], [endInclusive] and [monthStep].
  */
-class YearMonthProgression(
+data class YearMonthProgression(
     override val start: YearMonth,
     override val endInclusive: YearMonth,
     private val monthStep: Long = 1
