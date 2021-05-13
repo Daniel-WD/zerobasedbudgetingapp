@@ -42,13 +42,17 @@ class UpdateBudgetFragmentTest {
      */
     private val exampleBudgetWithCategory = BudgetWithCategory(
         Budget(1, YearMonth.of(2020, 12), 100),
-        Category("sex",  0, 1)
+        Category("sex", 0, 1)
     )
 
     @Before
     fun setup() {
         // Set ViewModel properties
-        `when`(mockViewModel.budgetWithCategory).thenReturn(MutableLiveData(exampleBudgetWithCategory))
+        `when`(mockViewModel.budgetWithCategory).thenReturn(
+            MutableLiveData(
+                exampleBudgetWithCategory
+            )
+        )
 
         // Launch scenario
         launchFragmentInHiltContainer<UpdateBudgetFragment> {

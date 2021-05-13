@@ -23,7 +23,6 @@
 
     <!-- Select payee text -->
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -71,7 +70,6 @@
 
     <!-- Divider -->
     <View
-        android:id="@+id/vDivider2"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@drawable/divider_add_edit_transaction"

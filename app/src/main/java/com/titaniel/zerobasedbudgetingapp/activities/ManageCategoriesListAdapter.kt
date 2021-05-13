@@ -9,14 +9,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 
 /**
@@ -81,7 +77,8 @@ class ManageCategoriesListAdapter(
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageCategoriesItem {
         // Inflate view
-        val view = LayoutInflater.from(context).inflate(R.layout.item_category_management, parent, false)
+        val view =
+            LayoutInflater.from(context).inflate(R.layout.item_category_management, parent, false)
 
         // Create ViewHolder
         val viewHolder = ManageCategoriesItem(view)
@@ -90,7 +87,7 @@ class ManageCategoriesListAdapter(
         viewHolder.ivDragHandle.setOnTouchListener { _, event ->
 
             // Check action down event
-            if(event.actionMasked == MotionEvent.ACTION_DOWN) {
+            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 // Start dragging
                 itemTouchHelper.startDrag(viewHolder)
             }

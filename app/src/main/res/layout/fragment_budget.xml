@@ -28,7 +28,7 @@
                 android:id="@+id/fragmentContainerSetMonth"
                 android:name="com.titaniel.zerobasedbudgetingapp.fragments.fragment_set_month.SetMonthFragment"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 

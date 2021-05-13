@@ -8,7 +8,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository

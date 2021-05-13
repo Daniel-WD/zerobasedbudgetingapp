@@ -1,8 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.fragments
 
-import android.support.test.InstrumentationRegistry
 import androidx.lifecycle.MutableLiveData
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
@@ -98,7 +98,10 @@ class TransactionsFragmentTest {
         checkRecyclerViewContentHasCorrectData(R.id.transactionsList,
             exampleTransactionsWithCategoryAndPayee,
             { hasDescendant(withText(it.transaction.pay.toString())) },
-            { hasDescendant( it.category?.let { cat -> withText(cat.name) } ?: withText(R.string.activity_add_edit_transaction_to_be_budgeted)) },
+            {
+                hasDescendant(it.category?.let { cat -> withText(cat.name) }
+                    ?: withText(R.string.activity_add_edit_transaction_to_be_budgeted))
+            },
             { hasDescendant(withText(it.payee.name)) },
             { hasDescendant(withText(convertLocalDateToString(it.transaction.date))) })
     }

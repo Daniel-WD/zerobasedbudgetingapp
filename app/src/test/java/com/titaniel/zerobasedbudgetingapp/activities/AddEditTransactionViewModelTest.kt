@@ -298,7 +298,11 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
         )
 
         // Stub getTransactionById of transaction repository
-        `when`(transactionRepositoryMock.getTransactionWithCategoryAndPayeeById(editTransactionWithCategoryAndPayee.transaction.id))
+        `when`(
+            transactionRepositoryMock.getTransactionWithCategoryAndPayeeById(
+                editTransactionWithCategoryAndPayee.transaction.id
+            )
+        )
             .thenReturn(flow { emit(editTransactionWithCategoryAndPayee) })
 
         // Stub getAllPayees of payee repository
@@ -320,7 +324,9 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
     @Test
     fun gets_edit_transaction_correctly() {
         // Verify getTransactionsById with correct transaction id
-        verify(transactionRepositoryMock).getTransactionWithCategoryAndPayeeById(editTransactionWithCategoryAndPayee.transaction.id)
+        verify(transactionRepositoryMock).getTransactionWithCategoryAndPayeeById(
+            editTransactionWithCategoryAndPayee.transaction.id
+        )
 
     }
 

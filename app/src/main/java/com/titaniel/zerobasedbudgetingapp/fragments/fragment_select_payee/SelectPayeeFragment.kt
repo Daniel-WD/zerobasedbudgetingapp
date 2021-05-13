@@ -7,34 +7,19 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
-import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
-import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 /**
  * Bottom sheet dialog fragment for payee selection
  */
 @AndroidEntryPoint
 class SelectPayeeFragment : BottomSheetDialogFragment() {
-
-    companion object {
-        /**
-         * Payee key
-         */
-        const val PAYEE_KEY = "payee_key"
-    }
 
     /**
      * Add payee image
@@ -77,7 +62,7 @@ class SelectPayeeFragment : BottomSheetDialogFragment() {
         // Add payee listener
         ivAddPayee.setOnClickListener {
             // Try set new payee, dismiss if successful
-            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if(it) dismiss() }
+            parentViewModel.setNewPayee(etNewPayee.text.toString()).let { if (it) dismiss() }
         }
 
         // Keyboard 'OK' click listener

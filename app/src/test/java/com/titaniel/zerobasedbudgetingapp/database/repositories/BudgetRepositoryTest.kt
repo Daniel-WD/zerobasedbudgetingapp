@@ -9,7 +9,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDate
 import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
@@ -79,7 +78,7 @@ class BudgetRepositoryTest {
         // Verify get budgets by month on dao
         verify(budgetDaoMock).getByMonth(month)
     }
-    
+
     @Test
     fun performs_get_all_budgets_correctly() {
 

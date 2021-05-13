@@ -69,7 +69,11 @@ class BudgetFragmentTest {
     fun setup() {
         // Set ViewModel properties
         `when`(mockViewModel.toBeBudgeted).thenReturn(MutableLiveData(toBeBudgeted))
-        `when`(mockViewModel.budgetsWithCategoryOfMonth).thenReturn(MutableLiveData(exampleBudgetsWithCategoryOfMonth))
+        `when`(mockViewModel.budgetsWithCategoryOfMonth).thenReturn(
+            MutableLiveData(
+                exampleBudgetsWithCategoryOfMonth
+            )
+        )
         `when`(mockViewModel.availableMoney).thenReturn(MutableLiveData(exampleAvailableMoney))
 
         // Launch scenario
@@ -167,7 +171,8 @@ class BudgetFragmentTest {
     }
 
     private fun checkBudgetListContent() {
-        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleBudgetsWithCategoryOfMonth,
+        checkRecyclerViewContentHasCorrectData(R.id.listBudgeting,
+            exampleBudgetsWithCategoryOfMonth,
             { hasDescendant(withText(it.budget.budgeted.toString())) },
             { hasDescendant(withText(it.category.name)) })
         checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleAvailableMoney.toList(),

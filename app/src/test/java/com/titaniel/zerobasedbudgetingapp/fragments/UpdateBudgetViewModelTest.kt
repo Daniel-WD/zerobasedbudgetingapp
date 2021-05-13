@@ -51,7 +51,8 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Test budgetWithCategory
      */
-    private val budgetWithCategory = BudgetWithCategory(Budget(1, YearMonth.now(), 234), Category("cat", 2, 1))
+    private val budgetWithCategory =
+        BudgetWithCategory(Budget(1, YearMonth.now(), 234), Category("cat", 2, 1))
 
     @ExperimentalCoroutinesApi
     @Before
@@ -62,7 +63,11 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
         savedStateHandleSpy.set(UpdateBudgetFragment.BUDGET_ID_KEY, budgetId)
 
         // Stub getBudgetById
-        `when`(budgetRepositoryMock.getBudgetWithCategoryById(budgetId)).thenReturn(flow { emit(budgetWithCategory) })
+        `when`(budgetRepositoryMock.getBudgetWithCategoryById(budgetId)).thenReturn(flow {
+            emit(
+                budgetWithCategory
+            )
+        })
 
         // Create ViewModel instance
         updateBudgetViewModel = UpdateBudgetViewModel(

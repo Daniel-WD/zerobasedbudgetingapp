@@ -19,7 +19,7 @@ fun convertLocalDateToString(localDate: LocalDate): String {
 fun createSimpleMediatorLiveData(vararg liveData: LiveData<*>): MediatorLiveData<Unit> {
     val mediator: MediatorLiveData<Unit> = MediatorLiveData()
     liveData.forEach {
-        mediator.addSource(it) { mediator.value = Unit}
+        mediator.addSource(it) { mediator.value = Unit }
     }
     return mediator
 }

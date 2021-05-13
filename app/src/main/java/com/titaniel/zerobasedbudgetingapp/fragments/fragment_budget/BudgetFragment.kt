@@ -9,7 +9,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +19,6 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
@@ -28,8 +26,6 @@ import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
