@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import java.text.NumberFormat
 
 /**
  * Show keyboard for activities
@@ -62,3 +64,7 @@ inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
     noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
 ): Lazy<VM> =
     OverridableLazy(activityViewModels(factoryProducer))
+
+fun TextView.setMoneyValue(cents: Long) {
+    text = NumberFormat.getCurrencyInstance().format(cents.toDouble()/100)
+}

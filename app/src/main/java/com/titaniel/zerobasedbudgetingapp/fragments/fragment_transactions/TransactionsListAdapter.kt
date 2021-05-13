@@ -15,6 +15,7 @@ import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
+import com.titaniel.zerobasedbudgetingapp.utils.setMoneyValue
 
 /**
  * [TransactionsListAdapter] in [context] for displaying a list of [transactionsWithCategoryAndPayee].
@@ -87,7 +88,7 @@ class TransactionsListAdapter(
                 if (transactionWithCategoryAndPayee.transaction.description.isEmpty()) INVISIBLE else VISIBLE
 
             // Set value text
-            holder.tvPay.text = transactionWithCategoryAndPayee.transaction.pay.toString()
+            holder.tvPay.setMoneyValue(transactionWithCategoryAndPayee.transaction.pay)
 
             // Set payee text
             holder.cpPayee.text = transactionWithCategoryAndPayee.payee.name
