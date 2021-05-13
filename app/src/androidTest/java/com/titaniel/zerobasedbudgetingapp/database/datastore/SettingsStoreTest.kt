@@ -20,7 +20,8 @@ class SettingsStoreTest {
     fun setup() {
 
         // Initialize SettingStore
-        settingStore = SettingStore(InstrumentationRegistry.getInstrumentation().targetContext, "testSettings")
+        settingStore =
+            SettingStore(InstrumentationRegistry.getInstrumentation().targetContext, "testSettings")
 
     }
 

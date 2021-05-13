@@ -178,15 +178,6 @@ class AddEditTransactionViewModel @Inject constructor(
 class AddEditTransactionActivity : AppCompatActivity() {
 
     companion object {
-        /**
-         * Payee request key
-         */
-        const val PAYEE_REQUEST_KEY = "payee_request_key"
-
-        /**
-         * Category request key
-         */
-        const val CATEGORY_REQUEST_KEY = "category_request_key"
 
         /**
          * Edit transaction key

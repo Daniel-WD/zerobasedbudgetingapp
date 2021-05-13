@@ -36,7 +36,7 @@ fun atPosition(position: Int, itemMatcher: Matcher<View?>): Matcher<View?> {
 /**
  * Source: StackOverflow... Used in espresso tests to perform an [action] on a list item in [matcher] RecyclerView.
  */
-fun actionOnItemView(matcher: Matcher<View?>, action: ViewAction): ViewAction? {
+fun actionOnItemView(matcher: Matcher<View?>, action: ViewAction): ViewAction {
     return object : ViewAction {
         override fun getDescription(): String {
             return String.format(

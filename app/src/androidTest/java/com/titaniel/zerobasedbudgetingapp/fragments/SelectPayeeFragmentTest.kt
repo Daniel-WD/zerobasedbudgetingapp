@@ -1,6 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.fragments
 
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -12,7 +11,6 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.PayeesListAdapter

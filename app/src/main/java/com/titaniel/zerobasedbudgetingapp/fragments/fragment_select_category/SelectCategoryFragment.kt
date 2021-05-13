@@ -6,37 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.bundleOf
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
-import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.utils.provideActivityViewModel
-import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 /**
  * [SelectCategoryFragment] for category selection
  */
 @AndroidEntryPoint
 class SelectCategoryFragment : BottomSheetDialogFragment() {
-
-    companion object {
-        /**
-         * Category key
-         */
-        const val CATEGORY_KEY = "category_key"
-    }
 
     /**
      * Categories list

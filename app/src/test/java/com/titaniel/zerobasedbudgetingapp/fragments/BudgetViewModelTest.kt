@@ -1,9 +1,7 @@
-package com.titaniel.zerobasedbudgetingapp.activities
+package com.titaniel.zerobasedbudgetingapp.fragments
 
 import com.google.common.truth.Truth.assertThat
-import com.jraska.livedata.test
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
-import com.titaniel.zerobasedbudgetingapp._testutils.TestUtils
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
@@ -17,17 +15,14 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOf
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
@@ -119,15 +114,15 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
         Transaction(1000, 1, 0, "", LocalDate.of(2020, 9, 10), 2), // 2
         Transaction(300, 1, 1, "", LocalDate.of(2020, 9, 15), 3), // 3
         Transaction(-50, 1, 1, "", LocalDate.of(2020, 9, 10), 4), // 4
-            Transaction(-10, 1, 4, "", LocalDate.of(2020, 9, 9), 5), // 5
-            Transaction(-100, 1, 4, "", LocalDate.of(2020, 9, 30), 6), // 6
+        Transaction(-10, 1, 4, "", LocalDate.of(2020, 9, 9), 5), // 5
+        Transaction(-100, 1, 4, "", LocalDate.of(2020, 9, 30), 6), // 6
 
         Transaction(-100, 1, 0, "", LocalDate.of(2020, 5, 1), 7), // 7
         Transaction(-190, 1, 1, "", LocalDate.of(2020, 4, 23), 8), // 8
         Transaction(1000, 1, 0, "", LocalDate.of(2020, 10, 10), 9), // 9
         Transaction(300, 1, 2, "", LocalDate.of(2020, 12, 15), 10), // 10
         Transaction(-50, 1, 1, "", LocalDate.of(2020, 6, 10), 11), // 11
-            Transaction(-10, 1, 4, "", LocalDate.of(2010, 9, 9), 12), // 12
+        Transaction(-10, 1, 4, "", LocalDate.of(2010, 9, 9), 12), // 12
         Transaction(-100, 1, 0, "", LocalDate.of(2021, 9, 30), 13), // 13
         Transaction(-100, 1, 4, "", LocalDate.of(2023, 10, 1), 14), // 14
         Transaction(-190, 1, 1, "", LocalDate.of(2011, 6, 23), 15), // 15
@@ -286,10 +281,10 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Create ViewModel to test
         budgetViewModel = BudgetViewModel(
-            settingRepositoryMock,
-            categoryRepositoryMock,
             transactionRepositoryMock,
-            budgetRepositoryMock
+            categoryRepositoryMock,
+            budgetRepositoryMock,
+            settingRepositoryMock
         )
     }
 

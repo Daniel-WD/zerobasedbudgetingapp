@@ -33,10 +33,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    settingRepository: SettingRepository,
-    categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
-    budgetRepository: BudgetRepository
+    categoryRepository: CategoryRepository,
+    budgetRepository: BudgetRepository,
+    settingRepository: SettingRepository
 ) : ViewModel() {
 
     /**
@@ -109,14 +109,15 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [budgetsWithCategoryOfMonth]
      */
-    private val budgetsWithCategoryUpdateObserver: Observer<Any> = Observer {
+    private val budgetsWithCategoryUpdateObserver: Observer<Unit> = Observer {
         val mon = month.value
         val budsWithCat = allBudgetsWithCategory.value
 
         // Check non null
-        if(mon != null && budsWithCat != null) {
+        if (mon != null && budsWithCat != null) {
             // Filter all budgetsWithCategory of currently selected month
-            budgetsWithCategoryOfMonth.value = budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
+            budgetsWithCategoryOfMonth.value =
+                budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
         }
 
     }
@@ -124,7 +125,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [availableMoney]
      */
-    private val updateAvailableMoneyObserver: Observer<Any> = Observer {
+    private val updateAvailableMoneyObserver: Observer<Unit> = Observer {
         val budsWithCatMon = budgetsWithCategoryOfMonth.value
         val transOfCats = transactionsOfCategories.value
         val budsOfCats = budgetsOfCategories.value
@@ -150,7 +151,7 @@ class BudgetViewModel @Inject constructor(
     /**
      * Observer to update [toBeBudgeted]
      */
-    private val updateToBeBudgetedObserver: Observer<Any> = Observer {
+    private val updateToBeBudgetedObserver: Observer<Unit> = Observer {
         val trans = transactions.value
         val buds = allBudgets.value
 

@@ -1,7 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.fragments
 
-import android.os.Bundle
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -12,7 +10,6 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
 import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
 import com.titaniel.zerobasedbudgetingapp._testutils.replace
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionViewModel
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.CategoriesListAdapter
@@ -87,13 +84,6 @@ class SelectCategoryFragmentTest {
     @Test
     fun performs_item_click_correctly() {
 
-        // Set fragment result listener
-        testFragment.requireActivity().runOnUiThread {
-            testFragment.setFragmentResultListener(AddEditTransactionActivity.CATEGORY_REQUEST_KEY) { s: String, bundle: Bundle ->
-                assertThat(bundle[SelectCategoryFragment.CATEGORY_KEY]).isEqualTo("cat5")
-            }
-        }
-
         // Click item
         onView(withId(R.id.listCategories))
             .perform(
@@ -106,10 +96,16 @@ class SelectCategoryFragmentTest {
         // Check if fragment finishes
         assertThat(testFragment.isAdded).isFalse()
 
+        // Check category value in view model
+        assertThat(mockParentViewModel.category.value).isEqualTo(exampleCategories[4])
+
     }
 
     private fun checkCategoryListContent() {
-        checkRecyclerViewContentHasCorrectData(R.id.listCategories, exampleCategories, { hasDescendant(withText(it.name)) })
+        checkRecyclerViewContentHasCorrectData(
+            R.id.listCategories,
+            exampleCategories,
+            { hasDescendant(withText(it.name)) })
     }
 
 }

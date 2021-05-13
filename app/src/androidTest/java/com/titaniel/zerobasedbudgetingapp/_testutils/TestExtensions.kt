@@ -1,13 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp._testutils
 
-import android.view.View
-import androidx.annotation.IdRes
 import androidx.lifecycle.ViewModel
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.ViewMatchers
 import com.titaniel.zerobasedbudgetingapp.utils.OverridableLazy
-import org.hamcrest.Matcher
 import kotlin.reflect.KProperty1
 import kotlin.reflect.jvm.isAccessible
 

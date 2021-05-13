@@ -15,11 +15,11 @@
 
         <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
-            app:navigationIcon="@drawable/ic_baseline_close_24"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/menu_manage_categories"
+            app:navigationIcon="@drawable/ic_baseline_close_24"
             app:title="@string/activity_manage_categories_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        tools:listitem="@layout/item_category_management"/>
+        tools:listitem="@layout/item_category_management" />
 
     <!-- Create/Edit button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -40,6 +40,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:enabled="true"
-        android:src="@drawable/ic_baseline_check_24"/>
+        android:src="@drawable/ic_baseline_check_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

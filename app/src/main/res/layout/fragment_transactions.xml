@@ -20,9 +20,16 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_baseline_menu_24"
-            app:title="September" />
+            android:layout_height="?attr/actionBarSize">
+
+            <!-- SetMonthFragment -->
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragmentContainerSetMonth"
+                android:name="com.titaniel.zerobasedbudgetingapp.fragments.fragment_set_month.SetMonthFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -166,7 +166,7 @@ class ManageCategoriesViewModel @Inject constructor(
             // Update transactions that had a category that should be deleted to use Category.TO_BE_BUDGETED instead
             val updatedTransactions =
                 transactionRepository.getAllTransactions().first()
-                        // Filter transactions that have category that will be deleted
+                    // Filter transactions that have category that will be deleted
                     .filter { transaction -> delCats.find { it.id == transaction.categoryId } != null }
                     .onEach { it.categoryId = Category.TO_BE_BUDGETED.id }
 
@@ -182,12 +182,15 @@ class ManageCategoriesViewModel @Inject constructor(
             // Update categories
             categoryRepository.updateCategories(*updateCats.toTypedArray())
 
-            // Get month
-            val mon = settingRepository.getMonth().first()
-            requireNotNull(mon)
+            // Create new budgets for every month
+            val newBudgets = settingRepository.availableMonths.first().map { month ->
 
-            // Create new budgets
-            val newBudgets = newCatIds.map { id -> Budget(id, mon, 0) }
+                // Create new budgets for month
+                newCatIds.map { id -> Budget(id, month, 0) }
+
+            }
+                // Fold nested list
+                .fold(mutableListOf<Budget>(), { a, b -> a.apply { addAll(b) } })
 
             // Insert new budgets
             budgetRepository.addBudgets(*newBudgets.toTypedArray())

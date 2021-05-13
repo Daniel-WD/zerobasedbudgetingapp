@@ -26,6 +26,8 @@ class SettingRepositoryTest {
 
     @Before
     fun setup() {
+
+        // Create test object
         settingRepository = SettingRepository(settingStoreMock)
     }
 
