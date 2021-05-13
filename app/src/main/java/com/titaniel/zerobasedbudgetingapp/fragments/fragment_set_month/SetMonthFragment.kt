@@ -18,6 +18,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.YearMonth
@@ -138,7 +139,7 @@ class SetMonthFragment : Fragment(R.layout.fragment_set_month) {
             }
 
             // Set current selection, when fragment is created
-            lifecycleScope.launch {
+            GlobalScope.launch {
                 spSelectMonth.setSelection(viewModel.getIndexOfMonth())
             }
 
