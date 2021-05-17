@@ -35,30 +35,19 @@
                 android:layout_height="wrap_content">
 
                 <!-- EditText for entering transaction value. -->
-                <EditText
+                <com.blackcat.currencyedittext.CurrencyEditText
                     android:id="@+id/etPay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:cursorVisible="false"
                     android:fontFamily="sans-serif-medium"
-                    android:hint="@string/zero"
                     android:imeOptions="actionDone"
                     android:importantForAutofill="no"
-                    android:inputType="numberSigned"
                     android:paddingStart="16dp"
                     android:paddingEnd="8dp"
                     android:textSize="36sp"
-                    tools:text="599" />
-
-                <!-- TextView cents text -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/activity_add_edit_transaction_cents"
-                    android:textSize="36sp"
-                    tools:text="cents" />
+                    tools:text="5,99 €" />
 
             </LinearLayout>
 

@@ -68,3 +68,8 @@ inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
 fun TextView.setMoneyValue(cents: Long) {
     text = NumberFormat.getCurrencyInstance().format(cents.toDouble()/100)
 }
+
+/**
+ * Returns all digits in text. Not spaced.
+ */
+fun TextView.number() = text.filter { Character.isDigit(it) }.toString().toLong()

@@ -2,6 +2,7 @@
 
 <!-- Layout representing a budget entry with its available value -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="55dp">
@@ -18,20 +19,23 @@
         android:textSize="16sp"
         tools:text="Category 1" />
 
-    <!-- Budgeted value -->
-    <EditText
+    <!-- EditText for entering transaction value. -->
+    <com.blackcat.currencyedittext.CurrencyEditText
         android:id="@+id/etBudgeted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="@dimen/fragment_budget_budgeted_margin"
-        android:hint="@string/zero"
+        android:background="@android:color/transparent"
+        android:cursorVisible="false"
+        android:fontFamily="sans-serif-medium"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:includeFontPadding="false"
-        android:inputType="numberSigned"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
         android:textSize="16sp"
-        tools:text="100" />
+        tools:text="599" />
 
     <!-- Done btn -->
     <ImageView

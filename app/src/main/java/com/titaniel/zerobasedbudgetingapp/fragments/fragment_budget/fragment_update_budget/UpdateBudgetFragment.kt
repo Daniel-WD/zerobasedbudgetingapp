@@ -15,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.blackcat.currencyedittext.CurrencyEditText
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
@@ -83,7 +84,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     /**
      * Budgeted value edit text
      */
-    private lateinit var etBudgeted: EditText
+    private lateinit var etBudgeted: CurrencyEditText
 
     /**
      * Done button
@@ -146,6 +147,12 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
             }
             false
         }
+
+        // Value text clicked listener
+        etBudgeted.setOnClickListener {
+            // Cursor position to end
+            etBudgeted.setSelection(etBudgeted.text?.length ?: 0)
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -164,11 +171,8 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
      */
     private fun updateBudget() {
 
-        // Budgeted value
-        val budgeted =
-            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
-
-        viewModel.updateBudget(budgeted)
+        // Update budget
+        viewModel.updateBudget(etBudgeted.rawValue)
 
         // Close fragment
         dismiss()

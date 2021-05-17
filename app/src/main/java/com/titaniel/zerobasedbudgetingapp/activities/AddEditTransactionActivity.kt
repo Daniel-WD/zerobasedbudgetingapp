@@ -1,6 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.os.Bundle
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.blackcat.currencyedittext.CurrencyEditText
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -25,10 +28,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
-import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -200,7 +200,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Money value EditText
      */
-    private lateinit var etPay: EditText
+    private lateinit var etPay: CurrencyEditText
 
     /**
      * Payee TextView
@@ -280,7 +280,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 etPay.setText(it.transaction.pay.toString())
 
                 // Set value text cursor to end
-                etPay.setSelection(etPay.text.length)
+                etPay.setSelection(etPay.text?.length ?: 0) // TODO duplication
 
                 // Set description text (ViewModel value gets set when description text changes)
                 etDescription.setText(it.transaction.description)
@@ -364,17 +364,16 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Value text clicked listener
-        etPay.setOnClickListener {
+        etPay.setOnClickListener { // TODO outsource in own view?, this is duplicated in UpdateBudgetFragment
             // Cursor position to end
-            etPay.setSelection(etPay.text.length)
+            etPay.setSelection(etPay.text?.length ?: 0)
         }
 
         // Value text changed listener
-        etPay.addTextChangedListener { value ->
+        etPay.addTextChangedListener {
             // Set transaction value, 0 when blank
-            viewModel.pay.value =
-                if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
-                    .toLong()
+
+            viewModel.pay.value = etPay.rawValue
         }
 
         // Description text changed listener
