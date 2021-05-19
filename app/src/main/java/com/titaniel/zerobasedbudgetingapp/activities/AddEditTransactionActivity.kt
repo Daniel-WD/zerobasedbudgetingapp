@@ -1,8 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.os.Bundle
-import android.text.InputType
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -19,6 +17,7 @@ import com.blackcat.currencyedittext.CurrencyEditText
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.rm.rmswitch.RMSwitch
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
@@ -36,6 +35,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 
 /**
@@ -58,6 +58,11 @@ class AddEditTransactionViewModel @Inject constructor(
      * All categories
      */
     val allCategories = categoryRepository.getAllCategories().asLiveData()
+
+    /**
+     * Flag, if pay is negative or positive
+     */
+    var positive = false
 
     /**
      * [pay] of transaction
@@ -129,11 +134,14 @@ class AddEditTransactionViewModel @Inject constructor(
         // Get editTransaction
         val eTransWRest = editTransactionWithCategoryAndPayee.value
 
+        // Real pay value
+        val realPay = pay.value!!.absoluteValue.let { if(positive) it else -it }
+
         // Check if should edit transaction
         if (eTransWRest != null) { // Edit transaction
 
             // Apply new values
-            eTransWRest.transaction.pay = pay.value!!
+            eTransWRest.transaction.pay = realPay
             eTransWRest.transaction.payeeId = payee.value!!.id
             eTransWRest.transaction.categoryId = category.value!!.id
             eTransWRest.transaction.date = date.value!!
@@ -153,7 +161,7 @@ class AddEditTransactionViewModel @Inject constructor(
                 // Save new transaction
                 transactionRepository.addTransactions(
                     Transaction(
-                        pay.value!!,
+                        realPay,
                         payeeId,
                         category.value!!.id,
                         description.value!!.trim(),
@@ -252,6 +260,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var datePicker: MaterialDatePicker<Long>
 
+    /**
+     * Switch positive/negative pay
+     */
+    private lateinit var switchPosNeg: RMSwitch
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -268,6 +281,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         lCategory = findViewById(R.id.layoutCategory)
         lDate = findViewById(R.id.layoutDate)
         lDescription = findViewById(R.id.layoutDescription)
+        switchPosNeg = findViewById(R.id.switchPosNeg)
 
         // Transaction observer
         viewModel.editTransactionWithCategoryAndPayee.observe(this, {
@@ -276,8 +290,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
+                // Set pos/neg in viewmodel
+                viewModel.positive = it.transaction.pay > 0
+
                 // Set pay text (ViewModel value gets set when pay text changes)
                 etPay.setText(it.transaction.pay.toString())
+
+                // Set pos/neg switch
+                switchPosNeg.isChecked = viewModel.positive
 
                 // Set value text cursor to end
                 etPay.setSelection(etPay.text?.length ?: 0) // TODO duplication
@@ -320,6 +340,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             }
         })
+
+        // Add positive/negative switch change listener
+        switchPosNeg.addSwitchObserver { _, positive -> viewModel.positive = positive }
 
         // Toolbar menu listener
         toolbar.setOnMenuItemClickListener { menuItem ->

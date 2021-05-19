@@ -30,7 +30,7 @@
                 app:title="@string/activity_add_edit_transaction_create_transaction" />
 
             <!-- Layout for transaction value -->
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -49,7 +49,25 @@
                     android:textSize="36sp"
                     tools:text="5,99 €" />
 
-            </LinearLayout>
+                <!-- Two states switch -->
+                <com.rm.rmswitch.RMSwitch
+                    android:id="@+id/switchPosNeg"
+                    android:layout_width="60dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="16dp"
+                    app:checked="false"
+                    app:forceAspectRatio="false"
+                    app:enabled="true"
+                    app:switchDesign="android"
+                    app:switchBkgCheckedColor="@android:color/holo_green_dark"
+                    app:switchBkgNotCheckedColor="@android:color/holo_red_dark"
+                    app:switchToggleCheckedColor="@android:color/holo_green_light"
+                    app:switchToggleCheckedImage="@drawable/ic_baseline_add_24"
+                    app:switchToggleNotCheckedColor="@android:color/holo_red_light"
+                    app:switchToggleNotCheckedImage="@drawable/ic_baseline_remove_24"/>
+
+            </FrameLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
 
