@@ -1,6 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import androidx.lifecycle.MutableLiveData
+import java.text.NumberFormat
 import java.time.YearMonth
 
 /**
@@ -13,13 +13,6 @@ fun <E, P> MutableList<E>.addUnique(element: E, uniquePropertyDelegate: (E) -> P
         return true
     }
     return false
-}
-
-/**
- * Re emits value, so that all observers get called again.
- */
-fun <T> MutableLiveData<T>.reEmit() {
-    this.value = this.value
 }
 
 /**
@@ -64,3 +57,8 @@ data class YearMonthProgression(
  * Override range operator to return [YearMonthProgression].
  */
 operator fun YearMonth.rangeTo(other: YearMonth) = YearMonthProgression(this, other)
+
+/**
+ * Formats value to money string.
+ */
+fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble() / 100)

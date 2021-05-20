@@ -20,6 +20,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.text.IsEmptyString.isEmptyString
@@ -28,10 +29,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDate
+import kotlin.math.absoluteValue
 
 @RunWith(MockitoJUnitRunner::class)
 class AddEditTransactionActivityTest {
@@ -56,6 +59,7 @@ class AddEditTransactionActivityTest {
         `when`(mockViewModel.description).thenReturn(MutableLiveData(""))
         `when`(mockViewModel.date).thenReturn(MutableLiveData())
         `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(MutableLiveData(null))
+        `when`(mockViewModel.positive).thenReturn(false)
 
         // Add lifecycle callback
         ActivityLifecycleMonitorRegistry.getInstance()
@@ -82,7 +86,7 @@ class AddEditTransactionActivityTest {
     fun starts_correctly() {
 
         // Value empty
-        onView(withId(R.id.etPay)).check(matches(withText(isEmptyString())))
+        onView(withId(R.id.etPay)).check(matches(withText(0L.moneyFormat())))
 
         // Payee empty
         onView(withId(R.id.tvPayee)).check(matches(withText(isEmptyString())))
@@ -102,13 +106,16 @@ class AddEditTransactionActivityTest {
         // Button text is create
         onView(withId(R.id.fabCreateApply)).check(matches(withText(R.string.activity_add_edit_transaction_create)))
 
+        // Pos/neg switch is unchecked
+        onView(withId(R.id.switchPosNeg)).check(matches(isNotChecked()))
+
     }
 
     @Test
-    fun starts_correctly_with_edit_transaction() {
+    fun starts_correctly_with_positive_edit_transaction() {
 
         // Create editTransaction data
-        val pay = -120L
+        val pay = 120L
         val payee = Payee("payee", 1)
         val category = Category("category", 0, 1)
         val description = "description"
@@ -127,12 +134,12 @@ class AddEditTransactionActivityTest {
         // Stub data validity check to return true
         `when`(mockViewModel.isDataValid()).thenReturn(true)
 
-        // Recreate ownScenario (recreate didn't work)
+        // Create ownScenario (recreate didn't work)
 
         val ownScenario = launchActivity<AddEditTransactionActivity>()
 
         // Check pay
-        onView(withId(R.id.etPay)).check(matches(withText(pay.toString())))
+        onView(withId(R.id.etPay)).check(matches(withText(pay.moneyFormat())))
 
         // Check payeeName
         onView(withId(R.id.tvPayee)).check(matches(withText(payee.name)))
@@ -150,13 +157,13 @@ class AddEditTransactionActivityTest {
         onView(withId(R.id.layoutDate)).perform(click())
         onView(withId(R.id.confirm_button)).perform(click())
 
-        // Title for transaction creation
+        // Title for edit transaction
         onView(withId(android.R.id.content)).check(matches(hasDescendant(withText(R.string.activity_add_edit_transaction_edit_transaction))))
 
-        // Button text is create
+        // Button text is apply
         onView(withId(R.id.fabCreateApply)).check(matches(withText(R.string.activity_add_edit_transaction_apply)))
 
-        // Create btn enabled
+        // Apply btn enabled
         onView(withId(R.id.fabCreateApply)).check(matches(isEnabled()))
 
         // Assert transaction values in ViewModel correct
@@ -165,8 +172,68 @@ class AddEditTransactionActivityTest {
         assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(date)
+        verify(mockViewModel).positive = true
 
         ownScenario.close()
+    }
+
+    @Test
+    fun starts_correctly_with_negative_edit_transaction_and_to_be_budgeted_as_category() {
+        // NOTE: only negativity and to_be_budgeted as category is tested here. Rest is already verified in 'starts_correctly_with_positive_edit_transaction()'
+
+        // Create editTransaction data
+        val pay = -120L
+        val payee = Payee("payee", 1)
+        val category = Category.TO_BE_BUDGETED
+        val description = "description"
+        val date = LocalDate.of(1998, 1, 12)
+
+        // Set editTransaction
+        `when`(mockViewModel.editTransactionWithCategoryAndPayee).thenReturn(
+            MutableLiveData(
+                TransactionWithCategoryAndPayee(
+                    Transaction(pay, payee.id, category.id, description, date),
+                    category, payee
+                )
+            )
+        )
+
+        // Create ownScenario (recreate didn't work)
+
+        val ownScenario = launchActivity<AddEditTransactionActivity>()
+
+        // Check categoryName
+        onView(withId(R.id.tvCategory)).check(matches(withText(R.string.activity_add_edit_transaction_to_be_budgeted)))
+
+        // Assert transaction values in ViewModel correct
+        assertThat(mockViewModel.category.value).isEqualTo(category)
+        verify(mockViewModel).positive = false
+
+
+        ownScenario.close()
+    }
+
+    @Test
+    fun handles_pos_neg_switch_click_correctly() {
+
+        // Reset mock to invalidate previous positive = ...
+        Mockito.reset(mockViewModel)
+
+        // Pos/neg switch is unchecked
+        onView(withId(R.id.switchPosNeg)).perform(click())
+
+        // Check positive has been set to true
+        verify(mockViewModel).positive = true
+
+        // Reset mock to invalidate previous positive = ...
+        Mockito.reset(mockViewModel)
+
+        // Pos/neg switch is unchecked
+        onView(withId(R.id.switchPosNeg)).perform(click())
+
+        // Check positive has been set to false
+        verify(mockViewModel).positive = false
+
     }
 
     @Test
@@ -293,7 +360,7 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun creates_transaction_without_description_correctly() {
+    fun creates_transaction_without_description_and_negative_pay_correctly() {
 
         // Setup expected values
         val pay = -1234L
@@ -334,16 +401,17 @@ class AddEditTransactionActivityTest {
         verify(mockViewModel).applyData()
 
         // Assert transaction values correct
-        assertThat(mockViewModel.pay.value).isEqualTo(pay)
+        assertThat(mockViewModel.pay.value).isEqualTo(pay.absoluteValue)
         assertThat(mockViewModel.payee.value).isEqualTo(payee)
         assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
+        assertThat(mockViewModel.positive).isFalse()
 
     }
 
     @Test
-    fun creates_transaction_with_description_correctly() {
+    fun creates_transaction_with_description_and_positive_pay_correctly() {
 
         // Setup expected values
         val pay = 1234L
@@ -353,6 +421,9 @@ class AddEditTransactionActivityTest {
 
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
+
+        // Make pay positive
+        onView(withId(R.id.switchPosNeg)).perform(click())
 
         // Type description
         onView(withId(R.id.etDescription)).perform(typeText(description))
@@ -392,6 +463,8 @@ class AddEditTransactionActivityTest {
         assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
+        verify(mockViewModel).positive = true
+
     }
 
 }

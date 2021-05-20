@@ -13,9 +13,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.blackcat.currencyedittext.CurrencyEditText
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.rm.rmswitch.RMSwitch
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.PayeeRepository
@@ -25,10 +27,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_category.SelectCategoryFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_payee.SelectPayeeFragment
-import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
-import com.titaniel.zerobasedbudgetingapp.utils.forceHideSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.utils.forceShowSoftKeyboard
-import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -36,6 +35,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 
 /**
@@ -60,7 +60,12 @@ class AddEditTransactionViewModel @Inject constructor(
     val allCategories = categoryRepository.getAllCategories().asLiveData()
 
     /**
-     * [pay] of transaction
+     * Flag, if pay is negative or positive
+     */
+    var positive = false
+
+    /**
+     * [pay] of transaction, should always be positive.
      */
     val pay = MutableLiveData(0L)
 
@@ -129,11 +134,14 @@ class AddEditTransactionViewModel @Inject constructor(
         // Get editTransaction
         val eTransWRest = editTransactionWithCategoryAndPayee.value
 
+        // Real pay value
+        val realPay = pay.value!!.let { if (positive) it else -it }
+
         // Check if should edit transaction
         if (eTransWRest != null) { // Edit transaction
 
             // Apply new values
-            eTransWRest.transaction.pay = pay.value!!
+            eTransWRest.transaction.pay = realPay
             eTransWRest.transaction.payeeId = payee.value!!.id
             eTransWRest.transaction.categoryId = category.value!!.id
             eTransWRest.transaction.date = date.value!!
@@ -153,7 +161,7 @@ class AddEditTransactionViewModel @Inject constructor(
                 // Save new transaction
                 transactionRepository.addTransactions(
                     Transaction(
-                        pay.value!!,
+                        realPay,
                         payeeId,
                         category.value!!.id,
                         description.value!!.trim(),
@@ -198,9 +206,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
 
     /**
-     * Money value EditText
+     * CurrencyEditText for entering the pay value
      */
-    private lateinit var etPay: EditText
+    private lateinit var etPay: CurrencyEditText
 
     /**
      * Payee TextView
@@ -252,6 +260,11 @@ class AddEditTransactionActivity : AppCompatActivity() {
      */
     private lateinit var datePicker: MaterialDatePicker<Long>
 
+    /**
+     * Switch positive/negative pay
+     */
+    private lateinit var switchPosNeg: RMSwitch
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_transaction)
@@ -268,6 +281,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
         lCategory = findViewById(R.id.layoutCategory)
         lDate = findViewById(R.id.layoutDate)
         lDescription = findViewById(R.id.layoutDescription)
+        switchPosNeg = findViewById(R.id.switchPosNeg)
 
         // Transaction observer
         viewModel.editTransactionWithCategoryAndPayee.observe(this, {
@@ -276,18 +290,24 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 // Change texts for edit mode
                 updateUiToEditMode()
 
+                // Set pos/neg in viewmodel
+                viewModel.positive = it.transaction.pay > 0
+
                 // Set pay text (ViewModel value gets set when pay text changes)
-                etPay.setText(it.transaction.pay.toString())
+                etPay.setText(it.transaction.pay.absoluteValue.toString())
+
+                // Set pos/neg switch
+                switchPosNeg.isChecked = viewModel.positive
 
                 // Set value text cursor to end
-                etPay.setSelection(etPay.text.length)
+                etPay.cursorEnd()
 
                 // Set description text (ViewModel value gets set when description text changes)
                 etDescription.setText(it.transaction.description)
 
                 // Set ViewModel values
                 viewModel.payee.value = it.payee
-                viewModel.category.value = it.category
+                viewModel.category.value = it.resolvedCategory
                 viewModel.date.value = it.transaction.date
 
                 // Update save btn enabled
@@ -320,6 +340,9 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
             }
         })
+
+        // Add positive/negative switch change listener
+        switchPosNeg.addSwitchObserver { _, positive -> viewModel.positive = positive }
 
         // Toolbar menu listener
         toolbar.setOnMenuItemClickListener { menuItem ->
@@ -365,16 +388,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
         // Value text clicked listener
         etPay.setOnClickListener {
-            // Cursor position to end
-            etPay.setSelection(etPay.text.length)
+            etPay.cursorEnd()
         }
 
         // Value text changed listener
-        etPay.addTextChangedListener { value ->
-            // Set transaction value, 0 when blank
-            viewModel.pay.value =
-                if (value.toString().isBlank() || value.toString() == "-") 0 else value.toString()
-                    .toLong()
+        etPay.addTextChangedListener {
+            // Set transaction value, from text
+            // Set transaction value, from text
+            viewModel.pay.value = etPay.rawValue
         }
 
         // Description text changed listener

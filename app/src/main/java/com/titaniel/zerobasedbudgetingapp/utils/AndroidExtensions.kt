@@ -3,11 +3,13 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -62,3 +64,16 @@ inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
     noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
 ): Lazy<VM> =
     OverridableLazy(activityViewModels(factoryProducer))
+
+/**
+ * Sets cursor position to the end.
+ */
+fun EditText.cursorEnd() = setSelection(text.length)
+
+
+/**
+ * Re emits value, so that all observers get called again.
+ */
+fun <T> MutableLiveData<T>.reEmit() {
+    this.value = this.value
+}

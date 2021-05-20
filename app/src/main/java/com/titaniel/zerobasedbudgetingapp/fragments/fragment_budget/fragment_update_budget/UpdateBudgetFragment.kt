@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
@@ -15,10 +14,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.blackcat.currencyedittext.CurrencyEditText
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.utils.cursorEnd
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,7 +84,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
     /**
      * Budgeted value edit text
      */
-    private lateinit var etBudgeted: EditText
+    private lateinit var etBudgeted: CurrencyEditText
 
     /**
      * Done button
@@ -146,6 +147,11 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
             }
             false
         }
+
+        // Value text clicked listener
+        etBudgeted.setOnClickListener {
+            etBudgeted.cursorEnd()
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -164,11 +170,8 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
      */
     private fun updateBudget() {
 
-        // Budgeted value
-        val budgeted =
-            if (etBudgeted.text.isBlank()) 0 else etBudgeted.text.toString().toLong()
-
-        viewModel.updateBudget(budgeted)
+        // Update budget
+        viewModel.updateBudget(etBudgeted.rawValue)
 
         // Close fragment
         dismiss()

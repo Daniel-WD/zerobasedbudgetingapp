@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 
 /**
  * [BudgetListAdapter] in [context] for displaying [budgetsWithCategoryOfMonth] with the respective [availableMoney]. Notifies [itemClickedListener] when item is clicked.
@@ -77,10 +78,10 @@ class BudgetListAdapter(
             holder.tvCategory.text = bWithCat.category.name
 
             // Find budget
-            holder.tvBudgeted.text = (bWithCat.budget.budgeted).toString()
+            holder.tvBudgeted.text = bWithCat.budget.budgeted.moneyFormat()
 
             // Set available value
-            holder.tvAvailable.text = availableMoney[bWithCat].toString()
+            availableMoney[bWithCat]?.let { holder.tvAvailable.text = it.moneyFormat() }
 
             // Entry click listener
             holder.itemView.setOnClickListener {

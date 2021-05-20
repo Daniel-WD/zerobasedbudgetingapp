@@ -23,6 +23,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -271,7 +272,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
         viewModel.toBeBudgeted.observe(viewLifecycleOwner) {
 
             // Update to be budgeted text
-            tvToBeBudgeted.text = it.toString()
+            tvToBeBudgeted.text = it.moneyFormat()
         }
     }
 

@@ -136,20 +136,38 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         testViewModel.description.value = description
         testViewModel.date.value = date
 
-        val expectedTransaction =
+        // When transaction should be negative
+
+        testViewModel.positive = false
+
+        val expectedTransactionNegative =
+            Transaction(-pay, payee.id, category.id, description.trim(), date)
+
+        // Apply data
+        testViewModel.applyData()
+
+        // Verify addTransactions called
+        verify(transactionRepositoryMock).addTransactions(expectedTransactionNegative)
+
+        // When transaction should be positive
+
+        testViewModel.positive = true
+
+        val expectedTransactionPositive =
             Transaction(pay, payee.id, category.id, description.trim(), date)
 
         // Apply data
         testViewModel.applyData()
 
         // Verify addTransactions called
-        verify(transactionRepositoryMock).addTransactions(expectedTransaction)
+        verify(transactionRepositoryMock).addTransactions(expectedTransactionPositive)
+
 
         // Verify addPayees called
-        verify(payeeRepositoryMock).addPayees(payee)
+        verify(payeeRepositoryMock, times(2)).addPayees(payee)
 
         // Verify checks for data validity
-        verify(testViewModel).isDataValid()
+        verify(testViewModel, times(2)).isDataValid()
 
     }
 
