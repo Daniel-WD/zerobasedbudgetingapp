@@ -1,6 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
-import androidx.lifecycle.MutableLiveData
 import java.text.NumberFormat
 import java.time.YearMonth
 
@@ -62,4 +61,4 @@ operator fun YearMonth.rangeTo(other: YearMonth) = YearMonthProgression(this, ot
 /**
  * Formats value to money string.
  */
-fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble()/100)
+fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble() / 100)

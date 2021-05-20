@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import org.junit.Test
-import java.time.YearMonth
 
 class AndroidExtensionsTest : CoroutinesAndLiveDataTest() {
 

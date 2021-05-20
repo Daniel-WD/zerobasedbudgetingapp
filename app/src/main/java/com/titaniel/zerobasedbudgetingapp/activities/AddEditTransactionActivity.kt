@@ -135,7 +135,7 @@ class AddEditTransactionViewModel @Inject constructor(
         val eTransWRest = editTransactionWithCategoryAndPayee.value
 
         // Real pay value
-        val realPay = pay.value!!.let { if(positive) it else -it }
+        val realPay = pay.value!!.let { if (positive) it else -it }
 
         // Check if should edit transaction
         if (eTransWRest != null) { // Edit transaction

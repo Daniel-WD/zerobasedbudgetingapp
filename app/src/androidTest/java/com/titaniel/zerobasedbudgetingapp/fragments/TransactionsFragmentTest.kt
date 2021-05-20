@@ -102,7 +102,8 @@ class TransactionsFragmentTest {
             {
                 hasDescendant(
                     withText(it.resolvedCategory.name)
-                    ?: withText(R.string.activity_add_edit_transaction_to_be_budgeted))
+                        ?: withText(R.string.activity_add_edit_transaction_to_be_budgeted)
+                )
             },
             { hasDescendant(withText(it.payee.name)) },
             { hasDescendant(withText(convertLocalDateToString(it.transaction.date))) })
