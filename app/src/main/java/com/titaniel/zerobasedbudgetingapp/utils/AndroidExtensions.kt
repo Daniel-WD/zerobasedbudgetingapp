@@ -67,11 +67,9 @@ inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
     OverridableLazy(activityViewModels(factoryProducer))
 
 /**
- * Sets [money] formatted with the local currency symbol as text. [money] represents the smallest unit (cents, penny, ...).
+ * Formats value to money string.
  */
-fun TextView.setMoneyValue(money: Long) {
-    text = NumberFormat.getCurrencyInstance().format(money.toDouble()/100)
-}
+fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble()/100)
 
 /**
  * Sets cursor position to the end.

@@ -65,7 +65,7 @@ class AddEditTransactionViewModel @Inject constructor(
     var positive = false
 
     /**
-     * [pay] of transaction
+     * [pay] of transaction, should always be positive.
      */
     val pay = MutableLiveData(0L)
 
