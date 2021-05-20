@@ -14,6 +14,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWit
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsViewModel
 import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,7 +98,7 @@ class TransactionsFragmentTest {
     private fun checkTransactionListContent() {
         checkRecyclerViewContentHasCorrectData(R.id.transactionsList,
             exampleTransactionsWithCategoryAndPayee,
-            { hasDescendant(withText(it.transaction.pay.toString())) },
+            { hasDescendant(withText(it.transaction.pay.moneyFormat())) },
             {
                 hasDescendant(
                     withText(it.resolvedCategory.name)

@@ -33,8 +33,8 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.never
 import java.time.LocalDate
+import kotlin.math.absoluteValue
 
 @RunWith(MockitoJUnitRunner::class)
 class AddEditTransactionActivityTest {
@@ -86,7 +86,7 @@ class AddEditTransactionActivityTest {
     fun starts_correctly() {
 
         // Value empty
-        onView(withId(R.id.etPay)).check(matches(withText(isEmptyString())))
+        onView(withId(R.id.etPay)).check(matches(withText(0L.moneyFormat())))
 
         // Payee empty
         onView(withId(R.id.tvPayee)).check(matches(withText(isEmptyString())))
@@ -360,7 +360,7 @@ class AddEditTransactionActivityTest {
     }
 
     @Test
-    fun creates_transaction_without_description_correctly() {
+    fun creates_transaction_without_description_and_negative_pay_correctly() {
 
         // Setup expected values
         val pay = -1234L
@@ -401,16 +401,17 @@ class AddEditTransactionActivityTest {
         verify(mockViewModel).applyData()
 
         // Assert transaction values correct
-        assertThat(mockViewModel.pay.value).isEqualTo(pay)
+        assertThat(mockViewModel.pay.value).isEqualTo(pay.absoluteValue)
         assertThat(mockViewModel.payee.value).isEqualTo(payee)
         assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
+        assertThat(mockViewModel.positive).isFalse()
 
     }
 
     @Test
-    fun creates_transaction_with_description_correctly() {
+    fun creates_transaction_with_description_and_positive_pay_correctly() {
 
         // Setup expected values
         val pay = 1234L
@@ -420,6 +421,9 @@ class AddEditTransactionActivityTest {
 
         // Type value
         onView(withId(R.id.etPay)).perform(typeText(pay.toString()))
+
+        // Make pay positive
+        onView(withId(R.id.switchPosNeg)).perform(click())
 
         // Type description
         onView(withId(R.id.etDescription)).perform(typeText(description))
@@ -459,6 +463,8 @@ class AddEditTransactionActivityTest {
         assertThat(mockViewModel.category.value).isEqualTo(category)
         assertThat(mockViewModel.description.value).isEqualTo(description)
         assertThat(mockViewModel.date.value).isEqualTo(LocalDate.now())
+        verify(mockViewModel).positive = true
+
     }
 
 }

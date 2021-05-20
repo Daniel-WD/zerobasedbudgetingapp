@@ -16,6 +16,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCate
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetListAdapter
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -89,7 +90,7 @@ class BudgetFragmentTest {
     fun starts_correctly() {
 
         // ToBeBudgeted text is correct
-        onView(withId(R.id.tvToBeBudgeted)).check(matches(withText(toBeBudgeted.toString())))
+        onView(withId(R.id.tvToBeBudgeted)).check(matches(withText(toBeBudgeted.moneyFormat())))
 
         checkBudgetListContent()
 
@@ -124,7 +125,7 @@ class BudgetFragmentTest {
         }
 
         // Check if new value is displayed
-        onView(withId(R.id.tvToBeBudgeted)).check(matches(withText(newToBeBudgeted.toString())))
+        onView(withId(R.id.tvToBeBudgeted)).check(matches(withText(newToBeBudgeted.moneyFormat())))
 
     }
 
@@ -173,10 +174,10 @@ class BudgetFragmentTest {
     private fun checkBudgetListContent() {
         checkRecyclerViewContentHasCorrectData(R.id.listBudgeting,
             exampleBudgetsWithCategoryOfMonth,
-            { hasDescendant(withText(it.budget.budgeted.toString())) },
+            { hasDescendant(withText(it.budget.budgeted.moneyFormat())) },
             { hasDescendant(withText(it.category.name)) })
         checkRecyclerViewContentHasCorrectData(R.id.listBudgeting, exampleAvailableMoney.toList(),
-            { hasDescendant(withText(it.second.toString())) })
+            { hasDescendant(withText(it.second.moneyFormat())) })
     }
 
 }

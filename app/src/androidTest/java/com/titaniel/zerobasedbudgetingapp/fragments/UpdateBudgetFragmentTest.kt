@@ -14,6 +14,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetViewModel
+import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,7 +71,7 @@ class UpdateBudgetFragmentTest {
         onView(withId(R.id.tvCategory)).check(matches(withText(exampleBudgetWithCategory.category.name)))
 
         // Budgeted text correct
-        onView(withId(R.id.etBudgeted)).check(matches(withText(exampleBudgetWithCategory.budget.budgeted.toString())))
+        onView(withId(R.id.etBudgeted)).check(matches(withText(exampleBudgetWithCategory.budget.budgeted.moneyFormat())))
 
         // Budgeted text is focused
         onView(withId(R.id.etBudgeted)).check(matches(hasFocus()))
@@ -80,7 +81,7 @@ class UpdateBudgetFragmentTest {
     @Test
     fun performs_done_btn_click_correctly() {
 
-        val newBudgetedValue = -45324532L
+        val newBudgetedValue = 45324532L
 
         // Change budgeted value
         onView(withId(R.id.etBudgeted)).perform(replaceText(""))
@@ -100,7 +101,7 @@ class UpdateBudgetFragmentTest {
     @Test
     fun performs_ime_action_done_correctly() {
 
-        val newBudgetedValue = -45324532L
+        val newBudgetedValue = 45324532L
 
         // Change budgeted value
         onView(withId(R.id.etBudgeted)).perform(replaceText(""))
