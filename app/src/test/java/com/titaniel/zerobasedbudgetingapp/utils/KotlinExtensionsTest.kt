@@ -143,13 +143,4 @@ class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
 
     }
 
-    @Test
-    fun long_money_format_works_correctly() {
-
-        // Set local to germany
-        Locale.setDefault(Locale.GERMANY)
-
-        assertThat(1000L.moneyFormat()).isEqualTo("10,00 €")
-    }
-
 }
