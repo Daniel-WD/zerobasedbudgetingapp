@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.titaniel.zerobasedbudgetingapp.R
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
 import com.titaniel.zerobasedbudgetingapp.utils.setMoneyValue
@@ -95,7 +96,9 @@ class TransactionsListAdapter(
 
             // Set category text
             holder.cpCategory.text =
-                if (transactionWithCategoryAndPayee.category == null) context.getString(R.string.activity_add_edit_transaction_to_be_budgeted) else transactionWithCategoryAndPayee.category.name
+                if (transactionWithCategoryAndPayee.resolvedCategory == Category.TO_BE_BUDGETED) context.getString(
+                    R.string.activity_add_edit_transaction_to_be_budgeted
+                ) else transactionWithCategoryAndPayee.resolvedCategory.name
 
             // Set date text
             holder.tvDate.text =

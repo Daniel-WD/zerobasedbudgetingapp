@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.relations
 
 import androidx.room.Embedded
+import androidx.room.Ignore
 import androidx.room.Relation
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
@@ -14,9 +15,14 @@ data class TransactionWithCategoryAndPayee(
     @Relation(
         parentColumn = "categoryId",
         entityColumn = "id"
-    ) val category: Category?,
+    ) private val category: Category?,
     @Relation(
         parentColumn = "payeeId",
         entityColumn = "id"
     ) val payee: Payee
-)
+) {
+
+    @Ignore
+    val resolvedCategory = category ?: Category.TO_BE_BUDGETED
+
+}

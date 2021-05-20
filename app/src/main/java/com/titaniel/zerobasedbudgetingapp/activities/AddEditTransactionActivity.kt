@@ -307,7 +307,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
 
                 // Set ViewModel values
                 viewModel.payee.value = it.payee
-                viewModel.category.value = it.category
+                viewModel.category.value = it.resolvedCategory
                 viewModel.date.value = it.transaction.date
 
                 // Update save btn enabled
