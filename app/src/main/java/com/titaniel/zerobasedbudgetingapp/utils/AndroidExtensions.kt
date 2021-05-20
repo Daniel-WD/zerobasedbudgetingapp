@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -65,11 +66,16 @@ inline fun <reified VM : ViewModel> Fragment.provideActivityViewModel(
 ): Lazy<VM> =
     OverridableLazy(activityViewModels(factoryProducer))
 
-fun TextView.setMoneyValue(cents: Long) {
-    text = NumberFormat.getCurrencyInstance().format(cents.toDouble()/100)
+/**
+ * Sets [money] formatted with the local currency symbol as text. [money] represents the smallest unit (cents, penny, ...).
+ */
+fun TextView.setMoneyValue(money: Long) {
+    text = NumberFormat.getCurrencyInstance().format(money.toDouble()/100)
 }
 
 /**
- * Returns all digits in text. Not spaced.
+ * Sets cursor position to the end.
  */
-fun TextView.number() = text.filter { Character.isDigit(it) }.toString().toLong()
+fun EditText.cursorEnd() {
+    setSelection(text.length)
+}

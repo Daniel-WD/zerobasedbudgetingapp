@@ -22,6 +22,9 @@ data class TransactionWithCategoryAndPayee(
     ) val payee: Payee
 ) {
 
+    /**
+     * Field with same value as [category]. Substitutes null with [Category.TO_BE_BUDGETED]
+     */
     @Ignore
     val resolvedCategory = category ?: Category.TO_BE_BUDGETED
 

@@ -20,6 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
+import com.titaniel.zerobasedbudgetingapp.utils.cursorEnd
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -150,8 +151,7 @@ class UpdateBudgetFragment : BottomSheetDialogFragment() {
 
         // Value text clicked listener
         etBudgeted.setOnClickListener {
-            // Cursor position to end
-            etBudgeted.setSelection(etBudgeted.text?.length ?: 0)
+            etBudgeted.cursorEnd()
         }
     }
 

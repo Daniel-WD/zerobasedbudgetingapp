@@ -135,7 +135,7 @@ class AddEditTransactionViewModel @Inject constructor(
         val eTransWRest = editTransactionWithCategoryAndPayee.value
 
         // Real pay value
-        val realPay = pay.value!!.absoluteValue.let { if(positive) it else -it }
+        val realPay = pay.value!!.let { if(positive) it else -it }
 
         // Check if should edit transaction
         if (eTransWRest != null) { // Edit transaction
@@ -206,7 +206,7 @@ class AddEditTransactionActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
 
     /**
-     * Money value EditText
+     * CurrencyEditText for entering the pay value
      */
     private lateinit var etPay: CurrencyEditText
 
@@ -294,13 +294,13 @@ class AddEditTransactionActivity : AppCompatActivity() {
                 viewModel.positive = it.transaction.pay > 0
 
                 // Set pay text (ViewModel value gets set when pay text changes)
-                etPay.setText(it.transaction.pay.toString())
+                etPay.setText(it.transaction.pay.absoluteValue.toString())
 
                 // Set pos/neg switch
                 switchPosNeg.isChecked = viewModel.positive
 
                 // Set value text cursor to end
-                etPay.setSelection(etPay.text?.length ?: 0) // TODO duplication
+                etPay.cursorEnd()
 
                 // Set description text (ViewModel value gets set when description text changes)
                 etDescription.setText(it.transaction.description)
@@ -387,15 +387,14 @@ class AddEditTransactionActivity : AppCompatActivity() {
         }
 
         // Value text clicked listener
-        etPay.setOnClickListener { // TODO outsource in own view?, this is duplicated in UpdateBudgetFragment
-            // Cursor position to end
-            etPay.setSelection(etPay.text?.length ?: 0)
+        etPay.setOnClickListener {
+            etPay.cursorEnd()
         }
 
         // Value text changed listener
         etPay.addTextChangedListener {
-            // Set transaction value, 0 when blank
-
+            // Set transaction value, from text
+            // Set transaction value, from text
             viewModel.pay.value = etPay.rawValue
         }
 

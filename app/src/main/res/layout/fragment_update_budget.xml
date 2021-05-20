@@ -19,7 +19,7 @@
         android:textSize="16sp"
         tools:text="Category 1" />
 
-    <!-- EditText for entering transaction value. -->
+    <!-- Budgeted value -->
     <com.blackcat.currencyedittext.CurrencyEditText
         android:id="@+id/etBudgeted"
         android:layout_width="wrap_content"
