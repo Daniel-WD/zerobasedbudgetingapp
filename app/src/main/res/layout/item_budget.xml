@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- Item representing a category and its budget data -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="55dp">
@@ -9,12 +10,19 @@
     <!-- Category value text -->
     <TextView
         android:id="@+id/tvCategory"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/fragment_budget_category_margin"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
         android:includeFontPadding="false"
+        android:maxLines="1"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvBudgeted"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Category 1" />
 
     <!-- Budgeted value text -->
@@ -26,6 +34,9 @@
         android:layout_marginEnd="@dimen/fragment_budget_budgeted_margin"
         android:includeFontPadding="false"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="100€" />
 
     <!-- Available value text -->
@@ -37,6 +48,9 @@
         android:layout_marginEnd="@dimen/fragment_budget_available_margin"
         android:includeFontPadding="false"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="20€" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
