@@ -42,7 +42,6 @@
         android:id="@+id/ivEdit"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical|end"
         android:padding="8dp"
         android:src="@drawable/ic_baseline_edit_24"
         app:layout_constraintEnd_toStartOf="@+id/ivDelete" />
