@@ -1,7 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.content.Intent
-import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.os.bundleOf

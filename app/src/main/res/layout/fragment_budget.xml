@@ -37,12 +37,12 @@
             android:id="@+id/tvToBeBudgeted"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:layout_marginHorizontal="16dp"
             android:fontFamily="sans-serif-medium"
-            android:includeFontPadding="false"
-            android:textSize="36sp"
             android:gravity="bottom"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textSize="36sp"
             app:autoSizeTextType="uniform"
             tools:text="5000,00 €" />
 
