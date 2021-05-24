@@ -33,15 +33,18 @@
         </com.google.android.material.appbar.MaterialToolbar>
 
         <!-- To be budgeted value -->
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvToBeBudgeted"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginHorizontal="16dp"
             android:fontFamily="sans-serif-medium"
+            android:gravity="bottom"
             android:includeFontPadding="false"
+            android:maxLines="1"
             android:textSize="36sp"
-            tools:text="5000€ Available" />
+            app:autoSizeTextType="uniform"
+            tools:text="5000,00 €" />
 
         <!-- Headers container -->
         <FrameLayout

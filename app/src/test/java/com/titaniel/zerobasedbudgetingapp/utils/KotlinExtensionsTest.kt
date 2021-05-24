@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import org.junit.Test
 import java.time.YearMonth
-import java.util.*
 
 class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
 

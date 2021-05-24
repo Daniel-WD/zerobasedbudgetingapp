@@ -1,8 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget
 
 import android.content.Intent
-import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -197,7 +197,7 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     /**
      * "To be budgeted" Text
      */
-    private lateinit var tvToBeBudgeted: TextView
+    private lateinit var tvToBeBudgeted: AppCompatTextView
 
     /**
      * Budgeting list

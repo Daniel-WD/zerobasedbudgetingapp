@@ -2,7 +2,6 @@ package com.titaniel.zerobasedbudgetingapp.activities
 
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
@@ -238,17 +237,17 @@ class AddEditTransactionActivity : AppCompatActivity() {
     /**
      * Payee layout
      */
-    private lateinit var lPayee: LinearLayout
+    private lateinit var lPayee: ConstraintLayout
 
     /**
      * Category layout
      */
-    private lateinit var lCategory: LinearLayout
+    private lateinit var lCategory: ConstraintLayout
 
     /**
      * Date layout
      */
-    private lateinit var lDate: LinearLayout
+    private lateinit var lDate: ConstraintLayout
 
     /**
      * Description layout
