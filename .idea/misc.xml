@@ -8,7 +8,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/danie/AndroidStudioProjects/zerobasedbudgetingapp/app/src/main/res/layout/fragment_budget.xml" value="0.45208333333333334" />
         <entry key="..\:/Users/danie/AndroidStudioProjects/zerobasedbudgetingapp/app/src/main/res/layout/fragment_set_month.xml" value="0.45208333333333334" />
+        <entry key="..\:/Users/danie/AndroidStudioProjects/zerobasedbudgetingapp/app/src/main/res/layout/fragment_transactions.xml" value="0.45208333333333334" />
       </map>
     </option>
   </component>

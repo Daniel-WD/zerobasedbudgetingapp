@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_month
+package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.titaniel.zerobasedbudgetingapp.compose.assets.*
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
@@ -94,19 +95,11 @@ class SelectMonthViewModel @Inject constructor(
      * Set new month that has [index] in [_selectableMonths].
      */
     fun onMonthClick(month: YearMonth) {
-        println("$month has been clicked")
 
         // Set month
-//        viewModelScope.launch {
-//            settingRepository.setMonth(month)
-//        }
-    }
-
-    /**
-     * Returns index of the currently selected month in [_selectableMonths].
-     */
-    suspend fun getIndexOfMonth(): Int {
-        return _selectableMonths.value!!.indexOf(settingRepository.getMonth().first())
+        viewModelScope.launch {
+            settingRepository.setMonth(month)
+        }
     }
 
 }
@@ -131,12 +124,6 @@ class SelectMonthFragment : BottomSheetDialogFragment() {
 
 }
 
-private val DividerColor = Color(0x1FFFFFFF)
-
-private val Text87Color = Color(0xdeffffff)
-private val Text40Color = Color(0x66FFFFFF)
-private val Text60Color = Color(0x99ffffff)
-
 @Composable
 fun SelectMonthDialog(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
 
@@ -144,7 +131,7 @@ fun SelectMonthDialog(viewModel: SelectMonthViewModel = viewModel(), onDismiss: 
 
     Column {
         Header()
-        Divider(thickness = 1.dp, color = DividerColor)
+        Divider(thickness = 1.dp, color = Divider12Color)
         Content(months) { month ->
             viewModel.onMonthClick(month)
             onDismiss()
@@ -228,7 +215,7 @@ fun SelectMontDialogPreview() {
 
         Column {
             Header()
-            Divider(thickness = 1.dp, color = DividerColor)
+            Divider(thickness = 1.dp, color = Divider12Color)
             Content(months) {}
         }
     }
