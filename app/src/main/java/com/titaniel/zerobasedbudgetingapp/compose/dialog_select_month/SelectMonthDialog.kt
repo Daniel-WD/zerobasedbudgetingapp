@@ -49,7 +49,6 @@ class SelectMonthViewModel @Inject constructor(
      * Selectable months
      */
     private val _selectableMonths: MutableLiveData<List<YearMonth>> = MutableLiveData()
-
     val selectableMonths: LiveData<List<YearMonth>> = _selectableMonths
 
     init {
