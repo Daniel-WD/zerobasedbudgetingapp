@@ -22,6 +22,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepos
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.fragment_update_budget.UpdateBudgetFragment
+import com.titaniel.zerobasedbudgetingapp.fragments.fragment_select_month.SelectMonthFragment
 import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
 import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -229,6 +230,11 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
                 }
                 else -> false
             }
+        }
+
+        // Toolbar click listener
+        toolbar.setOnClickListener {
+            SelectMonthFragment().show(childFragmentManager, "SelectMonthFragment")
         }
 
         // Init list categories
