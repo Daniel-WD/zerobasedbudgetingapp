@@ -37,9 +37,9 @@ class BudgetDaoTest {
     /**
      * Categories to meet foreign key constraints.
      */
-    private val category1 = Category("name", 0, 1)
-    private val category2 = Category("name", 1, 2)
-    private val category3 = Category("name", 2, 3)
+    private val category1 = Category("name", 0, 0, 1)
+    private val category2 = Category("name", 0, 1, 2)
+    private val category3 = Category("name", 0, 2, 3)
 
     /**
      * BudgetsWithCategory derived from example budgets, categories

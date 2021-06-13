@@ -43,23 +43,23 @@ class TransactionsFragmentTest {
     private val exampleTransactionsWithCategoryAndPayee = listOf(
         TransactionWithCategoryAndPayee(
             Transaction(1, 1, 1, "", LocalDate.of(2020, 12, 1)),
-            Category("cat1", 0, 1), Payee("payee1", 1)
+            Category("cat1", 0, 0, 1), Payee("payee1", 1)
         ),
         TransactionWithCategoryAndPayee(
             Transaction(2, 1, 1, "", LocalDate.of(2020, 10, 2)),
-            Category("cat1", 0, 1), Payee("payee1", 1)
+            Category("cat1", 0, 0, 1), Payee("payee1", 1)
         ),
         TransactionWithCategoryAndPayee(
             Transaction(3, 2, 1, "hallo welt", LocalDate.of(2010, 1, 20)),
-            Category("cat1", 0, 1), Payee("payee2", 2)
+            Category("cat1", 0, 0, 1), Payee("payee2", 2)
         ),
         TransactionWithCategoryAndPayee(
             Transaction(4, 4, 2, "", LocalDate.of(2023, 5, 12)),
-            Category("cat2", 0, 2), Payee("payee4", 4)
+            Category("cat2", 0, 0, 2), Payee("payee4", 4)
         ),
         TransactionWithCategoryAndPayee(
             Transaction(5, 2, 2, "woowhoehwoe", LocalDate.of(2010, 11, 1)),
-            Category("cat2", 0, 2), Payee("payee2", 2)
+            Category("cat2", 0, 0, 2), Payee("payee2", 2)
         ),
     )
 

@@ -65,12 +65,12 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
      * Fake category data
      */
     private val exampleCategories = listOf(
-        Category("cat1", 0, 0), // 0
-        Category("cat2", 1, 1), // 1
-        Category("cat3", 2, 2), // 2
-        Category("cat4", 3, 3), // 3
-        Category("cat5", 4, 4), // 4
-        Category("cat6", 5, 5) // 5
+        Category("cat1", 0, 0, 0), // 0
+        Category("cat2", 0, 1, 1), // 1
+        Category("cat3", 0, 2, 2), // 2
+        Category("cat4", 0, 3, 3), // 3
+        Category("cat5", 0, 4, 4), // 4
+        Category("cat6", 0, 5, 5) // 5
     )
 
     /**

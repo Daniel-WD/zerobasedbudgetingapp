@@ -63,10 +63,10 @@ class SelectMonthViewModelTest : CoroutinesAndLiveDataTest() {
      * Test categories
      */
     private val categories = listOf(
-        Category("cat1", 1, 1),
-        Category("cat2", 2, 2),
-        Category("cat3", 3, 3),
-        Category("cat4", 4, 4)
+        Category("cat1", 0, 1, 1),
+        Category("cat2", 0, 2, 2),
+        Category("cat3", 0, 3, 3),
+        Category("cat4", 0, 4, 4)
     )
 
     /**

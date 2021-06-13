@@ -43,7 +43,7 @@ class UpdateBudgetFragmentTest {
      */
     private val exampleBudgetWithCategory = BudgetWithCategory(
         Budget(1, YearMonth.of(2020, 12), 100),
-        Category("sex", 0, 1)
+        Category("sex", 0, 0, 1)
     )
 
     @Before

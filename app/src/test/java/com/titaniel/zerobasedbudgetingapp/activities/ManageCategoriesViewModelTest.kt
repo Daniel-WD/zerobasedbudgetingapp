@@ -70,12 +70,12 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
      * Fake category data
      */
     private val exampleCategories = listOf(
-        Category("cat1", 9, 1), // 0
-        Category("cat2", 8, 2), // 1
-        Category("cat3", 7, 3), // 2
-        Category("cat4", 6, 4), // 3
-        Category("cat5", 5, 5), // 4
-        Category("cat6", 4, 6) // 5
+        Category("cat1", 0, 9, 1), // 0
+        Category("cat2", 0, 8, 2), // 1
+        Category("cat3", 0, 7, 3), // 2
+        Category("cat4", 0, 6, 4), // 3
+        Category("cat5", 0, 5, 5), // 4
+        Category("cat6", 0, 4, 6) // 5
     )
 
     /**
@@ -92,7 +92,7 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Sorted fake categories
      */
-    private val sortedExampleCategories = exampleCategories.sortedBy { it.index }
+    private val sortedExampleCategories = exampleCategories.sortedBy { it.positionInGroup }
 
     @ExperimentalCoroutinesApi
     @Before
@@ -137,7 +137,7 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
         assertThat(testViewModel.categoriesChanged()).isFalse()
 
         // Add category
-        val cat = Category("ajsdfölks", 7, 1)
+        val cat = Category("ajsdfölks", 0, 7, 1)
         newCats.add(cat)
 
         assertThat(testViewModel.categoriesChanged()).isTrue()
@@ -238,12 +238,12 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
 
         // Set new cats
         testViewModel.newCategories.value = mutableListOf(
-            Category("cat1", 9, 1),
-            Category("cat4", 6, 4),
-            Category("newcat", 6, 0),
-            Category("newnamecat2", 8, 2),
-            Category("cat3", 7, 3),
-            Category("newnamecat5", 5, 5)
+            Category("cat1", 0, 9, 1),
+            Category("cat4", 0, 6, 4),
+            Category("newcat", 0, 6, 0),
+            Category("newnamecat2", 0, 8, 2),
+            Category("cat3", 0, 7, 3),
+            Category("newnamecat5", 0, 5, 5)
         )
 
         testViewModel.saveNewCategories()
@@ -252,16 +252,16 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
             *exampleTransactions.take(2).map { it.apply { categoryId = -1 } }.toTypedArray()
         )
 
-        verify(categoryRepositoryMock).deleteCategories(Category("cat6", 4, 6))
+        verify(categoryRepositoryMock).deleteCategories(Category("cat6", 0, 4, 6))
 
-        verify(categoryRepositoryMock).addCategories(Category("newcat", 2, 0))
+        verify(categoryRepositoryMock).addCategories(Category("newcat", 0, 2, 0))
 
         verify(categoryRepositoryMock).updateCategories(
-            Category("cat1", 0, 1),
-            Category("cat4", 1, 4),
-            Category("newnamecat2", 3, 2),
-            Category("cat3", 4, 3),
-            Category("newnamecat5", 5, 5)
+            Category("cat1", 0, 0, 1),
+            Category("cat4", 0, 1, 4),
+            Category("newnamecat2", 0, 3, 2),
+            Category("cat3", 0, 4, 3),
+            Category("newnamecat5", 0, 5, 5)
         )
 
         val expectedNewBudgets = availableMonths.map { month ->

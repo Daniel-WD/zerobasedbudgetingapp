@@ -48,11 +48,11 @@ class BudgetFragmentTest {
      * BudgetsOfMonth example data
      */
     private val exampleBudgetsWithCategoryOfMonth = listOf(
-        BudgetWithCategory(Budget(0, YearMonth.of(2020, 10), 20), Category("a", 0, 0)),
-        BudgetWithCategory(Budget(1, YearMonth.of(2020, 10), 100), Category("b", 1, 1)),
-        BudgetWithCategory(Budget(2, YearMonth.of(2020, 10), 202342), Category("c", 2, 2)),
-        BudgetWithCategory(Budget(3, YearMonth.of(2020, 10), 203), Category("d", 3, 3)),
-        BudgetWithCategory(Budget(4, YearMonth.of(2020, 10), 21230), Category("e", 4, 4))
+        BudgetWithCategory(Budget(0, YearMonth.of(2020, 10), 20), Category("a", 0, 0, 0)),
+        BudgetWithCategory(Budget(1, YearMonth.of(2020, 10), 100), Category("b", 0, 1, 1)),
+        BudgetWithCategory(Budget(2, YearMonth.of(2020, 10), 202342), Category("c", 0, 2, 2)),
+        BudgetWithCategory(Budget(3, YearMonth.of(2020, 10), 203), Category("d", 0, 3, 3)),
+        BudgetWithCategory(Budget(4, YearMonth.of(2020, 10), 21230), Category("e", 0, 4, 4))
     )
 
     /**

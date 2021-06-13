@@ -126,7 +126,7 @@ class AddEditTransactionViewModelWithoutEditTransactionTest : CoroutinesAndLiveD
         // Setup data
         val pay = 500L
         val payee = Payee("payee", 1)
-        val category = Category("category", 2)
+        val category = Category("category", 0, 2)
         val description = "   Super \n cool description    \n"
         val date = LocalDate.now()
 
@@ -299,7 +299,7 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
     private val editTransactionWithCategoryAndPayee =
         TransactionWithCategoryAndPayee(
             Transaction(123, 3, 4, "description", LocalDate.now(), 5),
-            Category("cat", 1, 4),
+            Category("cat", 0, 1, 4),
             Payee("payee", 3)
         )
 
@@ -370,7 +370,7 @@ class AddEditTransactionViewModelWithEditTransactionTest : CoroutinesAndLiveData
         // Setup data
         val newPay = 500L
         val newPayee = Payee("payee", 1)
-        val newCategory = Category("category", 34)
+        val newCategory = Category("category", 0, 34)
         val newDescription = "   Super \n cool description    \n"
         val newDate = LocalDate.now().plusDays(10)
 

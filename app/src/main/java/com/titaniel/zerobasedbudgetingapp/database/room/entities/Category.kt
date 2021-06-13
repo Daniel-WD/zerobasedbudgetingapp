@@ -4,12 +4,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * [Category] with [name] and [id]
+ * Category a user can budget for.
  */
 @Entity
 data class Category(
     var name: String,
-    var index: Int,
+    var groupId: Int,
+    var positionInGroup: Int,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 ) {
@@ -18,7 +19,7 @@ data class Category(
         /**
          * Category that represents [TO_BE_BUDGETED]
          */
-        val TO_BE_BUDGETED = Category("\nTO_BE_BUDGETED", -1, -1)
+        val TO_BE_BUDGETED = Category("\nTO_BE_BUDGETED", 0, -1, -1)
     }
 
 }
