@@ -1,9 +1,11 @@
 package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.lifecycle.liveData
-import androidx.lifecycle.viewmodel.compose.viewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

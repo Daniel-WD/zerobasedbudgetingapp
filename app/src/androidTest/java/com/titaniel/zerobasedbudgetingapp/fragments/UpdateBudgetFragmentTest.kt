@@ -81,7 +81,7 @@ class UpdateBudgetFragmentTest {
     @Test
     fun performs_done_btn_click_correctly() {
 
-        val newBudgetedValue = 45324532L
+        val newBudgetedValue = 453532L
 
         // Change budgeted value
         onView(withId(R.id.etBudgeted)).perform(replaceText(""))
@@ -101,7 +101,7 @@ class UpdateBudgetFragmentTest {
     @Test
     fun performs_ime_action_done_correctly() {
 
-        val newBudgetedValue = 45324532L
+        val newBudgetedValue = 453532L
 
         // Change budgeted value
         onView(withId(R.id.etBudgeted)).perform(replaceText(""))
