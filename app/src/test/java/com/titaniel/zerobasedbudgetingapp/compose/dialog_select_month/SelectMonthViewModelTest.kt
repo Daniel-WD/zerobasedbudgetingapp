@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.fragments
+package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
 
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
@@ -7,7 +7,6 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryReposito
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_set_month.SetMonthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -21,7 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
-class SetMonthViewModelTest : CoroutinesAndLiveDataTest() {
+class SelectMonthViewModelTest : CoroutinesAndLiveDataTest() {
 
     /**
      * BudgetRepository mock
@@ -44,7 +43,7 @@ class SetMonthViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * UpdateBudgetViewModel to test
      */
-    private lateinit var viewModel: SetMonthViewModel
+    private lateinit var viewModel: SelectMonthViewModel
 
     /**
      * Test month
@@ -98,9 +97,6 @@ class SetMonthViewModelTest : CoroutinesAndLiveDataTest() {
     override fun setup() {
         super.setup()
 
-        // Stub getMonth()
-        `when`(settingRepositoryMock.getMonth()).thenReturn(flow { emit(month) })
-
         // Stub availableMonths
         `when`(settingRepositoryMock.availableMonths).thenReturn(flow { emit(availableMonths) })
 
@@ -129,7 +125,7 @@ class SetMonthViewModelTest : CoroutinesAndLiveDataTest() {
         })
 
         // Create ViewModel instance
-        viewModel = SetMonthViewModel(
+        viewModel = SelectMonthViewModel(
             settingRepositoryMock, categoryRepositoryMock, budgetRepositoryMock
         )
 
@@ -162,26 +158,14 @@ class SetMonthViewModelTest : CoroutinesAndLiveDataTest() {
     }
 
     @Test
-    fun sets_month_correctly(): Unit = runBlocking {
-
-        // Define index of month to set
-        val index = 1
+    fun performs_on_month_click_correctly(): Unit = runBlocking {
 
         // Set month
-        viewModel.setMonth(index)
+        viewModel.onMonthClick(availableMonths[2])
 
         // Check correct month has been set
-        verify(settingRepositoryMock).setMonth(availableMonths[index])
+        verify(settingRepositoryMock).setMonth(availableMonths[2])
 
     }
-
-    @Test
-    fun gets_index_of_month_correctly(): Unit = runBlocking {
-
-        // Check if returns correct index
-        assertThat(viewModel.getIndexOfMonth()).isEqualTo(availableMonths.indexOf(month))
-
-    }
-
 
 }

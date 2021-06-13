@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -63,6 +64,12 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
         // Init views
         toolbar = requireView().findViewById(R.id.toolbar)
         transactionsList = requireView().findViewById(R.id.transactionsList)
+
+        // Toolbar click listener
+        toolbar.setOnClickListener {
+            SelectMonthDialogFragment()
+                .show(childFragmentManager, "SelectMonthFragment")
+        }
 
         // Init transactionList
         // Set layout manager

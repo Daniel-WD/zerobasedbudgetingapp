@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.ManageCategoriesActivity
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
@@ -229,6 +230,12 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
                 }
                 else -> false
             }
+        }
+
+        // Toolbar click listener
+        toolbar.setOnClickListener {
+            SelectMonthDialogFragment()
+                .show(childFragmentManager, "SelectMonthFragment")
         }
 
         // Init list categories
