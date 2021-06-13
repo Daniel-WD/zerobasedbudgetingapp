@@ -20,15 +20,9 @@ interface GroupDao {
     suspend fun add(vararg groups: Group): Array<Long>
 
     /**
-     * Get all groups
+     * Get all groups TODO: can be dropped if not in use and dataintegrity can be tested through other queries (i. e. relation)
      */
     @Query("SELECT * FROM `group`")
     fun getAll(): Flow<List<Group>>
-
-    /**
-     * Get group by [groupId]
-     */
-    @Query("SELECT * FROM `Group` WHERE `Group`.id = :groupId")
-    fun getById(groupId: Long): Flow<Group>
 
 }

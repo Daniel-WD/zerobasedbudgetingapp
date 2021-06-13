@@ -28,11 +28,4 @@ class GroupRepository @Inject constructor(
         return groupDao.getAll()
     }
 
-    /**
-     * Get group by [groupId]
-     */
-    fun getGroupById(groupId: Long): Flow<Group> {
-        return groupDao.getById(groupId)
-    }
-
 }
