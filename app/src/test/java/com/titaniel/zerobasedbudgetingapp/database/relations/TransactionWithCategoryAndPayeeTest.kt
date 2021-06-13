@@ -18,7 +18,7 @@ class TransactionWithCategoryAndPayeeTest {
 
         // Define dependencies
         val trans = Transaction(123123, 3, 213, "asöldikf", LocalDate.MAX, 23)
-        val cat = Category("sdfa", 43, 12)
+        val cat = Category("sdfa", 0, 43, 12)
         val payee = Payee("slakf", 345)
 
         // Create normal TransactionWithCategoryAndPayee

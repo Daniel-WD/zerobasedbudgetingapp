@@ -117,7 +117,7 @@ class AddEditTransactionActivityTest {
         // Create editTransaction data
         val pay = 120L
         val payee = Payee("payee", 1)
-        val category = Category("category", 0, 1)
+        val category = Category("category", 0, 0, 1)
         val description = "description"
         val date = LocalDate.of(1998, 1, 12)
 
@@ -303,7 +303,7 @@ class AddEditTransactionActivityTest {
 
         // Change category
         scenario.onActivity {
-            mockViewModel.category.value = Category(expectedCategory, 0)
+            mockViewModel.category.value = Category(expectedCategory, 0, 0)
         }
 
         // Check correct category
@@ -365,7 +365,7 @@ class AddEditTransactionActivityTest {
         // Setup expected values
         val pay = -1234L
         val payee = Payee("fakePayee")
-        val category = Category("fakeCategory", 1)
+        val category = Category("fakeCategory", 0, 1)
         val description = ""
 
         // Type value
@@ -416,7 +416,7 @@ class AddEditTransactionActivityTest {
         // Setup expected values
         val pay = 1234L
         val payee = Payee("fakePayee")
-        val category = Category("fakeCategory", 1)
+        val category = Category("fakeCategory", 0, 1)
         val description = "     fake Desc ription   "
 
         // Type value

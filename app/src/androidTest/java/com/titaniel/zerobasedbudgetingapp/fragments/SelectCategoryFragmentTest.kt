@@ -39,11 +39,11 @@ class SelectCategoryFragmentTest {
      * Example categories
      */
     private val exampleCategories = mutableListOf(
-        Category("cat1", 0),
-        Category("cat2", 1),
-        Category("cat3", 2),
-        Category("cat4", 3),
-        Category("cat5", 4)
+        Category("cat1", 0, 0),
+        Category("cat2", 0, 1),
+        Category("cat3", 0, 2),
+        Category("cat4", 0, 3),
+        Category("cat5", 0, 4)
     )
 
     @Before
@@ -72,7 +72,7 @@ class SelectCategoryFragmentTest {
     fun handles_data_change_correctly() {
 
         // Change data
-        exampleCategories.add(Category("newCat", 0))
+        exampleCategories.add(Category("newCat", 0, 0))
 
         // Sort list
         exampleCategories.sortBy { it.positionInGroup }

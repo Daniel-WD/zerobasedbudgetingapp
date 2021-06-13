@@ -32,10 +32,10 @@ class CategoryDaoTest {
     /**
      * Example categories
      */
-    private val category1 = Category("cat1", 0, 1)
-    private val category2 = Category("cat2", 1, 2)
-    private val category3 = Category("cat3", 2, 3)
-    private val category4 = Category("cat4", 3, 4)
+    private val category1 = Category("cat1", 0, 0, 1)
+    private val category2 = Category("cat2", 0, 1, 2)
+    private val category3 = Category("cat3", 0, 2, 3)
+    private val category4 = Category("cat4", 0, 3, 4)
 
     @Before
     fun setup(): Unit = runBlocking {

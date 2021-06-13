@@ -19,7 +19,7 @@ data class Category(
         /**
          * Category that represents [TO_BE_BUDGETED]
          */
-        val TO_BE_BUDGETED = Category("\nTO_BE_BUDGETED", -1, -1)
+        val TO_BE_BUDGETED = Category("\nTO_BE_BUDGETED", 0, -1, -1)
     }
 
 }

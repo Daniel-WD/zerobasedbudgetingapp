@@ -56,5 +56,10 @@ class DatabaseModuleTest {
         assertThat(databaseModule.provideBudgetDao(database)).isEqualTo(database.budgetDao())
     }
 
+    @Test
+    fun provides_group_dao_correctly() {
+        assertThat(databaseModule.provideGroupDao(database)).isEqualTo(database.groupDao())
+    }
+
 
 }

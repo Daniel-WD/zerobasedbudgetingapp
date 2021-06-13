@@ -48,11 +48,11 @@ class ManageCategoriesActivityTest {
      * Example category list
      */
     private val categories = mutableListOf(
-        Category("cat1", 1, 1),
-        Category("cat2", 2, 2),
-        Category("cat3", 3, 3),
-        Category("cat4", 4, 4),
-        Category("cat5", 5, 5)
+        Category("cat1", 0, 1, 1),
+        Category("cat2", 0, 2, 2),
+        Category("cat3", 0, 3, 3),
+        Category("cat4", 0, 4, 4),
+        Category("cat5", 0, 5, 5)
     )
 
     @Before

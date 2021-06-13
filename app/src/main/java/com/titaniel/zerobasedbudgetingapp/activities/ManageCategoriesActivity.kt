@@ -113,7 +113,7 @@ class ManageCategoriesViewModel @Inject constructor(
 
         if (categoryId == null) {
             // Create new category
-            val newCat = Category(name, cats.size)
+            val newCat = Category(name, 0, cats.size)
 
             // Add new category to cats
             cats.add(newCat)

@@ -52,7 +52,7 @@ class UpdateBudgetViewModelTest : CoroutinesAndLiveDataTest() {
      * Test budgetWithCategory
      */
     private val budgetWithCategory =
-        BudgetWithCategory(Budget(1, YearMonth.now(), 234), Category("cat", 2, 1))
+        BudgetWithCategory(Budget(1, YearMonth.now(), 234), Category("cat", 0, 2, 1))
 
     @ExperimentalCoroutinesApi
     @Before

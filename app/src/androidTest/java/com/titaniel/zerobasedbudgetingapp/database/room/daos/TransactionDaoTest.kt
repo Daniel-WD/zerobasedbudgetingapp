@@ -44,9 +44,9 @@ class TransactionDaoTest {
     /**
      * Example categories
      */
-    private val category1 = Category("cat1", 1, 1)
-    private val category2 = Category("cat2", 2, 2)
-    private val category3 = Category("cat3", 3, 3)
+    private val category1 = Category("cat1", 0, 1, 1)
+    private val category2 = Category("cat2", 0, 2, 2)
+    private val category3 = Category("cat3", 0, 3, 3)
 
     /**
      * TransactionWithCategoryAndPayee's derived from other example data
