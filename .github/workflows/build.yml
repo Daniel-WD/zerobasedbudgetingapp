@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1.4.3
         with:
-          java-version: 1.8
+          java-version: 1.11
 
       - run: bash ./gradlew test --stacktrace
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1.4.3
         with:
-          java-version: 1.8
+          java-version: 1.11
 
       - run: bash ./gradlew build --stacktrace
         
