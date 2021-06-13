@@ -115,26 +115,31 @@ class SelectMonthDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ) = ComposeView(requireContext()).apply {
         setContent {
-            MaterialTheme {
-                SelectMonthDialog(onDismiss = ::dismiss)
-            }
+            SelectMonthDialogScreen(onDismiss = ::dismiss)
         }
     }
 
 }
 
 @Composable
-fun SelectMonthDialog(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
-
+fun SelectMonthDialogScreen(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
     val months by viewModel.selectableMonths.observeAsState(emptyList())
+    MaterialTheme {
+
+        SelectMonthDialog(months = months) { month ->
+            viewModel.onMonthClick(month)
+            onDismiss()
+        }
+    }
+}
+
+@Composable
+fun SelectMonthDialog(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
 
     Column {
         Header()
         Divider(thickness = 1.dp, color = Divider12Color)
-        List(months) { month ->
-            viewModel.onMonthClick(month)
-            onDismiss()
-        }
+        List(months, onItemClick)
     }
 }
 
@@ -201,21 +206,15 @@ fun ListItem(month: YearMonth, onItemClick: (YearMonth) -> Unit) {
 @Preview(widthDp = 360, heightDp = 640)
 @Composable
 fun SelectMonthDialogPreview() {
-    MaterialTheme {
-        val months = listOf(
-            YearMonth.of(2020, 10),
-            YearMonth.of(2020, 11),
-            YearMonth.of(2020, 12),
-            YearMonth.of(2021, 1),
-            YearMonth.of(2021, 2),
-            YearMonth.of(2021, 3),
-            YearMonth.of(2021, 4),
-        )
+    val months = listOf(
+        YearMonth.of(2020, 10),
+        YearMonth.of(2020, 11),
+        YearMonth.of(2020, 12),
+        YearMonth.of(2021, 1),
+        YearMonth.of(2021, 2),
+        YearMonth.of(2021, 3),
+        YearMonth.of(2021, 4),
+    )
 
-        Column {
-            Header()
-            Divider(thickness = 1.dp, color = Divider12Color)
-            List(months) {}
-        }
-    }
+    SelectMonthDialog(months) {}
 }

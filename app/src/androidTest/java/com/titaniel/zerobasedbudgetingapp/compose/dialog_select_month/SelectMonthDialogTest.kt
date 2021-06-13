@@ -50,7 +50,7 @@ class SelectMonthDialogTest {
 
         // Start the app
         composeTestRule.setContent {
-            SelectMonthDialog(mockViewModel, dismissCallback)
+            SelectMonthDialogScreen(mockViewModel, dismissCallback)
         }
 
     }
