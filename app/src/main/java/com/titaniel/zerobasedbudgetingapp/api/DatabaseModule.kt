@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.titaniel.zerobasedbudgetingapp.database.datastore.SettingStore
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
-import com.titaniel.zerobasedbudgetingapp.database.room.daos.BudgetDao
-import com.titaniel.zerobasedbudgetingapp.database.room.daos.CategoryDao
-import com.titaniel.zerobasedbudgetingapp.database.room.daos.PayeeDao
-import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
+import com.titaniel.zerobasedbudgetingapp.database.room.daos.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,6 +55,14 @@ class DatabaseModule {
     @Provides
     fun provideBudgetDao(database: Database): BudgetDao {
         return database.budgetDao()
+    }
+
+    /**
+     * Provide budget dao of [database]
+     */
+    @Provides
+    fun provideGroupDao(database: Database): GroupDao {
+        return database.groupDao()
     }
 
     /**

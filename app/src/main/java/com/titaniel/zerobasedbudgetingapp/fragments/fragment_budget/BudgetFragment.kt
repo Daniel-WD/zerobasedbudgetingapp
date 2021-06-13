@@ -119,7 +119,7 @@ class BudgetViewModel @Inject constructor(
         if (mon != null && budsWithCat != null) {
             // Filter all budgetsWithCategory of currently selected month
             budgetsWithCategoryOfMonth.value =
-                budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.index }
+                budsWithCat.filter { it.budget.month == mon }.sortedBy { it.category.positionInGroup }
         }
 
     }

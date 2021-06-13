@@ -4,12 +4,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * [Category] with [name] and [id]
+ * Category a user can budget for.
  */
 @Entity
 data class Category(
     var name: String,
-    var index: Int,
+    var groupId: Int,
+    var positionInGroup: Int,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 ) {

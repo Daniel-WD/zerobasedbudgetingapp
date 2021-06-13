@@ -92,7 +92,7 @@ class ManageCategoriesViewModelTest : CoroutinesAndLiveDataTest() {
     /**
      * Sorted fake categories
      */
-    private val sortedExampleCategories = exampleCategories.sortedBy { it.index }
+    private val sortedExampleCategories = exampleCategories.sortedBy { it.positionInGroup }
 
     @ExperimentalCoroutinesApi
     @Before

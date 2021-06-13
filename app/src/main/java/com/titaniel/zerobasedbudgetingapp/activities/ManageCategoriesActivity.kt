@@ -46,7 +46,7 @@ class ManageCategoriesViewModel @Inject constructor(
      * All categories
      */
     private val categories =
-        categoryRepository.getAllCategories().map { list -> list.sortedBy { it.index } }
+        categoryRepository.getAllCategories().map { list -> list.sortedBy { it.positionInGroup } }
             .asLiveData()
 
     /**
@@ -147,7 +147,7 @@ class ManageCategoriesViewModel @Inject constructor(
         requireNotNull(newCatsList)
 
         // Apply indexes to new category order
-        newCatsList.forEachIndexed { i, category -> category.index = i }
+        newCatsList.forEachIndexed { i, category -> category.positionInGroup = i }
 
         // Find categories that should be deleted
         val delCats =

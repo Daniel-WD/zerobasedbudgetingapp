@@ -75,7 +75,7 @@ class SelectCategoryFragmentTest {
         exampleCategories.add(Category("newCat", 0))
 
         // Sort list
-        exampleCategories.sortBy { it.index }
+        exampleCategories.sortBy { it.positionInGroup }
 
         checkCategoryListContent()
 

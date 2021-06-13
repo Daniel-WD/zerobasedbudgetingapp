@@ -148,8 +148,8 @@ class CategoryDaoTest {
 
         // Change categories
         category4.name = "aölskjfalskdföa"
-        category2.index = 10
-        category3.index = 1
+        category2.positionInGroup = 10
+        category3.positionInGroup = 1
 
         // Update changed categories in db
         categoryDao.update(category2, category3, category4)
