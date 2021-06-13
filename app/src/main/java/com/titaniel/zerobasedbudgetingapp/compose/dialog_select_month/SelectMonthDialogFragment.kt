@@ -13,8 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,7 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * [SelectMonthViewModel] for [SelectMonthFragment].
+ * [SelectMonthViewModel] for [SelectMonthDialogFragment].
  */
 @HiltViewModel
 class SelectMonthViewModel @Inject constructor(
@@ -107,7 +107,7 @@ class SelectMonthViewModel @Inject constructor(
  * Bottom sheet dialog fragment for payee selection
  */
 @AndroidEntryPoint
-class SelectMonthFragment : BottomSheetDialogFragment() {
+class SelectMonthDialogFragment : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -131,7 +131,7 @@ fun SelectMonthDialog(viewModel: SelectMonthViewModel = viewModel(), onDismiss: 
     Column {
         Header()
         Divider(thickness = 1.dp, color = Divider12Color)
-        Content(months) { month ->
+        List(months) { month ->
             viewModel.onMonthClick(month)
             onDismiss()
         }
@@ -160,8 +160,8 @@ fun Header() {
 }
 
 @Composable
-fun Content(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
-    LazyColumn {
+fun List(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
+    LazyColumn(Modifier.testTag("List")) {
         items(months) { month ->
             ListItem(month = month, onItemClick)
         }
@@ -200,7 +200,7 @@ fun ListItem(month: YearMonth, onItemClick: (YearMonth) -> Unit) {
 
 @Preview(widthDp = 360, heightDp = 640)
 @Composable
-fun SelectMontDialogPreview() {
+fun SelectMonthDialogPreview() {
     MaterialTheme {
         val months = listOf(
             YearMonth.of(2020, 10),
@@ -215,7 +215,7 @@ fun SelectMontDialogPreview() {
         Column {
             Header()
             Divider(thickness = 1.dp, color = Divider12Color)
-            Content(months) {}
+            List(months) {}
         }
     }
 }

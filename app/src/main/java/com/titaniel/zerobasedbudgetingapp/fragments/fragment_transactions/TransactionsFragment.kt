@@ -14,7 +14,7 @@ import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthFragment
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,7 +67,8 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
 
         // Toolbar click listener
         toolbar.setOnClickListener {
-            SelectMonthFragment().show(childFragmentManager, "SelectMonthFragment")
+            SelectMonthDialogFragment()
+                .show(childFragmentManager, "SelectMonthFragment")
         }
 
         // Init transactionList
