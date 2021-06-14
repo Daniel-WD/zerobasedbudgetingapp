@@ -27,6 +27,7 @@ import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
+import com.titaniel.zerobasedbudgetingapp.utils.monthName
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -115,14 +116,14 @@ class SelectMonthDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ) = ComposeView(requireContext()).apply {
         setContent {
-            SelectMonthDialogScreen(onDismiss = ::dismiss)
+            SelectMonthDialogWrapper(onDismiss = ::dismiss)
         }
     }
 
 }
 
 @Composable
-fun SelectMonthDialogScreen(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
+fun SelectMonthDialogWrapper(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
     val months by viewModel.selectableMonths.observeAsState(emptyList())
     MaterialTheme {
 
@@ -184,7 +185,7 @@ fun ListItem(month: YearMonth, onItemClick: (YearMonth) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            month.month.name.lowercase().replaceFirstChar { it.uppercaseChar() },
+            month.monthName(),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = Text60Color

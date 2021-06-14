@@ -12,7 +12,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_budget.BudgetViewModel
+import com.titaniel.zerobasedbudgetingapp.compose.screen_budget.BudgetViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import org.junit.Before

@@ -62,3 +62,8 @@ operator fun YearMonth.rangeTo(other: YearMonth) = YearMonthProgression(this, ot
  * Formats value to money string.
  */
 fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble() / 100)
+
+/**
+ * Returns the month name with only first letter capitalized.
+ */
+fun YearMonth.monthName() = this.month.name.lowercase().replaceFirstChar { it.uppercaseChar() }
