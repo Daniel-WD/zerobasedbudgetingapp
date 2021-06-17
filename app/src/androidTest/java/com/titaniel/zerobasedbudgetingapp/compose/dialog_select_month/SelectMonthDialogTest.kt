@@ -27,7 +27,7 @@ class SelectMonthDialogTest {
      * Mock ViewModel
      */
     @Mock
-    private lateinit var mockViewModel: SelectMonthViewModel
+    private lateinit var mockViewModel: MonthPickerViewModel
 
     /**
      * Dismiss callback
@@ -53,7 +53,7 @@ class SelectMonthDialogTest {
 
         // Start the app
         composeTestRule.setContent {
-            SelectMonthDialogWrapper(mockViewModel, dismissCallback)
+            MonthPickerDialogWrapper(mockViewModel, dismissCallback)
         }
 
     }

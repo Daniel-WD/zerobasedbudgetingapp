@@ -27,7 +27,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogWrapper
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -258,7 +258,7 @@ fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupD
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
             Surface(color = BottomSheetBackgroundColor) {
-                SelectMonthDialogWrapper { scope.launch { monthPickerState.hide() } }
+                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
             }
         }) {
             Scaffold(

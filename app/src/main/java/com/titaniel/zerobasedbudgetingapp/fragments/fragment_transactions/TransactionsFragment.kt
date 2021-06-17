@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
+//import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel
@@ -61,46 +61,46 @@ class TransactionsFragment : Fragment(R.layout.fragment_transactions) {
     override fun onStart() {
         super.onStart()
 
-        // Init views
-        toolbar = requireView().findViewById(R.id.toolbar)
-        transactionsList = requireView().findViewById(R.id.transactionsList)
-
-        // Toolbar click listener
-        toolbar.setOnClickListener {
-            SelectMonthDialogFragment()
-                .show(childFragmentManager, "SelectMonthFragment")
-        }
-
-        // Init transactionList
-        // Set layout manager
-        transactionsList.layoutManager = LinearLayoutManager(context)
-
-        // Fix size
-        transactionsList.setHasFixedSize(true)
-
-        // Set adapter
-        transactionsList.adapter = TransactionsListAdapter(
-            viewModel.transactionsWithCategoryAndPayee,
-            { transactionWithCategoryAndPayee ->
-                // Start add/edit transaction activity and transmit transaction uuid
-                startActivity(
-                    Intent(requireContext(), AddEditTransactionActivity::class.java).putExtra(
-                        AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
-                        transactionWithCategoryAndPayee.transaction.id
-                    ),
-                )
-            },
-            requireContext(),
-            viewLifecycleOwner
-        )
-
-        // Add horizontal dividers
-        transactionsList.addItemDecoration(
-            DividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
-            )
-        )
+//        // Init views
+//        toolbar = requireView().findViewById(R.id.toolbar)
+//        transactionsList = requireView().findViewById(R.id.transactionsList)
+//
+//        // Toolbar click listener
+//        toolbar.setOnClickListener {
+//            SelectMonthDialogFragment()
+//                .show(childFragmentManager, "SelectMonthFragment")
+//        }
+//
+//        // Init transactionList
+//        // Set layout manager
+//        transactionsList.layoutManager = LinearLayoutManager(context)
+//
+//        // Fix size
+//        transactionsList.setHasFixedSize(true)
+//
+//        // Set adapter
+//        transactionsList.adapter = TransactionsListAdapter(
+//            viewModel.transactionsWithCategoryAndPayee,
+//            { transactionWithCategoryAndPayee ->
+//                // Start add/edit transaction activity and transmit transaction uuid
+//                startActivity(
+//                    Intent(requireContext(), AddEditTransactionActivity::class.java).putExtra(
+//                        AddEditTransactionActivity.EDIT_TRANSACTION_ID_KEY,
+//                        transactionWithCategoryAndPayee.transaction.id
+//                    ),
+//                )
+//            },
+//            requireContext(),
+//            viewLifecycleOwner
+//        )
+//
+//        // Add horizontal dividers
+//        transactionsList.addItemDecoration(
+//            DividerItemDecoration(
+//                context,
+//                DividerItemDecoration.VERTICAL
+//            )
+//        )
     }
 
 }

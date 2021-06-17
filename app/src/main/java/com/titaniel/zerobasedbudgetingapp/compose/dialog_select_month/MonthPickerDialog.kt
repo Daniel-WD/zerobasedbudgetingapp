@@ -1,8 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,26 +17,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.utils.monthName
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.YearMonth
 import java.util.*
 import javax.inject.Inject
 
 /**
- * [SelectMonthViewModel] for [SelectMonthDialogFragment].
+ * [MonthPickerViewModel] for [SelectMonthDialogFragment].
  */
 @HiltViewModel
-class SelectMonthViewModel @Inject constructor(
+class MonthPickerViewModel @Inject constructor(
     private val settingRepository: SettingRepository
 ) : ViewModel() {
 
@@ -62,30 +52,12 @@ class SelectMonthViewModel @Inject constructor(
 
 }
 
-/**
- * Bottom sheet dialog fragment for payee selection
- */
-@AndroidEntryPoint
-class SelectMonthDialogFragment : BottomSheetDialogFragment() {
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            SelectMonthDialogWrapper(onDismiss = ::dismiss)
-        }
-    }
-
-}
-
 @Composable
-fun SelectMonthDialogWrapper(viewModel: SelectMonthViewModel = viewModel(), onDismiss: () -> Unit) {
+fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDismiss: () -> Unit) {
     val months by viewModel.selectableMonths.observeAsState(emptyList())
     MaterialTheme {
 
-        SelectMonthDialog(months = months) { month ->
+        MonthPickerDialog(months = months) { month ->
             viewModel.onMonthClick(month)
             onDismiss()
         }
@@ -93,7 +65,7 @@ fun SelectMonthDialogWrapper(viewModel: SelectMonthViewModel = viewModel(), onDi
 }
 
 @Composable
-fun SelectMonthDialog(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
+fun MonthPickerDialog(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
 
     Column {
         Header()
@@ -172,8 +144,8 @@ fun SelectMonthDialogPreview() {
         YearMonth.of(2021, 1),
         YearMonth.of(2021, 2),
         YearMonth.of(2021, 3),
-        YearMonth.of(2021, 4),
+        YearMonth.of(2021, 4)
     )
 
-    SelectMonthDialog(months) {}
+    MonthPickerDialog(months) {}
 }

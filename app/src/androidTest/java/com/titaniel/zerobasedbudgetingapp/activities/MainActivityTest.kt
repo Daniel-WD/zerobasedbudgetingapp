@@ -21,71 +21,71 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class MainActivityTest {
 
-    /**
-     * Activity scenario
-     */
-    private lateinit var scenario: ActivityScenario<MainActivity>
-
-    @Before
-    fun setup() {
-
-        // Launch scenario
-        scenario = launchActivity()
-
-        // Initialize Intent recording
-        Intents.init()
-    }
-
-    @After
-    fun tearDown() {
-
-        // Release intent recording
-        Intents.release()
-
-        // Close scenario
-        scenario.close()
-    }
-
-    @Test
-    fun starts_with_correct_fragment() {
-
-        // Budget list is present
-        onView(withId(R.id.listBudgeting)).check(matches(isDisplayed()))
-
-    }
-
-    @Test
-    fun opens_page_budget_correctly() {
-
-        // Click on budget item in bottom navigation
-        onView(withId(R.id.page_budget)).perform(click())
-
-        // Budget list is present
-        onView(withId(R.id.listBudgeting)).check(matches(isDisplayed()))
-
-    }
-
-    @Test
-    fun opens_add_edit_transaction_activity_correctly() {
-
-        // Click on add edit transaction item in bottom navigation
-        onView(withId(R.id.page_add_edit_transaction)).perform(click())
-
-        // AddEditTransactionActivity is present
-        intended(hasComponent(AddEditTransactionActivity::class.java.name))
-
-        // Close keyboard (could interfere with other tests)
-        closeSoftKeyboard()
-    }
-
-    @Test
-    fun opens_page_transactions_correctly() {
-
-        // Click on budget item in bottom navigation
-        onView(withId(R.id.page_transactions)).perform(click())
-
-        // Transaction list is present
-        onView(withId(R.id.transactionsList)).check(matches(isDisplayed()))
-    }
+//    /**
+//     * Activity scenario
+//     */
+//    private lateinit var scenario: ActivityScenario<MainActivity>
+//
+//    @Before
+//    fun setup() {
+//
+//        // Launch scenario
+//        scenario = launchActivity()
+//
+//        // Initialize Intent recording
+//        Intents.init()
+//    }
+//
+//    @After
+//    fun tearDown() {
+//
+//        // Release intent recording
+//        Intents.release()
+//
+//        // Close scenario
+//        scenario.close()
+//    }
+//
+//    @Test
+//    fun starts_with_correct_fragment() {
+//
+//        // Budget list is present
+//        onView(withId(R.id.listBudgeting)).check(matches(isDisplayed()))
+//
+//    }
+//
+//    @Test
+//    fun opens_page_budget_correctly() {
+//
+//        // Click on budget item in bottom navigation
+//        onView(withId(R.id.page_budget)).perform(click())
+//
+//        // Budget list is present
+//        onView(withId(R.id.listBudgeting)).check(matches(isDisplayed()))
+//
+//    }
+//
+//    @Test
+//    fun opens_add_edit_transaction_activity_correctly() {
+//
+//        // Click on add edit transaction item in bottom navigation
+//        onView(withId(R.id.page_add_edit_transaction)).perform(click())
+//
+//        // AddEditTransactionActivity is present
+//        intended(hasComponent(AddEditTransactionActivity::class.java.name))
+//
+//        // Close keyboard (could interfere with other tests)
+//        closeSoftKeyboard()
+//    }
+//
+//    @Test
+//    fun opens_page_transactions_correctly() {
+//
+//        // Click on budget item in bottom navigation
+//        onView(withId(R.id.page_transactions)).perform(click())
+//
+//        // Transaction list is present
+//        onView(withId(R.id.transactionsList)).check(matches(isDisplayed()))
+//    }
 
 }
