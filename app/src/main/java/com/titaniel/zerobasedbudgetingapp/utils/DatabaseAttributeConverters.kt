@@ -39,7 +39,7 @@ class DatabaseAttributeConverters {
      */
     @TypeConverter
     fun yearMonthToEpochDay(yearMonth: YearMonth): Long {
-        return LocalDate.of(yearMonth.year, yearMonth.month, yearMonth.lengthOfMonth()).toEpochDay()
+        return yearMonth.asLocalDate().toEpochDay()
     }
 
 }

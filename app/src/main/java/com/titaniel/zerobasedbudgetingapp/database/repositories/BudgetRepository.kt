@@ -45,6 +45,13 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Get all budgets until [month]
+     */
+    fun getBudgetsUntilMonth(month: YearMonth): Flow<List<Budget>> {
+        return budgetDao.getUntilMonth(month)
+    }
+
+    /**
      * Get budget with [id]
      */
     fun getBudgetById(id: Long): Flow<Budget> {

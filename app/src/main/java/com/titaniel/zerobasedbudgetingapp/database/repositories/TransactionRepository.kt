@@ -4,6 +4,8 @@ import com.titaniel.zerobasedbudgetingapp.database.room.daos.TransactionDao
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,6 +50,13 @@ class TransactionRepository @Inject constructor(
      */
     fun getAllTransactions(): Flow<List<Transaction>> {
         return transactionDao.getAll()
+    }
+
+    /**
+     * Get all transactions until [date]
+     */
+    fun getTransactionsUntilDate(date: LocalDate): Flow<List<Transaction>> {
+        return transactionDao.getTransactionsUntilDate(date)
     }
 
     /**

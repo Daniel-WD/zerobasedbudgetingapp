@@ -5,6 +5,7 @@ import androidx.room.OnConflictStrategy.REPLACE
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import kotlinx.coroutines.flow.Flow
+import java.time.Year
 import java.time.YearMonth
 
 /**
@@ -42,6 +43,12 @@ interface BudgetDao {
      */
     @Query("SELECT * FROM budget WHERE month = :month")
     fun getByMonth(month: YearMonth): Flow<List<Budget>>
+
+    /**
+     * Get budgets until [month]
+     */
+    @Query("SELECT * FROM budget WHERE month <= :month")
+    fun getUntilMonth(month: YearMonth): Flow<List<Budget>>
 
     /**
      * Get all budgets

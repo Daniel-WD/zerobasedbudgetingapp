@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.YearMonth
 
 /**
@@ -67,3 +68,8 @@ fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDou
  * Returns the month name with only first letter capitalized.
  */
 fun YearMonth.monthName() = this.month.name.lowercase().replaceFirstChar { it.uppercaseChar() }
+
+/**
+ * Converts YearMonth to LocalDate with last day of month
+ */
+fun YearMonth.asLocalDate(): LocalDate = LocalDate.of(year, month, lengthOfMonth())

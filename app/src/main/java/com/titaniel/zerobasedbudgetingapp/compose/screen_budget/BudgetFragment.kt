@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,26 +26,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.database.repositories.BudgetRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.CategoryRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
-import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
+import com.titaniel.zerobasedbudgetingapp.database.repositories.*
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
-import com.titaniel.zerobasedbudgetingapp.utils.createSimpleMediatorLiveData
-import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
-import com.titaniel.zerobasedbudgetingapp.utils.monthName
+import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
+
 
 /**
  * [BudgetViewModel] for [BudgetFragment].
@@ -53,149 +51,156 @@ class BudgetViewModel @Inject constructor(
     transactionRepository: TransactionRepository,
     categoryRepository: CategoryRepository,
     budgetRepository: BudgetRepository,
-    settingRepository: SettingRepository
+    settingRepository: SettingRepository,
+    groupRepository: GroupRepository
 ) : ViewModel() {
 
     /**
      * Month
      */
-    private val month = settingRepository.getMonth().asLiveData()
+    val month = settingRepository.getMonth().asLiveData()
 
     /**
-     * Budgets by categories
+     * All transactions until this month, but not later than LocalDate.now()
      */
-    private val budgetsOfCategories = categoryRepository.getBudgetsOfCategories().asLiveData()
+    private val relevantTransactions =
+        Transformations.switchMap(month) { month ->
+            requireNotNull(month)
+
+            transactionRepository.getTransactionsUntilDate(
+                // Get transactions until this month, but not later than today
+                if (LocalDate.now()
+                        .isBefore(month.asLocalDate())
+                ) LocalDate.now() else month.asLocalDate()
+            ).asLiveData()
+        }
 
     /**
-     * Transactions by categories
+     * To be budgeted value
      */
-    private val transactionsOfCategories =
-        categoryRepository.getTransactionsOfCategories().asLiveData()
+    val toBeBudgeted = Transformations.map(relevantTransactions) { relTrans ->
+        // Calc 'to be budgeted' value
+        relTrans
+            // Find all 'to be budgeted' transactions
+            .filter { transaction -> transaction.categoryId == Category.TO_BE_BUDGETED.id }
+            // Sum transaction pay up
+            .fold(0L) { acc, transaction -> acc.plus(transaction.pay) }
+    }
 
     /**
-     * All budgets
+     * All budgets until this month
      */
-    private val allBudgets = budgetRepository.getAllBudgets().asLiveData()
+    private val relevantBudgets = Transformations.switchMap(month) { month ->
+        requireNotNull(month)
+
+        budgetRepository.getBudgetsUntilMonth(month).asLiveData()
+    }
 
     /**
-     * All transactions
+     * All categories
      */
-    private val transactions = transactionRepository.getAllTransactions().asLiveData()
+    private val categories = categoryRepository.getAllCategories().asLiveData()
 
     /**
-     * All budgetsWithCategory
+     * Groups
      */
-    private val allBudgetsWithCategory = budgetRepository.getAllBudgetsWithCategory().asLiveData()
+    private val groups =
+        groupRepository.getAllGroups().map { groups -> groups.sortedBy { group -> group.position } }
+            .asLiveData()
 
     /**
-     * To be budgeted
+     * BudgetsWithCategory of current month
      */
-    val toBeBudgeted: MutableLiveData<Long> = MutableLiveData()
+    private val budgetsWithCategoryOfMonth = Transformations.switchMap(month) { month ->
+        requireNotNull(month)
+
+        budgetRepository.getBudgetsWithCategoryByMonth(month).asLiveData()
+    }
 
     /**
-     * All budgetsWithCategory of selected month
+     * Contains all budget of this month, when every category has a budget for this month. Empty otherwise.
      */
-    val budgetsWithCategoryOfMonth: MutableLiveData<List<BudgetWithCategory>> = MutableLiveData()
+    private val budgetsToShow = Transformations.map(
+        TripleLiveData(
+            budgetsWithCategoryOfMonth,
+            categories,
+            month
+        )
+    ) { (budsWithCatOfMonth, cats, month) ->
+
+        if (budsWithCatOfMonth == null || cats == null || month == null) {
+            return@map budsWithCatOfMonth
+        }
+
+        // Calc budgets that need to be added
+        val missingBudgets =
+
+            // Filter categories that are not represented as a budget in this month
+            cats.filter { cat ->
+                budsWithCatOfMonth
+                    // Find a budget for cat in this month
+                    .find { budgetWithCategory -> budgetWithCategory.category == cat } == null
+            }
+                // Create budgets for categories that have no budget representation
+                .map { cat -> Budget(cat.id, month, 0) }
+
+        // Add missing budget to repository if there are any (this will transformation will be called again in that case)
+        if (missingBudgets.isNotEmpty()) {
+            viewModelScope.launch {
+                budgetRepository.addBudgets(*missingBudgets.toTypedArray())
+            }
+        }
+
+        budsWithCatOfMonth
+
+    }
 
     /**
-     * Available money per budget
+     * List of GroupData to represent in the ui
      */
-    val availableMoney: MutableLiveData<Map<BudgetWithCategory, Long>> = MutableLiveData(emptyMap())
+    val groupList = Transformations.map(
+        QuadrupleLiveData(
+            budgetsToShow,
+            groups,
+            relevantTransactions,
+            relevantBudgets
+        )
+    ) { (budsToShow, groups, relTransactions, relBudgets) ->
 
-    /**
-     * MediatorLiveData for [budgetsWithCategoryOfMonth], [transactionsOfCategories], [budgetsOfCategories], [month]
-     */
-    private val updateAvailableMoneyMediator = createSimpleMediatorLiveData(
-        budgetsWithCategoryOfMonth,
-        transactionsOfCategories,
-        budgetsOfCategories,
-        month
-    )
+        if (budsToShow == null || groups == null || relTransactions == null || relBudgets == null) {
+            return@map emptyList()
+        }
 
-    /**
-     * MediatorLiveData for [transactions], [allBudgets]
-     */
-    private val updateToBeBudgetedMediator = createSimpleMediatorLiveData(transactions, allBudgets)
+        // Create GroupDate for each group
+        groups.map { group ->
+            GroupData(
+                groupName = group.name,
+                items = budsToShow
 
-    /**
-     * MediatorLiveData for [month], [allBudgetsWithCategory]
-     */
-    private val budgetsWithCategoryUpdateMediator =
-        createSimpleMediatorLiveData(month, allBudgetsWithCategory)
+                    // Find BudgetsWithCategory of this group
+                    .filter { it.category.groupId == group.id }
 
-    /**
-     * Observer to update [budgetsWithCategoryOfMonth]
-     */
-    private val budgetsWithCategoryUpdateObserver: Observer<Unit> = Observer {
-        val mon = month.value
-        val budsWithCat = allBudgetsWithCategory.value
-
-        // Check non null
-        if (mon != null && budsWithCat != null) {
-            // Filter all budgetsWithCategory of currently selected month
-            budgetsWithCategoryOfMonth.value =
-                budsWithCat.filter { it.budget.month == mon }
+                    // Sort by positionInGroup
                     .sortedBy { it.category.positionInGroup }
+
+                    // Create CategoryItemData for each BudgetsWithCategory
+                    .map { budgetWithCategory ->
+                        CategoryItemData(
+                            categoryName = budgetWithCategory.category.name,
+                            budgetedAmount = budgetWithCategory.budget.budgeted,
+                            availableAmount = relTransactions
+                                .filter { transaction -> transaction.categoryId == budgetWithCategory.category.id }
+                                .fold(0L) {acc, transaction -> acc+transaction.pay }
+                                .plus(
+                                    relBudgets
+                                        .filter { budget -> budget.categoryId == budgetWithCategory.category.id }
+                                        .fold(0L) {acc, budget -> acc+budget.budgeted }
+                                )
+
+                        )
+                    }
+            )
         }
-
-    }
-
-    /**
-     * Observer to update [availableMoney]
-     */
-    private val updateAvailableMoneyObserver: Observer<Unit> = Observer {
-        val budsWithCatMon = budgetsWithCategoryOfMonth.value
-        val transOfCats = transactionsOfCategories.value
-        val budsOfCats = budgetsOfCategories.value
-        val mon = month.value
-
-        if (budsWithCatMon != null && transOfCats != null && budsOfCats != null && mon != null && budsOfCats.size == budsWithCatMon.size) {
-            // Update available money per budget
-            availableMoney.value = budsWithCatMon.map { budgetWithCategory ->
-                budgetWithCategory to
-                        // Sum of all transactions of the category of this budget until selected month (inclusive)
-                        (transOfCats.find { transactionsOfCategory -> transactionsOfCategory.category.id == budgetWithCategory.category.id }?.transactions
-                            ?.filter { transaction -> transaction.date.year < mon.year || (transaction.date.year == mon.year && transaction.date.month <= mon.month) }
-                            ?.fold(0L, { acc, transaction -> acc + transaction.pay }) ?: 0) +
-
-                        // Added with sum of all budgets with same category before this budget (inclusive)
-                        budsOfCats.find { budgetsOfCategory -> budgetsOfCategory.category.id == budgetWithCategory.category.id }!!.budgets
-                            .filter { bud -> bud.month <= mon }
-                            .fold(0L, { acc, bud -> acc + bud.budgeted })
-            }.toMap()
-        }
-    }
-
-    /**
-     * Observer to update [toBeBudgeted]
-     */
-    private val updateToBeBudgetedObserver: Observer<Unit> = Observer {
-        val trans = transactions.value
-        val buds = allBudgets.value
-
-        // Check non null
-        if (trans != null && buds != null) {
-            // Filter all transaction for to be budgeted, sum pays up. Subtract all budget values.
-            toBeBudgeted.value = trans.filter { it.categoryId == Category.TO_BE_BUDGETED.id }
-                .fold(0L, { acc, transaction -> acc + transaction.pay }) -
-                    buds.fold(0L, { acc, budget -> acc + budget.budgeted })
-        }
-    }
-
-    init {
-        // Register all observers
-        updateAvailableMoneyMediator.observeForever(updateAvailableMoneyObserver)
-        updateToBeBudgetedMediator.observeForever(updateToBeBudgetedObserver)
-        budgetsWithCategoryUpdateMediator.observeForever(budgetsWithCategoryUpdateObserver)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        // Remove all observers
-        updateAvailableMoneyMediator.removeObserver(updateAvailableMoneyObserver)
-        updateToBeBudgetedMediator.removeObserver(updateToBeBudgetedObserver)
-        budgetsWithCategoryUpdateMediator.removeObserver(budgetsWithCategoryUpdateObserver)
     }
 
 }
@@ -228,39 +233,47 @@ data class CategoryItemData(
 
 data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 
-data class ScreenData(
-    val selectedMonth: YearMonth,
-    val toBeBudgetedAmount: Long,
-    val groups: List<GroupData>
-)
-
 @Composable
 fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
-//    BudgetScreen()
+
+    val month by viewModel.month.observeAsState()
+    val toBeBudgetedAmount by viewModel.toBeBudgeted.observeAsState()
+    val groups by viewModel.groupList.observeAsState()
+
+    BudgetScreen(
+        month = month ?: YearMonth.now(),
+        toBeBudgetedAmount = toBeBudgetedAmount ?: 0,
+        groups = groups ?: emptyList()
+    )
+
 }
 
 @Composable
-fun BudgetScreen(screenData: ScreenData) {
+fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupData>) {
     MaterialTheme {
         Scaffold(
             topBar = {
                 Toolbar(
-                    selectedMonth = screenData.selectedMonth,
-                    toBeBudgetedAmount = screenData.toBeBudgetedAmount
+                    selectedMonth = month,
+                    toBeBudgetedAmount = toBeBudgetedAmount
                 )
             },
             bottomBar = { BottomBar() },
             backgroundColor = BackgroundColor,
             floatingActionButton = { Fab() }
         ) {
-            GroupList(groups = screenData.groups)
+            GroupList(groups = groups)
         }
     }
 }
 
 @Composable
 fun Fab() {
-    FloatingActionButton(onClick = { }, backgroundColor = PrimaryColor, contentColor = Color.Black) {
+    FloatingActionButton(
+        onClick = { },
+        backgroundColor = PrimaryColor,
+        contentColor = Color.Black
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_outline_post_add_24),
             contentDescription = null
@@ -301,16 +314,16 @@ fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long) {
                         onDismissRequest = { menuExpanded.value = false }
                     ) {
                         DropdownMenuItem(onClick = {}) {
-                            Text("Clear All Budgets", color = Text87Color)
+                            Text(stringResource(R.string.clear_all_budgets), color = Text87Color)
                         }
                         DropdownMenuItem(onClick = {}) {
-                            Text("Manage Categories", color = Text87Color)
+                            Text(stringResource(R.string.manage_categories), color = Text87Color)
                         }
                         DropdownMenuItem(onClick = {}) {
-                            Text("Manage Payees", color = Text87Color)
+                            Text(stringResource(R.string.manage_payees), color = Text87Color)
                         }
                         DropdownMenuItem(onClick = {}) {
-                            Text("Settings", color = Text87Color)
+                            Text(stringResource(R.string.settings), color = Text87Color)
                         }
                     }
                 },
@@ -322,11 +335,11 @@ fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long) {
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .offset(y = (-4).dp),
-                text = "${toBeBudgetedAmount.moneyFormat()} Available",
+                text = stringResource(id = R.string.to_be_budgeted_template, toBeBudgetedAmount.moneyFormat()),
                 color = Color(0xddffffff),
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Medium
-            ) // TODO -> strings.xml
+            )
             Header()
         }
     }
@@ -369,7 +382,7 @@ fun BottomBar() {
                 )
             },
             label = {
-                Text(text = "Budgets")
+                Text(text = stringResource(R.string.budgets))
             },
             selectedContentColor = PrimaryColor,
             unselectedContentColor = Text60Color
@@ -385,7 +398,7 @@ fun BottomBar() {
                 )
             },
             label = {
-                Text(text = "Transactions")
+                Text(text = stringResource(R.string.transactions))
             },
             selectedContentColor = PrimaryColor,
             unselectedContentColor = Text60Color
@@ -395,7 +408,7 @@ fun BottomBar() {
 
 @Composable
 fun GroupList(groups: List<GroupData>) {
-    LazyColumn {
+    LazyColumn(contentPadding = PaddingValues(bottom = (2.5 * 55).dp)) {
         items(groups) { groupData ->
             Group(data = groupData)
         }
@@ -509,125 +522,125 @@ fun CategoryItem(data: CategoryItemData) {
 fun BudgetScreenPreview() {
 
     BudgetScreen(
-        screenData = ScreenData(
-            selectedMonth = YearMonth.now(),
-            toBeBudgetedAmount = 100000,
-            groups = listOf(
-                GroupData(
-                    "Persönlich", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+//        budgetScreenData = BudgetScreenData(
+        month = YearMonth.now(),
+        toBeBudgetedAmount = 100000,
+        groups = listOf(
+            GroupData(
+                "Persönlich", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
-                ),
-                GroupData(
-                    "Haushalt", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
-                ),
-                GroupData(
-                    "Haushalt", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
-                ),
-                GroupData(
-                    "Haushalt", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
-                ),
-                GroupData(
-                    "Haushalt", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
-                ),
-                GroupData(
-                    "Haushalt", listOf(
-                        CategoryItemData(
-                            categoryName = "Lebensmittel",
-                            budgetedAmount = 1000000,
-                            availableAmount = 1200
-                        ),
-                        CategoryItemData(
-                            categoryName = "Investment",
-                            budgetedAmount = 0,
-                            availableAmount = 0
-                        ),
-                        CategoryItemData(
-                            categoryName = "Bücher",
-                            budgetedAmount = 10000,
-                            availableAmount = -1412
-                        )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412
                     )
                 )
             )
         )
     )
+//    )
 }
