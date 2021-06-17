@@ -8,11 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,12 +27,14 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -211,6 +210,7 @@ class BudgetViewModel @Inject constructor(
 @AndroidEntryPoint
 class BudgetFragment : Fragment() {
 
+    @ExperimentalMaterialApi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -233,6 +233,7 @@ data class CategoryItemData(
 
 data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 
+@ExperimentalMaterialApi
 @Composable
 fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
 
@@ -248,21 +249,33 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
 
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupData>) {
+    val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val scope = rememberCoroutineScope()
+
     MaterialTheme {
-        Scaffold(
-            topBar = {
-                Toolbar(
-                    selectedMonth = month,
-                    toBeBudgetedAmount = toBeBudgetedAmount
-                )
-            },
-            bottomBar = { BottomBar() },
-            backgroundColor = BackgroundColor,
-            floatingActionButton = { Fab() }
-        ) {
-            GroupList(groups = groups)
+        ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
+            Surface(color = BottomSheetBackgroundColor) {
+                SelectMonthDialogWrapper { scope.launch { monthPickerState.hide() } }
+            }
+        }) {
+            Scaffold(
+                topBar = {
+                    Toolbar(
+                        selectedMonth = month,
+                        toBeBudgetedAmount = toBeBudgetedAmount,
+                        scope = scope,
+                        monthPickerState = monthPickerState
+                    )
+                },
+                bottomBar = { BottomBar() },
+                backgroundColor = BackgroundColor,
+                floatingActionButton = { Fab() }
+            ) {
+                GroupList(groups = groups)
+            }
         }
     }
 }
@@ -281,14 +294,15 @@ fun Fab() {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
-fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long) {
+fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long, scope: CoroutineScope, monthPickerState: ModalBottomSheetState) {
     Surface(elevation = 4.dp, color = SolidToolbarColor) {
         Column {
             TopAppBar(
                 title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { scope.launch { monthPickerState.show() } }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_menu_24),
                             contentDescription = null,
@@ -516,6 +530,7 @@ fun CategoryItem(data: CategoryItemData) {
     }
 }
 
+@ExperimentalMaterialApi
 @Preview
 /*(widthDp = 360, heightDp = 640)*/
 @Composable

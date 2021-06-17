@@ -19,4 +19,6 @@ val SolidBottomNavigationColor = Color(0xFF2F2F2F)
 
 val BackgroundColor = Color(0xFF121212)
 
+val BottomSheetBackgroundColor = Color(0xFF2F2F2F)
+
 val NormalIconColor = Color(0xbdffffff)

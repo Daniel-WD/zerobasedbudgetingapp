@@ -41,58 +41,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SelectMonthViewModel @Inject constructor(
-    private val settingRepository: SettingRepository,
-    private val categoryRepository: CategoryRepository,
-    private val budgetRepository: BudgetRepository
+    private val settingRepository: SettingRepository
 ) : ViewModel() {
 
     /**
      * Selectable months
      */
-    private val _selectableMonths: MutableLiveData<List<YearMonth>> = MutableLiveData()
-    val selectableMonths: LiveData<List<YearMonth>> = _selectableMonths
-
-    init {
-
-        viewModelScope.launch {
-
-            // Calculate selectableMonths
-            settingRepository.availableMonths.first().let { months ->
-
-                // Add missing budgets for each month
-                months.forEach(::addMissingBudgets)
-
-                // Set selectable months
-                _selectableMonths.value = months
-            }
-        }
-
-    }
+    val selectableMonths: LiveData<List<YearMonth>> = settingRepository.availableMonths.asLiveData()
 
     /**
-     * Adds budgets for those categories that have no budget in [month].
-     */
-    private fun addMissingBudgets(month: YearMonth) {
-
-        viewModelScope.launch {
-
-            val categories = categoryRepository.getAllCategories().first()
-            val budgetsOfMonth = budgetRepository.getBudgetsByMonth(month).first()
-
-            // Calc for which categories there are no budgets for month
-            val missingBudgets =
-                categories.filter { category -> budgetsOfMonth.find { budget -> budget.categoryId == category.id } == null }
-                    .map { category -> Budget(category.id, month, 0) }.toTypedArray()
-
-            // Add missing budgets
-            budgetRepository.addBudgets(*missingBudgets)
-
-        }
-
-    }
-
-    /**
-     * Set new month that has [index] in [_selectableMonths].
+     * Sets [month] as globally selected month
      */
     fun onMonthClick(month: YearMonth) {
 
