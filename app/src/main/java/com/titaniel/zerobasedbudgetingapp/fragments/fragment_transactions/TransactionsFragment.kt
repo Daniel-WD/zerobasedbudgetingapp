@@ -1,18 +1,14 @@
 package com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions
 
-import android.content.Intent
+//import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp.activities.AddEditTransactionActivity
-//import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.SelectMonthDialogFragment
 import com.titaniel.zerobasedbudgetingapp.database.repositories.TransactionRepository
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import com.titaniel.zerobasedbudgetingapp.utils.provideViewModel

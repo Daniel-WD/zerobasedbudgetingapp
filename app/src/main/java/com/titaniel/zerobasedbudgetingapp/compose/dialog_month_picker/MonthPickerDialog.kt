@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
+package com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,7 +27,7 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * [MonthPickerViewModel] for [SelectMonthDialogFragment].
+ * [MonthPickerViewModel] for MonthPickerDialog.
  */
 @HiltViewModel
 class MonthPickerViewModel @Inject constructor(
@@ -54,9 +54,10 @@ class MonthPickerViewModel @Inject constructor(
 
 @Composable
 fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDismiss: () -> Unit) {
-    val months by viewModel.selectableMonths.observeAsState(emptyList())
-    MaterialTheme {
 
+    val months by viewModel.selectableMonths.observeAsState(emptyList())
+
+    MaterialTheme {
         MonthPickerDialog(months = months) { month ->
             viewModel.onMonthClick(month)
             onDismiss()

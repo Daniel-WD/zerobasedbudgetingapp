@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Group
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
@@ -30,10 +31,10 @@ class TransactionDaoTest {
     /**
      * Example transactions
      */
-    private val transaction1 = Transaction(1, 1, 2, "", LocalDate.now(), 1)
-    private val transaction2 = Transaction(2, 2, 3, "", LocalDate.now(), 2)
-    private val transaction3 = Transaction(3, 2, 1, "", LocalDate.now(), 3)
-    private val transaction4 = Transaction(4, 1, -1, "", LocalDate.now(), 4)
+    private val transaction4 = Transaction(4, 1, -1, "", LocalDate.of(2020, 6, 23), 4)
+    private val transaction1 = Transaction(1, 1, 2, "", LocalDate.of(1999, 4, 10), 1)
+    private val transaction2 = Transaction(2, 2, 3, "", LocalDate.of(2020, 5, 1), 2)
+    private val transaction3 = Transaction(3, 2, 1, "", LocalDate.of(2020, 6, 21), 3)
 
     /**
      * Example payees
@@ -44,9 +45,14 @@ class TransactionDaoTest {
     /**
      * Example categories
      */
-    private val category1 = Category("cat1", 0, 1, 1)
-    private val category2 = Category("cat2", 0, 2, 2)
-    private val category3 = Category("cat3", 0, 3, 3)
+    private val category1 = Category("cat1", 1, 1, 1)
+    private val category2 = Category("cat2", 1, 2, 2)
+    private val category3 = Category("cat3", 1, 3, 3)
+
+    /**
+     * Example group
+     */
+    private val group = Group("hallo", 2, 1)
 
     /**
      * TransactionWithCategoryAndPayee's derived from other example data
@@ -65,7 +71,8 @@ class TransactionDaoTest {
             Database::class.java
         ).build()
 
-        // Add example payees and categories
+        // Add example payees, categories, group
+        database.groupDao().add(group)
         database.payeeDao().add(payee1, payee2)
         database.categoryDao().add(category1, category2, category3)
 
@@ -159,6 +166,17 @@ class TransactionDaoTest {
                 tWithCatAPayee2,
                 tWithCatAPayee3,
                 tWithCatAPayee4
+            )
+        )
+    }
+
+    @Test
+    fun gets_transactions_until_date_correctly(): Unit = runBlocking {
+        assertThat(transactionDao.getUntilDate(LocalDate.of(2020, 6, 22)).first()).isEqualTo(
+            listOf(
+                transaction1,
+                transaction2,
+                transaction3
             )
         )
     }

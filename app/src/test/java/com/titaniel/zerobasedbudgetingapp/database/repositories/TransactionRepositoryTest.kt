@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
+import java.time.LocalDate
 
 @RunWith(MockitoJUnitRunner::class)
 class TransactionRepositoryTest {
@@ -106,6 +107,18 @@ class TransactionRepositoryTest {
         // Very dao call
         verify(transactionDaoMock).getTransactionWithCategoryAndPayeeById(id)
 
+    }
+
+    @Test
+    fun performs_get_transactions_until_date_correctly() {
+
+        val date = LocalDate.now()
+
+        // Call method
+        transactionRepository.getTransactionsUntilDate(date)
+
+        // Verify dao call
+        verify(transactionDaoMock).getUntilDate(date)
     }
 
 }

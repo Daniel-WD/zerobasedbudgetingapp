@@ -9,7 +9,7 @@ import com.titaniel.zerobasedbudgetingapp.compose.screen_budget.BudgetScreenWrap
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HostActivity: ComponentActivity() {
+class HostActivity : ComponentActivity() {
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {

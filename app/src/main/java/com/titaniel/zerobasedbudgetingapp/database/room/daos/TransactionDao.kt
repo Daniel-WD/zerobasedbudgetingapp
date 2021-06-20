@@ -6,7 +6,6 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
-import java.time.YearMonth
 
 /**
  * Data access object for everything concerning transactions
@@ -48,7 +47,7 @@ interface TransactionDao {
      * Get all transactions until [date]
      */
     @Query("SELECT * FROM `transaction` WHERE `transaction`.date <= :date")
-    fun getTransactionsUntilDate(date: LocalDate): Flow<List<Transaction>>
+    fun getUntilDate(date: LocalDate): Flow<List<Transaction>>
 
     /**
      * Get all TransactionWithCategoryAndPayee

@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
+package com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker
 
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -18,7 +18,7 @@ import org.mockito.kotlin.verify
 import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
-class SelectMonthDialogTest {
+class MonthPickerDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

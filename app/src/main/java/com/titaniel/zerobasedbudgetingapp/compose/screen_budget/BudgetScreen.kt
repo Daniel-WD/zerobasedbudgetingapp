@@ -1,8 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +10,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,17 +19,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month.MonthPickerDialogWrapper
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.utils.*
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -43,7 +38,7 @@ import javax.inject.Inject
 
 
 /**
- * [BudgetViewModel] for [BudgetFragment].
+ * [BudgetViewModel] for BudgetScreen.
  */
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
@@ -189,11 +184,11 @@ class BudgetViewModel @Inject constructor(
                             budgetedAmount = budgetWithCategory.budget.budgeted,
                             availableAmount = relTransactions
                                 .filter { transaction -> transaction.categoryId == budgetWithCategory.category.id }
-                                .fold(0L) {acc, transaction -> acc+transaction.pay }
+                                .fold(0L) { acc, transaction -> acc + transaction.pay }
                                 .plus(
                                     relBudgets
                                         .filter { budget -> budget.categoryId == budgetWithCategory.category.id }
-                                        .fold(0L) {acc, budget -> acc+budget.budgeted }
+                                        .fold(0L) { acc, budget -> acc + budget.budgeted }
                                 )
 
                         )
@@ -205,32 +200,17 @@ class BudgetViewModel @Inject constructor(
 }
 
 /**
- * [BudgetFragment] to show a list of categories. Each item contains budgeting information, which can be edited.
+ * Data class to represent a budget row
  */
-@AndroidEntryPoint
-class BudgetFragment : Fragment() {
-
-    @ExperimentalMaterialApi
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            MaterialTheme {
-                BudgetScreenWrapper()
-            }
-        }
-    }
-
-}
-
 data class CategoryItemData(
     val categoryName: String,
     val budgetedAmount: Long,
     val availableAmount: Long
 )
 
+/**
+ * Data class to represent a group with its budgets
+ */
 data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 
 @ExperimentalMaterialApi
@@ -257,9 +237,18 @@ fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupD
 
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-            Surface(color = BottomSheetBackgroundColor) {
-                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-            }
+//            Surface(
+//                modifier = Modifier.testTag("MonthPickerDialog"),
+//                color = BottomSheetBackgroundColor
+//            ) {
+//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+//            }
+            Surface(
+                modifier = Modifier
+                    .height(100.dp)
+                    .testTag("MonthPickerDialog"),
+                color = BottomSheetBackgroundColor
+            ) {}
         }) {
             Scaffold(
                 topBar = {
@@ -296,13 +285,21 @@ fun Fab() {
 
 @ExperimentalMaterialApi
 @Composable
-fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long, scope: CoroutineScope, monthPickerState: ModalBottomSheetState) {
+fun Toolbar(
+    selectedMonth: YearMonth,
+    toBeBudgetedAmount: Long,
+    scope: CoroutineScope,
+    monthPickerState: ModalBottomSheetState
+) {
     Surface(elevation = 4.dp, color = SolidToolbarColor) {
         Column {
             TopAppBar(
+                modifier = Modifier,
                 title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { monthPickerState.show() } }) {
+                    IconButton(
+                        modifier = Modifier.testTag("MonthButton"),
+                        onClick = { scope.launch { monthPickerState.show() } }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_menu_24),
                             contentDescription = null,
@@ -315,7 +312,9 @@ fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long, scope: Coroutine
                         mutableStateOf(false)
                     }
 
-                    IconButton(onClick = { menuExpanded.value = true }) {
+                    IconButton(
+                        modifier = Modifier.testTag("MenuButton"),
+                        onClick = { menuExpanded.value = true }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
                             contentDescription = null,
@@ -323,7 +322,9 @@ fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long, scope: Coroutine
                         )
                     }
                     DropdownMenu(
-                        modifier = Modifier.background(color = Color.Black),
+                        modifier = Modifier
+                            .background(color = Color.Black)
+                            .testTag("DropdownMenu"),
                         expanded = menuExpanded.value,
                         onDismissRequest = { menuExpanded.value = false }
                     ) {
@@ -349,7 +350,10 @@ fun Toolbar(selectedMonth: YearMonth, toBeBudgetedAmount: Long, scope: Coroutine
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .offset(y = (-4).dp),
-                text = stringResource(id = R.string.to_be_budgeted_template, toBeBudgetedAmount.moneyFormat()),
+                text = stringResource(
+                    id = R.string.to_be_budgeted_template,
+                    toBeBudgetedAmount.moneyFormat()
+                ),
                 color = Color(0xddffffff),
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Medium
@@ -422,7 +426,10 @@ fun BottomBar() {
 
 @Composable
 fun GroupList(groups: List<GroupData>) {
-    LazyColumn(contentPadding = PaddingValues(bottom = (2.5 * 55).dp)) {
+    LazyColumn(
+        modifier = Modifier.testTag("GroupList"),
+        contentPadding = PaddingValues(bottom = (2.5 * 55).dp)
+    ) {
         items(groups) { groupData ->
             Group(data = groupData)
         }
@@ -537,7 +544,6 @@ fun CategoryItem(data: CategoryItemData) {
 fun BudgetScreenPreview() {
 
     BudgetScreen(
-//        budgetScreenData = BudgetScreenData(
         month = YearMonth.now(),
         toBeBudgetedAmount = 100000,
         groups = listOf(
@@ -657,5 +663,4 @@ fun BudgetScreenPreview() {
             )
         )
     )
-//    )
 }
