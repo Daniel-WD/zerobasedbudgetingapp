@@ -138,4 +138,17 @@ class BudgetRepositoryTest {
 
     }
 
+    @Test
+    fun performs_get_budgets_until_month_correctly() {
+
+        val month = YearMonth.now()
+
+        // Call method
+        budgetRepository.getBudgetsUntilMonth(month)
+
+        // Verify dao call
+        verify(budgetDaoMock).getUntilMonth(month)
+
+    }
+
 }

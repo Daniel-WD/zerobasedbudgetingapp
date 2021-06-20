@@ -44,6 +44,12 @@ interface BudgetDao {
     fun getByMonth(month: YearMonth): Flow<List<Budget>>
 
     /**
+     * Get budgets until [month]
+     */
+    @Query("SELECT * FROM budget WHERE month <= :month")
+    fun getUntilMonth(month: YearMonth): Flow<List<Budget>>
+
+    /**
      * Get all budgets
      */
     @Query("SELECT * FROM budget")

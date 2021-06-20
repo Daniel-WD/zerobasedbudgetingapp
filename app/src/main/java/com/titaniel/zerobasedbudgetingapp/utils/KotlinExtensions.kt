@@ -1,6 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.utils
 
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.YearMonth
 
 /**
@@ -62,3 +63,13 @@ operator fun YearMonth.rangeTo(other: YearMonth) = YearMonthProgression(this, ot
  * Formats value to money string.
  */
 fun Long.moneyFormat(): String = NumberFormat.getCurrencyInstance().format(toDouble() / 100)
+
+/**
+ * Returns the month name with only first letter capitalized.
+ */
+fun YearMonth.monthName() = this.month.name.lowercase().replaceFirstChar { it.uppercaseChar() }
+
+/**
+ * Converts YearMonth to LocalDate with last day of month
+ */
+fun YearMonth.asLocalDate(): LocalDate = LocalDate.of(year, month, lengthOfMonth())

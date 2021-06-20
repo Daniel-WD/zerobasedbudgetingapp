@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp._testutils.CoroutinesAndLiveDataTest
 import org.junit.Test
+import java.time.LocalDate
 import java.time.YearMonth
 
 class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
@@ -139,6 +140,22 @@ class KotlinExtensionsTest : CoroutinesAndLiveDataTest() {
         val end = YearMonth.of(2000, 3)
 
         assertThat(start..end).isEqualTo(YearMonthProgression(start, end))
+
+    }
+
+    @Test
+    fun year_month_month_name_works_correctly() {
+
+        assertThat(YearMonth.of(2020, 4).monthName()).isEqualTo("April")
+        assertThat(YearMonth.of(2001, 7).monthName()).isEqualTo("July")
+
+    }
+
+    @Test
+    fun year_month_as_local_date() {
+
+        assertThat(YearMonth.of(2020, 4).asLocalDate()).isEqualTo(LocalDate.of(2020, 4, 30))
+        assertThat(YearMonth.of(1999, 12).asLocalDate()).isEqualTo(LocalDate.of(1999, 12, 31))
 
     }
 

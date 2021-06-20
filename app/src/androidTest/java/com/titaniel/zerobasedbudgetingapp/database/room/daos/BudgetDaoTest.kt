@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Group
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -33,13 +34,19 @@ class BudgetDaoTest {
     private val budget1 = Budget(1, YearMonth.of(1999, 5), 100, 1)
     private val budget2 = Budget(2, YearMonth.of(1999, 5), 100, 2)
     private val budget3 = Budget(3, YearMonth.of(2000, 12), 100, 3)
+    private val budget4 = Budget(3, YearMonth.of(2000, 11), 100, 4)
 
     /**
      * Categories to meet foreign key constraints.
      */
-    private val category1 = Category("name", 0, 0, 1)
-    private val category2 = Category("name", 0, 1, 2)
-    private val category3 = Category("name", 0, 2, 3)
+    private val category1 = Category("name", 1, 0, 1)
+    private val category2 = Category("name", 1, 1, 2)
+    private val category3 = Category("name", 1, 2, 3)
+
+    /**
+     * Example group
+     */
+    private val group = Group("hello", 3, 1)
 
     /**
      * BudgetsWithCategory derived from example budgets, categories
@@ -47,6 +54,7 @@ class BudgetDaoTest {
     private val budgetWithCategory1 = BudgetWithCategory(budget1, category1)
     private val budgetWithCategory2 = BudgetWithCategory(budget2, category2)
     private val budgetWithCategory3 = BudgetWithCategory(budget3, category3)
+    private val budgetWithCategory4 = BudgetWithCategory(budget4, category3)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -57,14 +65,15 @@ class BudgetDaoTest {
             Database::class.java
         ).build()
 
-        // Add categories
+        // Add categories, group
+        database.groupDao().add(group)
         database.categoryDao().add(category1, category2, category3)
 
         // Set budget dao
         budgetDao = database.budgetDao()
 
         // Add example budgets
-        budgetDao.add(budget1, budget2, budget3)
+        budgetDao.add(budget1, budget2, budget3, budget4)
 
     }
 
@@ -76,7 +85,7 @@ class BudgetDaoTest {
 
     @Test
     fun gets_budgets_correctly(): Unit = runBlocking {
-        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget2, budget3))
+        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget2, budget3, budget4))
     }
 
     @Test
@@ -88,7 +97,7 @@ class BudgetDaoTest {
         // Update budget1
         budgetDao.update(budget1)
 
-        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget2, budget3))
+        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget2, budget3, budget4))
     }
 
     @Test
@@ -96,6 +105,7 @@ class BudgetDaoTest {
         assertThat(budgetDao.getById(1).first()).isEqualTo(budget1)
         assertThat(budgetDao.getById(2).first()).isEqualTo(budget2)
         assertThat(budgetDao.getById(3).first()).isEqualTo(budget3)
+        assertThat(budgetDao.getById(4).first()).isEqualTo(budget4)
     }
 
     @Test
@@ -121,7 +131,7 @@ class BudgetDaoTest {
         database.categoryDao().delete(category2)
 
         // Check if respective budget is missing
-        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget3))
+        assertThat(budgetDao.getAll().first()).isEqualTo(listOf(budget1, budget3, budget4))
 
     }
 
@@ -154,7 +164,7 @@ class BudgetDaoTest {
     fun gets_all_budgets_with_category_correctly(): Unit = runBlocking {
         assertThat(budgetDao.getAllBudgetsWithCategory().first()).isEqualTo(
             listOf(
-                budgetWithCategory1, budgetWithCategory2, budgetWithCategory3
+                budgetWithCategory1, budgetWithCategory2, budgetWithCategory3, budgetWithCategory4
             )
         )
     }
@@ -166,6 +176,17 @@ class BudgetDaoTest {
         budgetDao.delete(budget2)
 
         assertThat(budgetDao.getById(2).first()).isEqualTo(null)
+    }
+
+    @Test
+    fun gets_budgets_until_month_correctly(): Unit = runBlocking {
+
+        assertThat(budgetDao.getUntilMonth(YearMonth.of(2000, 11)).first()).isEqualTo(
+            listOf(
+                budget1, budget2, budget4
+            )
+        )
+
     }
 
 }

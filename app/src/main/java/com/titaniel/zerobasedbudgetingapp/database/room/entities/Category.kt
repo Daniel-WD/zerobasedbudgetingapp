@@ -1,15 +1,24 @@
 package com.titaniel.zerobasedbudgetingapp.database.room.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 /**
  * Category a user can budget for.
  */
-@Entity
+@Entity(
+    foreignKeys = [ForeignKey(
+        entity = Group::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("groupId"),
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.NO_ACTION
+    )]
+)
 data class Category(
     var name: String,
-    var groupId: Int,
+    var groupId: Long,
     var positionInGroup: Int,
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

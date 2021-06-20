@@ -1,4 +1,4 @@
-package com.titaniel.zerobasedbudgetingapp.compose.dialog_select_month
+package com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker
 
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.liveData
+import com.titaniel.zerobasedbudgetingapp.utils.monthName
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,7 +18,7 @@ import org.mockito.kotlin.verify
 import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
-class SelectMonthDialogTest {
+class MonthPickerDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -26,7 +27,7 @@ class SelectMonthDialogTest {
      * Mock ViewModel
      */
     @Mock
-    private lateinit var mockViewModel: SelectMonthViewModel
+    private lateinit var mockViewModel: MonthPickerViewModel
 
     /**
      * Dismiss callback
@@ -52,7 +53,7 @@ class SelectMonthDialogTest {
 
         // Start the app
         composeTestRule.setContent {
-            SelectMonthDialogScreen(mockViewModel, dismissCallback)
+            MonthPickerDialogWrapper(mockViewModel, dismissCallback)
         }
 
     }
@@ -68,7 +69,7 @@ class SelectMonthDialogTest {
 
                 // Assert list item contains correct representation of yearMonth
                 content.onChildAt(i).assertTextEquals(
-                    yearMonth.month.name.lowercase().replaceFirstChar { it.uppercaseChar() },
+                    yearMonth.monthName(),
                     yearMonth.year.toString()
                 )
 

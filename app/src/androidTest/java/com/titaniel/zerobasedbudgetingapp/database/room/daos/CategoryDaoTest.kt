@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.titaniel.zerobasedbudgetingapp.database.room.Database
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
+import com.titaniel.zerobasedbudgetingapp.database.room.entities.Group
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetsOfCategory
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionsOfCategory
@@ -32,10 +33,15 @@ class CategoryDaoTest {
     /**
      * Example categories
      */
-    private val category1 = Category("cat1", 0, 0, 1)
-    private val category2 = Category("cat2", 0, 1, 2)
-    private val category3 = Category("cat3", 0, 2, 3)
-    private val category4 = Category("cat4", 0, 3, 4)
+    private val category1 = Category("cat1", 1, 0, 1)
+    private val category2 = Category("cat2", 1, 1, 2)
+    private val category3 = Category("cat3", 1, 2, 3)
+    private val category4 = Category("cat4", 1, 3, 4)
+
+    /**
+     * Example group
+     */
+    private val group = Group("group", 1, 1)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -45,6 +51,9 @@ class CategoryDaoTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             Database::class.java
         ).build()
+
+        // Set group
+        database.groupDao().add(group)
 
         // Get category dao
         categoryDao = database.categoryDao()
