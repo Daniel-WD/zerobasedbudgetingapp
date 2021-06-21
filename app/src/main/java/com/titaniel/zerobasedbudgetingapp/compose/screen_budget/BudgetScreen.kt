@@ -237,18 +237,18 @@ fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupD
 
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-//            Surface(
-//                modifier = Modifier.testTag("MonthPickerDialog"),
-//                color = BottomSheetBackgroundColor
-//            ) {
-//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-//            }
             Surface(
-                modifier = Modifier
-                    .height(100.dp)
-                    .testTag("MonthPickerDialog"),
+                modifier = Modifier.testTag("MonthPickerDialog"),
                 color = BottomSheetBackgroundColor
-            ) {}
+            ) {
+                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+            }
+//            Surface(
+//                modifier = Modifier
+//                    .height(100.dp)
+//                    .testTag("MonthPickerDialog"),
+//                color = BottomSheetBackgroundColor
+//            ) {}
         }) {
             Scaffold(
                 topBar = {
@@ -346,18 +346,28 @@ fun Toolbar(
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp
             )
-            Text(
+            Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .offset(y = (-4).dp),
-                text = stringResource(
-                    id = R.string.to_be_budgeted_template,
-                    toBeBudgetedAmount.moneyFormat()
-                ),
-                color = Color(0xddffffff),
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Medium
-            )
+                    .offset(y = (-4).dp)
+            ) {
+                Text(
+                    text = toBeBudgetedAmount.moneyFormat(),
+                    color = when {
+                        toBeBudgetedAmount > 0 -> TextGreenColor
+                        toBeBudgetedAmount < 0 -> TextRedColor
+                        else -> Text87Color
+                    },
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = " " + stringResource(id = R.string.available),
+                    color = Text87Color,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
             Header()
         }
     }

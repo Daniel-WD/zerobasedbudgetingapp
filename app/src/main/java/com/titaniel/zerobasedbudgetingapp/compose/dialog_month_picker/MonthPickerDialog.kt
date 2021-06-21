@@ -1,5 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +37,11 @@ class MonthPickerViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
+     * Selected month
+     */
+    val selectedMonth = settingRepository.getMonth().asLiveData()
+
+    /**
      * Selectable months
      */
     val selectableMonths: LiveData<List<YearMonth>> = settingRepository.availableMonths.asLiveData()
@@ -55,10 +62,11 @@ class MonthPickerViewModel @Inject constructor(
 @Composable
 fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDismiss: () -> Unit) {
 
+    val month by viewModel.selectedMonth.observeAsState()
     val months by viewModel.selectableMonths.observeAsState(emptyList())
 
     MaterialTheme {
-        MonthPickerDialog(months = months) { month ->
+        MonthPickerDialog(months = months, selectedMonth = month ?: YearMonth.of(1999, 1)) { month ->
             viewModel.onMonthClick(month)
             onDismiss()
         }
@@ -66,12 +74,12 @@ fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDi
 }
 
 @Composable
-fun MonthPickerDialog(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
+fun MonthPickerDialog(months: List<YearMonth>, selectedMonth: YearMonth, onItemClick: (YearMonth) -> Unit) {
 
     Column {
         Header()
         Divider(thickness = 1.dp, color = Divider12Color)
-        List(months, onItemClick)
+        List(months, selectedMonth, onItemClick)
     }
 }
 
@@ -97,40 +105,36 @@ fun Header() {
 }
 
 @Composable
-fun List(months: List<YearMonth>, onItemClick: (YearMonth) -> Unit) {
+fun List(months: List<YearMonth>, selectedMonth: YearMonth, onItemClick: (YearMonth) -> Unit) {
     LazyColumn(Modifier.testTag("List")) {
         items(months) { month ->
-            ListItem(month = month, onItemClick)
+            ListItem(month = month, month == selectedMonth, onItemClick)
         }
     }
 }
 
 @Composable
-fun ListItem(month: YearMonth, onItemClick: (YearMonth) -> Unit) {
+fun ListItem(month: YearMonth, selected: Boolean, onItemClick: (YearMonth) -> Unit) {
     Row(
         modifier = Modifier
             .clickable { onItemClick(month) }
             .fillMaxWidth()
             .height(48.dp)
+            .background(if(selected) PrimaryColor.copy(0.08f) else Color.Transparent)
             .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            month.monthName(),
+            text = month.monthName(),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Text60Color
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(4.dp)
+            color = if(selected) PrimaryColor else Text60Color
         )
         Text(
-            month.year.toString(),
+            text = " " + month.year.toString(),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Text40Color
+            color = if(selected) PrimaryColor else Text40Color
         )
     }
 }
@@ -148,5 +152,5 @@ fun SelectMonthDialogPreview() {
         YearMonth.of(2021, 4)
     )
 
-    MonthPickerDialog(months) {}
+    MonthPickerDialog(months, YearMonth.of(2021, 1)) {}
 }

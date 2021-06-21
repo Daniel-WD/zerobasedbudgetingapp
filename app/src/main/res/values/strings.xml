@@ -59,7 +59,7 @@
     <string name="fragment_budget_budgeted">Budgeted</string>
     <string name="fragment_budget_available">Available</string>
 
-    <string name="to_be_budgeted_template">%1$s Available</string>
+    <string name="available">Available</string>
     <string name="clear_all_budgets">Clear All Budgets</string>
     <string name="manage_categories">Manage Categories</string>
     <string name="manage_payees">Manage Payees</string>
