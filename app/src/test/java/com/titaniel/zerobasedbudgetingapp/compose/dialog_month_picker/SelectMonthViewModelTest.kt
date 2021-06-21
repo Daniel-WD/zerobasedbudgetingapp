@@ -38,6 +38,11 @@ class SelectMonthViewModelTest : CoroutinesAndLiveDataTest() {
         YearMonth.of(2020, 6)
     )
 
+    /**
+     * Test selected month
+     */
+    private val selectedMonth = YearMonth.of(2020, 5)
+
     @ExperimentalCoroutinesApi
     @Before
     override fun setup() {
@@ -46,6 +51,8 @@ class SelectMonthViewModelTest : CoroutinesAndLiveDataTest() {
         // Stub availableMonths
         `when`(settingRepositoryMock.availableMonths).thenReturn(flow { emit(availableMonths) })
 
+        // Stub selectedMonth
+        `when`(settingRepositoryMock.getMonth()).thenReturn(flow { emit(selectedMonth) })
 
         // Create ViewModel instance
         viewModel = MonthPickerViewModel(settingRepositoryMock)
