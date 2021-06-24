@@ -1,19 +1,30 @@
 package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,13 +34,13 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -44,10 +55,15 @@ import javax.inject.Inject
 class BudgetViewModel @Inject constructor(
     transactionRepository: TransactionRepository,
     categoryRepository: CategoryRepository,
-    budgetRepository: BudgetRepository,
+    val budgetRepository: BudgetRepository,
     settingRepository: SettingRepository,
     groupRepository: GroupRepository
 ) : ViewModel() {
+
+    /**
+     * Id of currently edited budget
+     */
+    private val editedBudgetId: MutableLiveData<Long> = MutableLiveData()
 
     /**
      * Month
@@ -70,24 +86,39 @@ class BudgetViewModel @Inject constructor(
         }
 
     /**
-     * To be budgeted value
-     */
-    val toBeBudgeted = Transformations.map(relevantTransactions) { relTrans ->
-        // Calc 'to be budgeted' value
-        relTrans
-            // Find all 'to be budgeted' transactions
-            .filter { transaction -> transaction.categoryId == Category.TO_BE_BUDGETED.id }
-            // Sum transaction pay up
-            .fold(0L) { acc, transaction -> acc.plus(transaction.pay) }
-    }
-
-    /**
      * All budgets until this month
      */
     private val relevantBudgets = Transformations.switchMap(month) { month ->
         requireNotNull(month)
 
         budgetRepository.getBudgetsUntilMonth(month).asLiveData()
+    }
+
+    /**
+     * To be budgeted value
+     */
+    val toBeBudgeted = Transformations.map(
+        DoubleLiveData(
+            relevantTransactions,
+            relevantBudgets
+        )
+    ) { (relTrans, relBudgets) ->
+
+        if (relTrans == null || relBudgets == null) {
+            return@map 0L
+        }
+
+        // Calc 'to be budgeted' value
+        relTrans
+            // Find all 'to be budgeted' transactions
+            .filter { transaction -> transaction.categoryId == Category.TO_BE_BUDGETED.id }
+            // Sum transaction pay up
+            .fold(0L) { acc, transaction -> acc.plus(transaction.pay) }
+            // Subtract...
+            .minus(
+                // ...the sum of all budget values
+                relBudgets.fold(0L, { acc, budget -> acc + budget.budgeted })
+            )
     }
 
     /**
@@ -153,13 +184,14 @@ class BudgetViewModel @Inject constructor(
      * List of GroupData to represent in the ui
      */
     val groupList = Transformations.map(
-        QuadrupleLiveData(
+        QuintupleLiveData(
             budgetsToShow,
             groups,
             relevantTransactions,
-            relevantBudgets
+            relevantBudgets,
+            editedBudgetId
         )
-    ) { (budsToShow, groups, relTransactions, relBudgets) ->
+    ) { (budsToShow, groups, relTransactions, relBudgets, editedBudgetId) ->
 
         if (budsToShow == null || groups == null || relTransactions == null || relBudgets == null) {
             return@map emptyList()
@@ -189,14 +221,81 @@ class BudgetViewModel @Inject constructor(
                                     relBudgets
                                         .filter { budget -> budget.categoryId == budgetWithCategory.category.id }
                                         .fold(0L) { acc, budget -> acc + budget.budgeted }
-                                )
-
+                                ),
+                            budgetId = budgetWithCategory.budget.id,
+                            state = when (editedBudgetId) {
+                                null -> CategoryItemState.NORMAL
+                                budgetWithCategory.budget.id -> CategoryItemState.CHANGE_SELECTED
+                                else -> CategoryItemState.CHANGE_UNSELECTED
+                            }
                         )
                     }
             )
         }
     }
 
+    /**
+     * Gets called when a user clicks on the budget with [budgetId]
+     */
+    fun onItemClick(budgetId: Long) {
+
+        // If theres not already an edited budget
+        if (editedBudgetId.value == null) {
+
+            // Set budget to edit
+            editedBudgetId.value = budgetId
+        }
+    }
+
+    /**
+     * Gets when a budget with [amount] should be applied to the currently edited budget
+     */
+    fun onBudgetConfirmationClick(amount: Long) {
+
+        viewModelScope.launch {
+
+            // Get edited budget
+            val budget = budgetRepository.getBudgetById(editedBudgetId.value!!).first()
+
+            // Update amount
+            budget.budgeted = amount
+
+            // Update budget
+            budgetRepository.updateBudgets(budget)
+
+            // Deselect budget
+            editedBudgetId.value = null
+        }
+
+    }
+
+    /**
+     * Gets called when the budget editing should stop without saving
+     */
+    fun onAbortBudgetChange() {
+        editedBudgetId.value = null
+    }
+
+}
+
+/**
+ * Class to represent visual state of a CategoryItem
+ */
+enum class CategoryItemState {
+    /**
+     * Normal state
+     */
+    NORMAL,
+
+    /**
+     * This items budget can be changed
+     */
+    CHANGE_SELECTED,
+
+    /**
+     * The budget of a different item can be changed
+     */
+    CHANGE_UNSELECTED
 }
 
 /**
@@ -205,7 +304,9 @@ class BudgetViewModel @Inject constructor(
 data class CategoryItemData(
     val categoryName: String,
     val budgetedAmount: Long,
-    val availableAmount: Long
+    val availableAmount: Long,
+    val budgetId: Long,
+    val state: CategoryItemState
 )
 
 /**
@@ -224,31 +325,41 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
     BudgetScreen(
         month = month ?: YearMonth.now(),
         toBeBudgetedAmount = toBeBudgetedAmount ?: 0,
-        groups = groups ?: emptyList()
+        groups = groups ?: emptyList(),
+        onItemClick = viewModel::onItemClick,
+        onBudgetConfirmationClick = viewModel::onBudgetConfirmationClick,
+        onAbortBudgetChange = viewModel::onAbortBudgetChange
     )
 
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupData>) {
+fun BudgetScreen(
+    month: YearMonth,
+    toBeBudgetedAmount: Long,
+    groups: List<GroupData>,
+    onItemClick: (budgetId: Long) -> Unit,
+    onBudgetConfirmationClick: (amount: Long) -> Unit,
+    onAbortBudgetChange: () -> Unit
+) {
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
 
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-            Surface(
-                modifier = Modifier.testTag("MonthPickerDialog"),
-                color = BottomSheetBackgroundColor
-            ) {
-                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-            }
 //            Surface(
-//                modifier = Modifier
-//                    .height(100.dp)
-//                    .testTag("MonthPickerDialog"),
+//                modifier = Modifier.testTag("MonthPickerDialog"),
 //                color = BottomSheetBackgroundColor
-//            ) {}
+//            ) {
+//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+//            }
+            Surface(
+                modifier = Modifier
+                    .height(100.dp)
+                    .testTag("MonthPickerDialog"),
+                color = BottomSheetBackgroundColor
+            ) {}
         }) {
             Scaffold(
                 topBar = {
@@ -263,7 +374,12 @@ fun BudgetScreen(month: YearMonth, toBeBudgetedAmount: Long, groups: List<GroupD
                 backgroundColor = BackgroundColor,
                 floatingActionButton = { Fab() }
             ) {
-                GroupList(groups = groups)
+                GroupList(
+                    groups = groups,
+                    onItemClick = onItemClick,
+                    onBudgetConfirmationClick = onBudgetConfirmationClick,
+                    onAbortBudgetChange = onAbortBudgetChange
+                )
             }
         }
     }
@@ -435,19 +551,29 @@ fun BottomBar() {
 }
 
 @Composable
-fun GroupList(groups: List<GroupData>) {
+fun GroupList(
+    groups: List<GroupData>,
+    onItemClick: (budgetId: Long) -> Unit,
+    onBudgetConfirmationClick: (amount: Long) -> Unit,
+    onAbortBudgetChange: () -> Unit
+) {
     LazyColumn(
         modifier = Modifier.testTag("GroupList"),
         contentPadding = PaddingValues(bottom = (2.5 * 55).dp)
     ) {
         items(groups) { groupData ->
-            Group(data = groupData)
+            Group(data = groupData, onItemClick, onBudgetConfirmationClick, onAbortBudgetChange)
         }
     }
 }
 
 @Composable
-fun Group(data: GroupData) {
+fun Group(
+    data: GroupData,
+    onItemClick: (budgetId: Long) -> Unit,
+    onBudgetConfirmationClick: (amount: Long) -> Unit,
+    onAbortChange: () -> Unit
+) {
 
     val budgetedSum =
         data.items.fold(0L, { acc, categoryItemData -> acc + categoryItemData.budgetedAmount })
@@ -492,7 +618,12 @@ fun Group(data: GroupData) {
         Divider(Modifier.height(1.dp), color = Divider12Color)
         Column {
             data.items.forEach { categoryItemData ->
-                CategoryItem(data = categoryItemData)
+                CategoryItem(
+                    data = categoryItemData,
+                    onItemClick,
+                    onBudgetConfirmationClick,
+                    onAbortChange
+                )
             }
         }
     }
@@ -500,14 +631,24 @@ fun Group(data: GroupData) {
 }
 
 @Composable
-fun CategoryItem(data: CategoryItemData) {
+fun CategoryItem(
+    data: CategoryItemData,
+    onItemClick: (budgetId: Long) -> Unit,
+    onBudgetConfirmationClick: (amount: Long) -> Unit,
+    onAbortChange: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                onItemClick(data.budgetId)
+            }
     ) {
+
         Row(
             modifier = Modifier
                 .height(54.dp)
+                .background(if (data.state == CategoryItemState.CHANGE_SELECTED) SelectedBudgetColor else Color.Transparent)
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -516,34 +657,117 @@ fun CategoryItem(data: CategoryItemData) {
                     .weight(2f)
                     .padding(end = 16.dp),
                 text = data.categoryName,
-                color = Text87Color,
+                color = if (data.state == CategoryItemState.CHANGE_UNSELECTED) Text50Color else Text87Color,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = data.budgetedAmount.moneyFormat(),
-                color = Text87Color,
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp),
-                text = data.availableAmount.moneyFormat(),
-                color = when {
-                    data.availableAmount > 0 -> TextGreenColor
-                    data.availableAmount < 0 -> TextRedColor
-                    else -> Text87Color
-                },
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+
+            // Have the ability to change the budget?
+            if (data.state == CategoryItemState.CHANGE_SELECTED) {
+
+                // Budget value text
+                var editBudgetValue by remember { mutableStateOf(data.budgetedAmount.toString()) }
+
+                // Abort budget change if text field focus gets lost?
+                var abortable by remember { mutableStateOf(false) }
+
+                // Requester for focus on text field
+                val focusRequester = remember { FocusRequester() }
+
+                BasicTextField(
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { state ->
+                            // If aborting is allowed and text is not focused
+                            if (abortable && !state.isFocused) {
+                                onAbortChange()
+                            }
+                        },
+                    value = TextFieldValue(
+                        text = editBudgetValue,
+                        selection = TextRange(editBudgetValue.length) // Cursor always on the end
+                    ),
+                    onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it) },
+                    textStyle = MaterialTheme.typography.body1.copy(
+                        textAlign = TextAlign.End,
+                        color = Text87Color
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        autoCorrect = false,
+                        imeAction = ImeAction.Done
+                    ),
+                    maxLines = 1,
+                    cursorBrush = SolidColor(Text87Color),
+                    visualTransformation = MoneyVisualTransformation,
+                    keyboardActions = KeyboardActions {
+                        onBudgetConfirmationClick(editBudgetValue.toLong())
+                        abortable = false
+                    }
+                )
+                DisposableEffect(Unit) {
+                    focusRequester.requestFocus()
+                    abortable = true
+                    onDispose { }
+                }
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                    IconButton(
+                        modifier = Modifier.offset(x = 12.dp),
+                        onClick = {
+                            onBudgetConfirmationClick(editBudgetValue.toLong())
+                            abortable = false
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_check_24),
+                            contentDescription = null,
+                            tint = Text87Color
+                        )
+                    }
+                }
+            } else {// Show budget data
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = data.budgetedAmount.moneyFormat(),
+                    color = if (data.state == CategoryItemState.CHANGE_UNSELECTED) Text50Color else Text87Color,
+                    textAlign = TextAlign.End,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        color = Text87Color,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.End,
+                        letterSpacing = 0.5.sp
+                    )
+                )
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
+                    text = data.availableAmount.moneyFormat(),
+                    color =
+                    if (data.state == CategoryItemState.CHANGE_UNSELECTED)
+                        when {
+                            data.availableAmount > 0 -> TextGreen50Color
+                            data.availableAmount < 0 -> TextRed50Color
+                            else -> Text50Color
+                        } else
+                        when {
+                            data.availableAmount > 0 -> TextGreenColor
+                            data.availableAmount < 0 -> TextRedColor
+                            else -> Text87Color
+                        },
+                    textAlign = TextAlign.End,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
-        Divider(Modifier.height(1.dp), color = Divider12Color)
+        Divider(
+            modifier = Modifier.height(1.dp),
+            color = if (data.state == CategoryItemState.CHANGE_SELECTED) Divider87Color else Divider12Color
+        )
     }
 }
 
@@ -562,17 +786,23 @@ fun BudgetScreenPreview() {
                     CategoryItemData(
                         categoryName = "Lebensmittel",
                         budgetedAmount = 1000000,
-                        availableAmount = 1200
+                        availableAmount = 1200,
+                        budgetId = 1,
+                        state = CategoryItemState.NORMAL
                     ),
                     CategoryItemData(
                         categoryName = "Investment",
                         budgetedAmount = 0,
-                        availableAmount = 0
+                        availableAmount = 0,
+                        budgetId = 2,
+                        state = CategoryItemState.NORMAL
                     ),
                     CategoryItemData(
                         categoryName = "Bücher",
                         budgetedAmount = 10000,
-                        availableAmount = -1412
+                        availableAmount = -1412,
+                        budgetId = 3,
+                        state = CategoryItemState.NORMAL
                     )
                 )
             ),
@@ -581,96 +811,26 @@ fun BudgetScreenPreview() {
                     CategoryItemData(
                         categoryName = "Lebensmittel",
                         budgetedAmount = 1000000,
-                        availableAmount = 1200
+                        availableAmount = 1200,
+                        budgetId = 4,
+                        state = CategoryItemState.CHANGE_SELECTED
                     ),
                     CategoryItemData(
                         categoryName = "Investment",
                         budgetedAmount = 0,
-                        availableAmount = 0
+                        availableAmount = 0,
+                        budgetId = 5,
+                        state = CategoryItemState.CHANGE_UNSELECTED
                     ),
                     CategoryItemData(
                         categoryName = "Bücher",
                         budgetedAmount = 10000,
-                        availableAmount = -1412
-                    )
-                )
-            ),
-            GroupData(
-                "Haushalt", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412
-                    )
-                )
-            ),
-            GroupData(
-                "Haushalt", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412
-                    )
-                )
-            ),
-            GroupData(
-                "Haushalt", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412
-                    )
-                )
-            ),
-            GroupData(
-                "Haushalt", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412
+                        availableAmount = -1412,
+                        budgetId = 6,
+                        state = CategoryItemState.CHANGE_UNSELECTED
                     )
                 )
             )
-        )
-    )
+        ),
+        onItemClick = {}, onBudgetConfirmationClick = {}, onAbortBudgetChange = {})
 }

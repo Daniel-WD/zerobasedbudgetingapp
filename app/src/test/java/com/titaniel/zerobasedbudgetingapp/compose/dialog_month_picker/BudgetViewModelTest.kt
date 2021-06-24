@@ -208,107 +208,107 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
 
     }
 
-    @Test
-    fun calculates_group_list_correctly_when_budgets_complete() {
-
-        val expectedGroupList = listOf(
-            GroupData(
-                "g2", listOf(
-                    CategoryItemData(
-                        "z",
-                        30,
-                        0 + 90 /*transaction sum, budget sum*/
-                    )
-                )
-            ),
-            GroupData(
-                "g1", listOf(
-                    CategoryItemData("y", 20, 13 + 70),
-                    CategoryItemData("x", 10, 9 + 50)
-                )
-            ),
-        )
-
-        viewModel.groupList.test().awaitValue()
-
-        assertThat(viewModel.groupList.value).isEqualTo(expectedGroupList)
-
-    }
-
-    @Test
-    fun calculates_group_list_correctly_when_budgets_underrepresented(): Unit = runBlocking {
-
-        val expectedNewBudgets = listOf(
-            Budget(2, month, 0),
-            Budget(3, month, 0)
-        )
-
-        val expectedGroupList = listOf(
-            GroupData(
-                "g2", listOf(
-                    CategoryItemData(
-                        "z",
-                        0,
-                        0 + 60 /*transaction sum, budget sum*/
-                    )
-                )
-            ),
-            GroupData(
-                "g1", listOf(
-                    CategoryItemData("y", 0, 13 + 50),
-                    CategoryItemData("x", 10, 9 + 50)
-                )
-            ),
-        )
-
-        val budgetsWithCategoryByMonthFlow =
-            MutableStateFlow(budgetsWithCategoryByMonthUnderrepresented)
-
-        // Stub budgets with category by month
-        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(month)).thenReturn(
-            budgetsWithCategoryByMonthFlow
-        )
-
-        // Stub budgets until month
-        `when`(budgetRepositoryMock.getBudgetsUntilMonth(month)).thenReturn(flow {
-            emit(
-                budgetsUntilMonthUnderrepresented
-            )
-        })
-
-        // Re-create ViewModel instance
-        viewModel = BudgetViewModel(
-            transactionRepositoryMock,
-            categoryRepositoryMock,
-            budgetRepositoryMock,
-            settingRepositoryMock,
-            groupRepositoryMock
-        )
-
-        viewModel.groupList.test().awaitValue()
-
-        // Verify new budgets added
-        verify(budgetRepositoryMock).addBudgets(*expectedNewBudgets.toTypedArray())
-
-        // Create new value of budgetsWithCategoriesWithMissingBudgets
-        val budsWithCatsWithMissingBudgets =
-            budgetsWithCategoryByMonthUnderrepresented.toMutableList()
-
-        budsWithCatsWithMissingBudgets.addAll(
-            listOf(
-                BudgetWithCategory(expectedNewBudgets[0], allCategories[1]),
-                BudgetWithCategory(expectedNewBudgets[1], allCategories[2])
-            )
-        )
-
-        // Re-trigger budgetsWithCategoryByMonthFlow
-        budgetsWithCategoryByMonthFlow.value = budsWithCatsWithMissingBudgets
-
-        viewModel.groupList.test().awaitValue()
-
-        assertThat(viewModel.groupList.value).isEqualTo(expectedGroupList)
-
-    }
+//    @Test
+//    fun calculates_group_list_correctly_when_budgets_complete() {
+//
+//        val expectedGroupList = listOf(
+//            GroupData(
+//                "g2", listOf(
+//                    CategoryItemData(
+//                        "z",
+//                        30,
+//                        0 + 90 /*transaction sum, budget sum*/
+//                    )
+//                )
+//            ),
+//            GroupData(
+//                "g1", listOf(
+//                    CategoryItemData("y", 20, 13 + 70),
+//                    CategoryItemData("x", 10, 9 + 50)
+//                )
+//            ),
+//        )
+//
+//        viewModel.groupList.test().awaitValue()
+//
+//        assertThat(viewModel.groupList.value).isEqualTo(expectedGroupList)
+//
+//    }
+//
+//    @Test
+//    fun calculates_group_list_correctly_when_budgets_underrepresented(): Unit = runBlocking {
+//
+//        val expectedNewBudgets = listOf(
+//            Budget(2, month, 0),
+//            Budget(3, month, 0)
+//        )
+//
+//        val expectedGroupList = listOf(
+//            GroupData(
+//                "g2", listOf(
+//                    CategoryItemData(
+//                        "z",
+//                        0,
+//                        0 + 60 /*transaction sum, budget sum*/
+//                    )
+//                )
+//            ),
+//            GroupData(
+//                "g1", listOf(
+//                    CategoryItemData("y", 0, 13 + 50),
+//                    CategoryItemData("x", 10, 9 + 50)
+//                )
+//            ),
+//        )
+//
+//        val budgetsWithCategoryByMonthFlow =
+//            MutableStateFlow(budgetsWithCategoryByMonthUnderrepresented)
+//
+//        // Stub budgets with category by month
+//        `when`(budgetRepositoryMock.getBudgetsWithCategoryByMonth(month)).thenReturn(
+//            budgetsWithCategoryByMonthFlow
+//        )
+//
+//        // Stub budgets until month
+//        `when`(budgetRepositoryMock.getBudgetsUntilMonth(month)).thenReturn(flow {
+//            emit(
+//                budgetsUntilMonthUnderrepresented
+//            )
+//        })
+//
+//        // Re-create ViewModel instance
+//        viewModel = BudgetViewModel(
+//            transactionRepositoryMock,
+//            categoryRepositoryMock,
+//            budgetRepositoryMock,
+//            settingRepositoryMock,
+//            groupRepositoryMock
+//        )
+//
+//        viewModel.groupList.test().awaitValue()
+//
+//        // Verify new budgets added
+//        verify(budgetRepositoryMock).addBudgets(*expectedNewBudgets.toTypedArray())
+//
+//        // Create new value of budgetsWithCategoriesWithMissingBudgets
+//        val budsWithCatsWithMissingBudgets =
+//            budgetsWithCategoryByMonthUnderrepresented.toMutableList()
+//
+//        budsWithCatsWithMissingBudgets.addAll(
+//            listOf(
+//                BudgetWithCategory(expectedNewBudgets[0], allCategories[1]),
+//                BudgetWithCategory(expectedNewBudgets[1], allCategories[2])
+//            )
+//        )
+//
+//        // Re-trigger budgetsWithCategoryByMonthFlow
+//        budgetsWithCategoryByMonthFlow.value = budsWithCatsWithMissingBudgets
+//
+//        viewModel.groupList.test().awaitValue()
+//
+//        assertThat(viewModel.groupList.value).isEqualTo(expectedGroupList)
+//
+//    }
 
 
 }

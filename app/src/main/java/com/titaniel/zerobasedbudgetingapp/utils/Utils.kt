@@ -42,11 +42,15 @@ class DoubleLiveData<A, B>(a: LiveData<A>, b: LiveData<B>, fireOnlyOnChange: Boo
 
     init {
         addSource(a) {
-            if (!fireOnlyOnChange || it != a.value) value = it to lastB
+            if (!fireOnlyOnChange || it != lastA) {
+                value = it to lastB
+            }
             lastA = it
         }
         addSource(b) {
-            if (!fireOnlyOnChange || it != b.value) value = lastA to it
+            if (!fireOnlyOnChange || it != lastB) {
+                value = lastA to it
+            }
             lastB = it
         }
     }
