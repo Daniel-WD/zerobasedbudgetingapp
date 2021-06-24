@@ -26,4 +26,4 @@ val BottomSheetBackgroundColor = Color(0xFF2F2F2F)
 
 val NormalIconColor = Color(0xbdffffff)
 
-val SelectedBudgetColor = Color(0xff1f1f1f)
+val EditedBudgetColor = Color(0xff1f1f1f)

@@ -1,5 +1,7 @@
 package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,7 +24,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +65,11 @@ class BudgetViewModel @Inject constructor(
      * Id of currently edited budget
      */
     private val editedBudgetId: MutableLiveData<Long> = MutableLiveData()
+
+    /**
+     * Whether a budget is currently edited
+     */
+    val inBudgetChangeMode = Transformations.map(editedBudgetId) { it != null }
 
     /**
      * Month
@@ -314,13 +320,22 @@ data class CategoryItemData(
  */
 data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
+fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) { // TODO -> split everything up in reasonable parts, last animations? -> open PR
 
+    // Month state
     val month by viewModel.month.observeAsState()
+
+    // To be budgeted amount state
     val toBeBudgetedAmount by viewModel.toBeBudgeted.observeAsState()
+
+    // Groups list state
     val groups by viewModel.groupList.observeAsState()
+
+    // inBudgetChangeMode state
+    val inBudgetChangeMode by viewModel.inBudgetChangeMode.observeAsState(false)
 
     BudgetScreen(
         month = month ?: YearMonth.now(),
@@ -328,11 +343,13 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
         groups = groups ?: emptyList(),
         onItemClick = viewModel::onItemClick,
         onBudgetConfirmationClick = viewModel::onBudgetConfirmationClick,
-        onAbortBudgetChange = viewModel::onAbortBudgetChange
+        onAbortBudgetChange = viewModel::onAbortBudgetChange,
+        inBudgetChangeMode = inBudgetChangeMode
     )
 
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun BudgetScreen(
@@ -341,7 +358,8 @@ fun BudgetScreen(
     groups: List<GroupData>,
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
-    onAbortBudgetChange: () -> Unit
+    onAbortBudgetChange: () -> Unit,
+    inBudgetChangeMode: Boolean
 ) {
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
@@ -367,12 +385,14 @@ fun BudgetScreen(
                         selectedMonth = month,
                         toBeBudgetedAmount = toBeBudgetedAmount,
                         scope = scope,
-                        monthPickerState = monthPickerState
+                        monthPickerState = monthPickerState,
+                        inBudgetChangeMode = inBudgetChangeMode,
+                        onAbortBudgetChange = onAbortBudgetChange
                     )
                 },
-                bottomBar = { BottomBar() },
+                bottomBar = { if (!inBudgetChangeMode) BottomBar() },
                 backgroundColor = BackgroundColor,
-                floatingActionButton = { Fab() }
+                floatingActionButton = { if (!inBudgetChangeMode) Fab() }
             ) {
                 GroupList(
                     groups = groups,
@@ -399,69 +419,106 @@ fun Fab() {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun Toolbar(
     selectedMonth: YearMonth,
     toBeBudgetedAmount: Long,
     scope: CoroutineScope,
-    monthPickerState: ModalBottomSheetState
+    monthPickerState: ModalBottomSheetState,
+    inBudgetChangeMode: Boolean,
+    onAbortBudgetChange: () -> Unit
 ) {
-    Surface(elevation = 4.dp, color = SolidToolbarColor) {
-        Column {
-            TopAppBar(
-                modifier = Modifier,
-                title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
-                navigationIcon = {
-                    IconButton(
-                        modifier = Modifier.testTag("MonthButton"),
-                        onClick = { scope.launch { monthPickerState.show() } }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_menu_24),
-                            contentDescription = null,
-                            tint = NormalIconColor
-                        )
-                    }
-                },
-                actions = {
-                    val menuExpanded = remember {
-                        mutableStateOf(false)
-                    }
+    val backgroundColor by animateColorAsState(targetValue = if (!inBudgetChangeMode) SolidToolbarColor else EditedBudgetColor)
 
-                    IconButton(
-                        modifier = Modifier.testTag("MenuButton"),
-                        onClick = { menuExpanded.value = true }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
-                            contentDescription = null,
-                            tint = NormalIconColor
-                        )
-                    }
-                    DropdownMenu(
-                        modifier = Modifier
-                            .background(color = Color.Black)
-                            .testTag("DropdownMenu"),
-                        expanded = menuExpanded.value,
-                        onDismissRequest = { menuExpanded.value = false }
-                    ) {
-                        DropdownMenuItem(onClick = {}) {
-                            Text(stringResource(R.string.clear_all_budgets), color = Text87Color)
+    Surface(
+        elevation = 4.dp,
+        color = backgroundColor
+    ) {
+        Column {
+            Box {
+                TopAppBar(
+                    title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
+                    navigationIcon = {
+                        IconButton(
+                            modifier = Modifier.testTag("MonthButton"),
+                            onClick = { scope.launch { monthPickerState.show() } }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_menu_24),
+                                contentDescription = null,
+                                tint = NormalIconColor
+                            )
                         }
-                        DropdownMenuItem(onClick = {}) {
-                            Text(stringResource(R.string.manage_categories), color = Text87Color)
+                    },
+                    actions = {
+                        val menuExpanded = remember {
+                            mutableStateOf(false)
                         }
-                        DropdownMenuItem(onClick = {}) {
-                            Text(stringResource(R.string.manage_payees), color = Text87Color)
+
+                        IconButton(
+                            modifier = Modifier.testTag("MenuButton"),
+                            onClick = { menuExpanded.value = true }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
+                                contentDescription = null,
+                                tint = NormalIconColor
+                            )
                         }
-                        DropdownMenuItem(onClick = {}) {
-                            Text(stringResource(R.string.settings), color = Text87Color)
+                        DropdownMenu(
+                            modifier = Modifier
+                                .background(color = Color.Black)
+                                .testTag("DropdownMenu"),
+                            expanded = menuExpanded.value,
+                            onDismissRequest = { menuExpanded.value = false }
+                        ) {
+                            DropdownMenuItem(onClick = {}) {
+                                Text(
+                                    stringResource(R.string.clear_all_budgets),
+                                    color = Text87Color
+                                )
+                            }
+                            DropdownMenuItem(onClick = {}) {
+                                Text(
+                                    stringResource(R.string.manage_categories),
+                                    color = Text87Color
+                                )
+                            }
+                            DropdownMenuItem(onClick = {}) {
+                                Text(stringResource(R.string.manage_payees), color = Text87Color)
+                            }
+                            DropdownMenuItem(onClick = {}) {
+                                Text(stringResource(R.string.settings), color = Text87Color)
+                            }
                         }
-                    }
-                },
-                contentColor = Color.White,
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
-            )
+                    },
+                    contentColor = Color.White,
+                    backgroundColor = Color.Transparent,
+                    elevation = 0.dp
+                )
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = inBudgetChangeMode,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    TopAppBar(
+                        title = { Text(text = stringResource(R.string.change_budget)) },
+                        actions = {
+                            IconButton(
+                                onClick = { onAbortBudgetChange() }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_baseline_close_24),
+                                    contentDescription = null,
+                                    tint = NormalIconColor
+                                )
+                            }
+                        },
+                        contentColor = Color.White,
+                        backgroundColor = backgroundColor,
+                        elevation = 0.dp
+                    )
+                }
+            }
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -637,6 +694,45 @@ fun CategoryItem(
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortChange: () -> Unit
 ) {
+
+    val transition = updateTransition(targetState = data.state, label = null)
+
+    val dividerColor by transition.animateColor(label = "") { state ->
+        when (state) {
+            CategoryItemState.CHANGE_SELECTED -> Divider87Color
+            else -> Divider12Color
+        }
+    }
+
+    val backgroundColor by transition.animateColor(label = "") { state ->
+        when (state) {
+            CategoryItemState.CHANGE_SELECTED -> EditedBudgetColor
+            else -> EditedBudgetColor.copy(alpha = 0f)
+        }
+    }
+
+    val normalTextColor by transition.animateColor(label = "") { state ->
+        when (state) {
+            CategoryItemState.CHANGE_UNSELECTED -> Text50Color
+            else -> Text87Color
+        }
+    }
+
+    val availableMoneyTextColor by transition.animateColor(label = "") { state ->
+        when (state) {
+            CategoryItemState.CHANGE_UNSELECTED -> when {
+                data.availableAmount > 0 -> TextGreen50Color
+                data.availableAmount < 0 -> TextRed50Color
+                else -> Text50Color
+            }
+            else -> when {
+                data.availableAmount > 0 -> TextGreenColor
+                data.availableAmount < 0 -> TextRedColor
+                else -> Text87Color
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -648,7 +744,7 @@ fun CategoryItem(
         Row(
             modifier = Modifier
                 .height(54.dp)
-                .background(if (data.state == CategoryItemState.CHANGE_SELECTED) SelectedBudgetColor else Color.Transparent)
+                .background(backgroundColor)
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -657,7 +753,7 @@ fun CategoryItem(
                     .weight(2f)
                     .padding(end = 16.dp),
                 text = data.categoryName,
-                color = if (data.state == CategoryItemState.CHANGE_UNSELECTED) Text50Color else Text87Color,
+                color = normalTextColor,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
@@ -730,34 +826,17 @@ fun CategoryItem(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = data.budgetedAmount.moneyFormat(),
-                    color = if (data.state == CategoryItemState.CHANGE_UNSELECTED) Text50Color else Text87Color,
+                    color = normalTextColor,
                     textAlign = TextAlign.End,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(
-                        color = Text87Color,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.End,
-                        letterSpacing = 0.5.sp
-                    )
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
                     text = data.availableAmount.moneyFormat(),
-                    color =
-                    if (data.state == CategoryItemState.CHANGE_UNSELECTED)
-                        when {
-                            data.availableAmount > 0 -> TextGreen50Color
-                            data.availableAmount < 0 -> TextRed50Color
-                            else -> Text50Color
-                        } else
-                        when {
-                            data.availableAmount > 0 -> TextGreenColor
-                            data.availableAmount < 0 -> TextRedColor
-                            else -> Text87Color
-                        },
+                    color = availableMoneyTextColor,
                     textAlign = TextAlign.End,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -766,11 +845,12 @@ fun CategoryItem(
         }
         Divider(
             modifier = Modifier.height(1.dp),
-            color = if (data.state == CategoryItemState.CHANGE_SELECTED) Divider87Color else Divider12Color
+            color = dividerColor
         )
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Preview
 /*(widthDp = 360, heightDp = 640)*/
@@ -832,5 +912,9 @@ fun BudgetScreenPreview() {
                 )
             )
         ),
-        onItemClick = {}, onBudgetConfirmationClick = {}, onAbortBudgetChange = {})
+        onItemClick = {},
+        onBudgetConfirmationClick = {},
+        onAbortBudgetChange = {},
+        inBudgetChangeMode = true
+    )
 }
