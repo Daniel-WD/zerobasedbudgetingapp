@@ -35,6 +35,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -320,6 +321,9 @@ data class CategoryItemData(
  */
 data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 
+/**
+ * Budget screen taking only the [viewModel] as input.
+ */
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -349,6 +353,10 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
 
 }
 
+/**
+ * Budget Screen, decoupled from a view model.
+ * For preview purposes.
+ */
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -361,23 +369,27 @@ fun BudgetScreen(
     onAbortBudgetChange: () -> Unit,
     inBudgetChangeMode: Boolean
 ) {
+    // Month picker state. Can be hidden or shown.
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+
+    // Coroutine scope
     val scope = rememberCoroutineScope()
 
+    // Add material theme
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-//            Surface(
-//                modifier = Modifier.testTag("MonthPickerDialog"),
-//                color = BottomSheetBackgroundColor
-//            ) {
-//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-//            }
             Surface(
-                modifier = Modifier
-                    .height(100.dp)
-                    .testTag("MonthPickerDialog"),
+                modifier = Modifier.testTag("MonthPickerDialog"),
                 color = BottomSheetBackgroundColor
-            ) {}
+            ) {
+                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+            }
+//            Surface(
+//                modifier = Modifier
+//                    .height(100.dp)
+//                    .testTag("MonthPickerDialog"),
+//                color = BottomSheetBackgroundColor
+//            ) {}
         }) {
             Scaffold(
                 topBar = {
@@ -405,6 +417,9 @@ fun BudgetScreen(
     }
 }
 
+/**
+ * Floating action button for creating a new transaction
+ */
 @Composable
 fun Fab() {
     FloatingActionButton(
@@ -419,6 +434,9 @@ fun Fab() {
     }
 }
 
+/**
+ * Toolbar that shows 'to be budgeted' value, app bar and table header
+ */
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -430,6 +448,7 @@ fun Toolbar(
     inBudgetChangeMode: Boolean,
     onAbortBudgetChange: () -> Unit
 ) {
+    // Toolbar background color, animated by budget change mode
     val backgroundColor by animateColorAsState(targetValue = if (!inBudgetChangeMode) SolidToolbarColor else EditedBudgetColor)
 
     Surface(
@@ -478,6 +497,9 @@ fun Toolbar(
     }
 }
 
+/**
+ * App bar that shows selected month, month picker link and context menu
+ */
 @ExperimentalMaterialApi
 @Composable
 fun DefaultAppBar(
@@ -507,8 +529,13 @@ fun DefaultAppBar(
     )
 }
 
+/**
+ * Context menu with 'show' button.
+ */
 @Composable
 fun DefaultAppBarMenu() {
+
+    // Expansion state of context menu
     val menuExpanded = remember {
         mutableStateOf(false)
     }
@@ -550,6 +577,9 @@ fun DefaultAppBarMenu() {
     }
 }
 
+/**
+ * App bar to notify user, that he is in 'change budget' mode. Option to abort this mode.
+ */
 @Composable
 fun BudgetChangeAppBar(onAbortBudgetChange: () -> Unit) {
     TopAppBar(
@@ -570,6 +600,9 @@ fun BudgetChangeAppBar(onAbortBudgetChange: () -> Unit) {
     )
 }
 
+/**
+ * Header for column descriptions
+ */
 @Composable
 fun Header() {
     Row(Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)) {
@@ -593,6 +626,9 @@ fun Header() {
     }
 }
 
+/**
+ * Bottom navigation
+ */
 @Composable
 fun BottomBar() {
     BottomNavigation(backgroundColor = SolidBottomNavigationColor) {
@@ -631,6 +667,9 @@ fun BottomBar() {
     }
 }
 
+/**
+ * List of groups
+ */
 @ExperimentalAnimationApi
 @Composable
 fun GroupList(
@@ -649,6 +688,9 @@ fun GroupList(
     }
 }
 
+/**
+ * Group that shows group information and its categories.
+ */
 @ExperimentalAnimationApi
 @Composable
 fun Group(
@@ -658,9 +700,11 @@ fun Group(
     onAbortChange: () -> Unit
 ) {
 
+    // Sum budget sum of categories of this group
     val budgetedSum =
         data.items.fold(0L, { acc, categoryItemData -> acc + categoryItemData.budgetedAmount })
 
+    // Sum of available amount of categories of this group
     val availableSum =
         data.items.fold(0L, { acc, categoryItemData -> acc + categoryItemData.availableAmount })
 
@@ -714,6 +758,9 @@ fun Group(
 
 }
 
+/**
+ * Category item to represent a category. Budget can be edited.
+ */
 @ExperimentalAnimationApi
 @Composable
 fun CategoryItem(
@@ -723,8 +770,10 @@ fun CategoryItem(
     onAbortChange: () -> Unit
 ) {
 
+    // Transition to coordinate animations by item state
     val transition = updateTransition(targetState = data.state, label = null)
 
+    // Divider color, animated by item state
     val dividerColor by transition.animateColor(label = "") { state ->
         when (state) {
             CategoryItemState.CHANGE_SELECTED -> Divider87Color
@@ -732,6 +781,7 @@ fun CategoryItem(
         }
     }
 
+    // Background color, animated by item state
     val backgroundColor by transition.animateColor(label = "") { state ->
         when (state) {
             CategoryItemState.CHANGE_SELECTED -> EditedBudgetColor
@@ -739,7 +789,8 @@ fun CategoryItem(
         }
     }
 
-    val normalTextColor by transition.animateColor(label = "") { state ->
+    // Text color, animated by item state
+    val textColor by transition.animateColor(label = "") { state ->
         when (state) {
             CategoryItemState.CHANGE_UNSELECTED -> Text50Color
             else -> Text87Color
@@ -766,7 +817,7 @@ fun CategoryItem(
                     .weight(2f)
                     .padding(end = 16.dp),
                 text = data.categoryName,
-                color = normalTextColor,
+                color = textColor,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2
             )
@@ -778,7 +829,7 @@ fun CategoryItem(
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    CategoryItemShowBudget(data = data, normalTextColor = normalTextColor)
+                    CategoryItemShowBudget(data = data, normalTextColor = textColor)
                 }
                 // Change budget
                 androidx.compose.animation.AnimatedVisibility(
@@ -801,9 +852,13 @@ fun CategoryItem(
     }
 }
 
+/**
+ * Part of [CategoryItem] to show budget and available amount.
+ */
 @Composable
 fun CategoryItemShowBudget(data: CategoryItemData, normalTextColor: Color) {
 
+    // Text color of available money values, animated by item state
     val availableMoneyTextColor by animateColorAsState(
         targetValue = when (data.state) {
             CategoryItemState.CHANGE_UNSELECTED -> when {
@@ -841,6 +896,9 @@ fun CategoryItemShowBudget(data: CategoryItemData, normalTextColor: Color) {
     }
 }
 
+/**
+ * Part of category item to change budget
+ */
 @Composable
 fun CategoryItemBudgetInput(
     data: CategoryItemData,
@@ -914,6 +972,9 @@ fun CategoryItemBudgetInput(
 
 }
 
+/**
+ * Preview of budget screen.
+ */
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Preview
@@ -957,21 +1018,21 @@ fun BudgetScreenPreview() {
                         budgetedAmount = 1000000,
                         availableAmount = 1200,
                         budgetId = 4,
-                        state = CategoryItemState.CHANGE_SELECTED
+                        state = CategoryItemState.NORMAL
                     ),
                     CategoryItemData(
                         categoryName = "Investment",
                         budgetedAmount = 0,
                         availableAmount = 0,
                         budgetId = 5,
-                        state = CategoryItemState.CHANGE_UNSELECTED
+                        state = CategoryItemState.NORMAL
                     ),
                     CategoryItemData(
                         categoryName = "Bücher",
                         budgetedAmount = 10000,
                         availableAmount = -1412,
                         budgetId = 6,
-                        state = CategoryItemState.CHANGE_UNSELECTED
+                        state = CategoryItemState.NORMAL
                     )
                 )
             )
