@@ -283,6 +283,24 @@ class BudgetViewModel @Inject constructor(
         editedBudgetId.value = null
     }
 
+    /**
+     * Clear all budgets
+     */
+    fun onClearAllBudgets() {
+
+        // Get budgets
+        val budgets = budgetsWithCategoryOfMonth.value!!.map { it.budget }
+
+        // Set all budgets to 0
+        budgets.forEach { budget -> budget.budgeted = 0 }
+
+        // Update budgets in db
+        viewModelScope.launch {
+            budgetRepository.updateBudgets(*budgets.toTypedArray())
+        }
+
+    }
+
 }
 
 /**
@@ -348,7 +366,8 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
         onItemClick = viewModel::onItemClick,
         onBudgetConfirmationClick = viewModel::onBudgetConfirmationClick,
         onAbortBudgetChange = viewModel::onAbortBudgetChange,
-        inBudgetChangeMode = inBudgetChangeMode
+        inBudgetChangeMode = inBudgetChangeMode,
+        onClearAllBudgets = viewModel::onClearAllBudgets
     )
 
 }
@@ -367,7 +386,8 @@ fun BudgetScreen(
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortBudgetChange: () -> Unit,
-    inBudgetChangeMode: Boolean
+    inBudgetChangeMode: Boolean,
+    onClearAllBudgets: () -> Unit
 ) {
     // Month picker state. Can be hidden or shown.
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -399,7 +419,8 @@ fun BudgetScreen(
                         scope = scope,
                         monthPickerState = monthPickerState,
                         inBudgetChangeMode = inBudgetChangeMode,
-                        onAbortBudgetChange = onAbortBudgetChange
+                        onAbortBudgetChange = onAbortBudgetChange,
+                        onClearAllBudgets = onClearAllBudgets
                     )
                 },
                 bottomBar = { if (!inBudgetChangeMode) BottomBar() },
@@ -446,7 +467,8 @@ fun Toolbar(
     scope: CoroutineScope,
     monthPickerState: ModalBottomSheetState,
     inBudgetChangeMode: Boolean,
-    onAbortBudgetChange: () -> Unit
+    onAbortBudgetChange: () -> Unit,
+    onClearAllBudgets: () -> Unit
 ) {
     // Toolbar background color, animated by budget change mode
     val backgroundColor by animateColorAsState(targetValue = if (!inBudgetChangeMode) SolidToolbarColor else EditedBudgetColor)
@@ -460,14 +482,15 @@ fun Toolbar(
                 DefaultAppBar(
                     selectedMonth = selectedMonth,
                     scope = scope,
-                    monthPickerState = monthPickerState
+                    monthPickerState = monthPickerState,
+                    onClearAllBudgets = onClearAllBudgets
                 )
                 androidx.compose.animation.AnimatedVisibility(
                     visible = inBudgetChangeMode,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    BudgetChangeAppBar(onAbortBudgetChange)
+                    BudgetChangeAppBar(onAbortBudgetChange = onAbortBudgetChange)
                 }
             }
             Row(
@@ -505,7 +528,8 @@ fun Toolbar(
 fun DefaultAppBar(
     selectedMonth: YearMonth,
     scope: CoroutineScope,
-    monthPickerState: ModalBottomSheetState
+    monthPickerState: ModalBottomSheetState,
+    onClearAllBudgets: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
@@ -521,7 +545,7 @@ fun DefaultAppBar(
             }
         },
         actions = {
-            DefaultAppBarMenu()
+            DefaultAppBarMenu(onClearAllBudgets = onClearAllBudgets)
         },
         contentColor = Color.White,
         backgroundColor = Color.Transparent,
@@ -533,7 +557,7 @@ fun DefaultAppBar(
  * Context menu with 'show' button.
  */
 @Composable
-fun DefaultAppBarMenu() {
+fun DefaultAppBarMenu(onClearAllBudgets: () -> Unit) {
 
     // Expansion state of context menu
     val menuExpanded = remember {
@@ -556,7 +580,7 @@ fun DefaultAppBarMenu() {
         expanded = menuExpanded.value,
         onDismissRequest = { menuExpanded.value = false }
     ) {
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = onClearAllBudgets) {
             Text(
                 stringResource(R.string.clear_all_budgets),
                 color = Text87Color
@@ -822,7 +846,11 @@ fun CategoryItem(
                 maxLines = 2
             )
 
-            Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+            Box(
+                modifier = Modifier
+                    .weight(2f)
+                    .fillMaxHeight()
+            ) {
                 // View Budget
                 androidx.compose.animation.AnimatedVisibility(
                     visible = data.state != CategoryItemState.CHANGE_SELECTED,
@@ -1040,6 +1068,7 @@ fun BudgetScreenPreview() {
         onItemClick = {},
         onBudgetConfirmationClick = {},
         onAbortBudgetChange = {},
-        inBudgetChangeMode = true
+        inBudgetChangeMode = true,
+        onClearAllBudgets = {}
     )
 }
