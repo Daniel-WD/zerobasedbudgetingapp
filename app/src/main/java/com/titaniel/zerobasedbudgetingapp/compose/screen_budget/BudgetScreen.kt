@@ -323,7 +323,7 @@ data class GroupData(val groupName: String, val items: List<CategoryItemData>)
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) { // TODO -> split everything up in reasonable parts, last animations? -> open PR
+fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
 
     // Month state
     val month by viewModel.month.observeAsState()
@@ -438,85 +438,17 @@ fun Toolbar(
     ) {
         Column {
             Box {
-                TopAppBar(
-                    title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
-                    navigationIcon = {
-                        IconButton(
-                            modifier = Modifier.testTag("MonthButton"),
-                            onClick = { scope.launch { monthPickerState.show() } }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_baseline_menu_24),
-                                contentDescription = null,
-                                tint = NormalIconColor
-                            )
-                        }
-                    },
-                    actions = {
-                        val menuExpanded = remember {
-                            mutableStateOf(false)
-                        }
-
-                        IconButton(
-                            modifier = Modifier.testTag("MenuButton"),
-                            onClick = { menuExpanded.value = true }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
-                                contentDescription = null,
-                                tint = NormalIconColor
-                            )
-                        }
-                        DropdownMenu(
-                            modifier = Modifier
-                                .background(color = Color.Black)
-                                .testTag("DropdownMenu"),
-                            expanded = menuExpanded.value,
-                            onDismissRequest = { menuExpanded.value = false }
-                        ) {
-                            DropdownMenuItem(onClick = {}) {
-                                Text(
-                                    stringResource(R.string.clear_all_budgets),
-                                    color = Text87Color
-                                )
-                            }
-                            DropdownMenuItem(onClick = {}) {
-                                Text(
-                                    stringResource(R.string.manage_categories),
-                                    color = Text87Color
-                                )
-                            }
-                            DropdownMenuItem(onClick = {}) {
-                                Text(stringResource(R.string.manage_payees), color = Text87Color)
-                            }
-                            DropdownMenuItem(onClick = {}) {
-                                Text(stringResource(R.string.settings), color = Text87Color)
-                            }
-                        }
-                    },
-                    contentColor = Color.White,
-                    backgroundColor = Color.Transparent,
-                    elevation = 0.dp
+                DefaultAppBar(
+                    selectedMonth = selectedMonth,
+                    scope = scope,
+                    monthPickerState = monthPickerState
                 )
                 androidx.compose.animation.AnimatedVisibility(
                     visible = inBudgetChangeMode,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    TopAppBar(
-                        title = { Text(text = stringResource(R.string.change_budget)) },
-                        actions = {
-                            IconButton(
-                                onClick = { onAbortBudgetChange() }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_baseline_close_24),
-                                    contentDescription = null,
-                                    tint = NormalIconColor
-                                )
-                            }
-                        },
-                        contentColor = Color.White,
-                        backgroundColor = backgroundColor,
-                        elevation = 0.dp
-                    )
+                    BudgetChangeAppBar(onAbortBudgetChange)
                 }
             }
             Row(
@@ -544,6 +476,98 @@ fun Toolbar(
             Header()
         }
     }
+}
+
+@ExperimentalMaterialApi
+@Composable
+fun DefaultAppBar(
+    selectedMonth: YearMonth,
+    scope: CoroutineScope,
+    monthPickerState: ModalBottomSheetState
+) {
+    TopAppBar(
+        title = { Text(text = "${selectedMonth.monthName()} ${selectedMonth.year}") },
+        navigationIcon = {
+            IconButton(
+                modifier = Modifier.testTag("MonthButton"),
+                onClick = { scope.launch { monthPickerState.show() } }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_menu_24),
+                    contentDescription = null,
+                    tint = NormalIconColor
+                )
+            }
+        },
+        actions = {
+            DefaultAppBarMenu()
+        },
+        contentColor = Color.White,
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp
+    )
+}
+
+@Composable
+fun DefaultAppBarMenu() {
+    val menuExpanded = remember {
+        mutableStateOf(false)
+    }
+
+    IconButton(
+        modifier = Modifier.testTag("MenuButton"),
+        onClick = { menuExpanded.value = true }) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
+            contentDescription = null,
+            tint = NormalIconColor
+        )
+    }
+    DropdownMenu(
+        modifier = Modifier
+            .background(color = Color.Black)
+            .testTag("DropdownMenu"),
+        expanded = menuExpanded.value,
+        onDismissRequest = { menuExpanded.value = false }
+    ) {
+        DropdownMenuItem(onClick = {}) {
+            Text(
+                stringResource(R.string.clear_all_budgets),
+                color = Text87Color
+            )
+        }
+        DropdownMenuItem(onClick = {}) {
+            Text(
+                stringResource(R.string.manage_categories),
+                color = Text87Color
+            )
+        }
+        DropdownMenuItem(onClick = {}) {
+            Text(stringResource(R.string.manage_payees), color = Text87Color)
+        }
+        DropdownMenuItem(onClick = {}) {
+            Text(stringResource(R.string.settings), color = Text87Color)
+        }
+    }
+}
+
+@Composable
+fun BudgetChangeAppBar(onAbortBudgetChange: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = stringResource(R.string.change_budget)) },
+        actions = {
+            IconButton(
+                onClick = { onAbortBudgetChange() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_close_24),
+                    contentDescription = null,
+                    tint = NormalIconColor
+                )
+            }
+        },
+        contentColor = Color.White,
+        backgroundColor = EditedBudgetColor,
+        elevation = 0.dp
+    )
 }
 
 @Composable
@@ -607,6 +631,7 @@ fun BottomBar() {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun GroupList(
     groups: List<GroupData>,
@@ -624,6 +649,7 @@ fun GroupList(
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun Group(
     data: GroupData,
@@ -634,6 +660,7 @@ fun Group(
 
     val budgetedSum =
         data.items.fold(0L, { acc, categoryItemData -> acc + categoryItemData.budgetedAmount })
+
     val availableSum =
         data.items.fold(0L, { acc, categoryItemData -> acc + categoryItemData.availableAmount })
 
@@ -687,6 +714,7 @@ fun Group(
 
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun CategoryItem(
     data: CategoryItemData,
@@ -718,21 +746,6 @@ fun CategoryItem(
         }
     }
 
-    val availableMoneyTextColor by transition.animateColor(label = "") { state ->
-        when (state) {
-            CategoryItemState.CHANGE_UNSELECTED -> when {
-                data.availableAmount > 0 -> TextGreen50Color
-                data.availableAmount < 0 -> TextRed50Color
-                else -> Text50Color
-            }
-            else -> when {
-                data.availableAmount > 0 -> TextGreenColor
-                data.availableAmount < 0 -> TextRedColor
-                else -> Text87Color
-            }
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -758,89 +771,27 @@ fun CategoryItem(
                 maxLines = 2
             )
 
-            // Have the ability to change the budget?
-            if (data.state == CategoryItemState.CHANGE_SELECTED) {
-
-                // Budget value text
-                var editBudgetValue by remember { mutableStateOf(data.budgetedAmount.toString()) }
-
-                // Abort budget change if text field focus gets lost?
-                var abortable by remember { mutableStateOf(false) }
-
-                // Requester for focus on text field
-                val focusRequester = remember { FocusRequester() }
-
-                BasicTextField(
-                    modifier = Modifier
-                        .weight(1f)
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { state ->
-                            // If aborting is allowed and text is not focused
-                            if (abortable && !state.isFocused) {
-                                onAbortChange()
-                            }
-                        },
-                    value = TextFieldValue(
-                        text = editBudgetValue,
-                        selection = TextRange(editBudgetValue.length) // Cursor always on the end
-                    ),
-                    onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it) },
-                    textStyle = MaterialTheme.typography.body1.copy(
-                        textAlign = TextAlign.End,
-                        color = Text87Color
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        autoCorrect = false,
-                        imeAction = ImeAction.Done
-                    ),
-                    maxLines = 1,
-                    cursorBrush = SolidColor(Text87Color),
-                    visualTransformation = MoneyVisualTransformation,
-                    keyboardActions = KeyboardActions {
-                        onBudgetConfirmationClick(editBudgetValue.toLong())
-                        abortable = false
-                    }
-                )
-                DisposableEffect(Unit) {
-                    focusRequester.requestFocus()
-                    abortable = true
-                    onDispose { }
+            Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+                // View Budget
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = data.state != CategoryItemState.CHANGE_SELECTED,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    CategoryItemShowBudget(data = data, normalTextColor = normalTextColor)
                 }
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                    IconButton(
-                        modifier = Modifier.offset(x = 12.dp),
-                        onClick = {
-                            onBudgetConfirmationClick(editBudgetValue.toLong())
-                            abortable = false
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_check_24),
-                            contentDescription = null,
-                            tint = Text87Color
-                        )
-                    }
+                // Change budget
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = data.state == CategoryItemState.CHANGE_SELECTED,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    CategoryItemBudgetInput(
+                        data = data,
+                        onAbortChange = onAbortChange,
+                        onBudgetConfirmationClick = onBudgetConfirmationClick
+                    )
                 }
-            } else {// Show budget data
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = data.budgetedAmount.moneyFormat(),
-                    color = normalTextColor,
-                    textAlign = TextAlign.End,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
-                    text = data.availableAmount.moneyFormat(),
-                    color = availableMoneyTextColor,
-                    textAlign = TextAlign.End,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
         Divider(
@@ -848,6 +799,119 @@ fun CategoryItem(
             color = dividerColor
         )
     }
+}
+
+@Composable
+fun CategoryItemShowBudget(data: CategoryItemData, normalTextColor: Color) {
+
+    val availableMoneyTextColor by animateColorAsState(
+        targetValue = when (data.state) {
+            CategoryItemState.CHANGE_UNSELECTED -> when {
+                data.availableAmount > 0 -> TextGreen50Color
+                data.availableAmount < 0 -> TextRed50Color
+                else -> Text50Color
+            }
+            else -> when {
+                data.availableAmount > 0 -> TextGreenColor
+                data.availableAmount < 0 -> TextRedColor
+                else -> Text87Color
+            }
+        }
+    )
+
+    Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = data.budgetedAmount.moneyFormat(),
+            color = normalTextColor,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp),
+            text = data.availableAmount.moneyFormat(),
+            color = availableMoneyTextColor,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun CategoryItemBudgetInput(
+    data: CategoryItemData,
+    onAbortChange: () -> Unit,
+    onBudgetConfirmationClick: (amount: Long) -> Unit
+) {
+
+    // Budget value text
+    var editBudgetValue by remember { mutableStateOf(data.budgetedAmount.toString()) }
+
+    // Abort budget change if text field focus gets lost?
+    var abortable by remember { mutableStateOf(false) }
+
+    // Requester for focus on text field
+    val focusRequester = remember { FocusRequester() }
+
+    Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
+        BasicTextField(
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+                .onFocusChanged { state ->
+                    // If aborting is allowed and text is not focused
+                    if (abortable && !state.isFocused) {
+                        onAbortChange()
+                    }
+                },
+            value = TextFieldValue(
+                text = editBudgetValue,
+                selection = TextRange(editBudgetValue.length) // Cursor always on the end
+            ),
+            onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it) },
+            textStyle = MaterialTheme.typography.body1.copy(
+                textAlign = TextAlign.End,
+                color = Text87Color
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                autoCorrect = false,
+                imeAction = ImeAction.Done
+            ),
+            maxLines = 1,
+            cursorBrush = SolidColor(Text87Color),
+            visualTransformation = MoneyVisualTransformation,
+            keyboardActions = KeyboardActions {
+                onBudgetConfirmationClick(editBudgetValue.toLong())
+                abortable = false
+            }
+        )
+        DisposableEffect(Unit) {
+            focusRequester.requestFocus()
+            abortable = true
+            onDispose { }
+        }
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+            IconButton(
+                modifier = Modifier.offset(x = 12.dp),
+                onClick = {
+                    onBudgetConfirmationClick(editBudgetValue.toLong())
+                    abortable = false
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_check_24),
+                    contentDescription = null,
+                    tint = Text87Color
+                )
+            }
+        }
+    }
+
 }
 
 @ExperimentalAnimationApi
