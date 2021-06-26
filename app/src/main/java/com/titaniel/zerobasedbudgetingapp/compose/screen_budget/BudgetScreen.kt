@@ -259,6 +259,10 @@ class BudgetViewModel @Inject constructor(
      */
     fun onBudgetConfirmationClick(amount: Long) {
 
+        if(editedBudgetId.value == null) {
+            throw IllegalStateException()
+        }
+
         viewModelScope.launch {
 
             // Get edited budget
