@@ -6,23 +6,38 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
+import android.R.string.no
+import java.util.*
+
+
+/**
+ * Visual transformation for a text field to format a text containing a money value that is a full
+ * number of cents, into a usual money format.
+ * 0 -> 0,00 €
+ * -123 -> -1,23 €
+ */
 
 val MoneyVisualTransformation = VisualTransformation { text ->
-    val stringText = text.toString()
 
-    val formattedText = stringText.toLong().moneyFormat()
+    // Get plain string
+    val plainText = text.toString()
 
+    // Format text to money format
+    val formattedText = plainText.toLong().moneyFormat()
+
+    // Indexes of formattedText that is delimiter: ,.[space] and the currency sign
     val delimiterIndexes =
-        formattedText.mapIndexed { index, c -> if (",. €".contains(c)) index else -1 }
+        formattedText.mapIndexed { index, c -> if (",. $".contains(c)) index else -1 }
             .filterNot { it == -1 }
 
+    // Cursor offset mapping between original and transformed text
     val offsetMapping = object : OffsetMapping {
         override fun originalToTransformed(offset: Int): Int {
 
-            return when (text.filter { it.isDigit() }.length) {
+            return when (plainText.filter { it.isDigit() }.length /* Amount of digits */) {
                 0 -> 0
                 1 ->
-                    if (text.contains('-')) {
+                    if (plainText.contains('-')) { // Is input negative?
                         when (offset) {
                             0 -> 0
                             1 -> 1
@@ -35,7 +50,7 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                         }
                     }
                 2 ->
-                    if (text.contains('-')) {
+                    if (plainText.contains('-')) { // Is input negative?
                         when (offset) {
                             0 -> 0
                             1 -> 1
@@ -49,15 +64,15 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                             else -> 4
                         }
                     }
-                else -> offset + delimiterIndexes.filter { it < offset }.size
+                else -> offset + delimiterIndexes.filter { it < offset }.size /* Add count of delimiters until offset */
             }
         }
 
         override fun transformedToOriginal(offset: Int): Int {
-            return when (text.length) {
+            return when (plainText.filter { it.isDigit() }.length /* Amount of digits */) {
                 0 -> 0
                 1 ->
-                    if (text.contains('-')) {
+                    if (plainText.contains('-')) { // Is input negative?
                         when {
                             offset == 0 -> 0
                             offset <= 4 -> 1
@@ -70,7 +85,7 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                         }
                     }
                 2 ->
-                    if (text.contains('-')) {
+                    if (plainText.contains('-')) { // Is input negative?
                         when {
                             offset == 0 -> 0
                             offset <= 3 -> 1
@@ -84,25 +99,10 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                             else -> 2
                         }
                     }
-                else -> offset - delimiterIndexes.filter { it < offset }.size
+                else -> offset - delimiterIndexes.filter { it < offset }.size /* Remove count of delimiters until offset */
             }
         }
     }
 
     TransformedText(AnnotatedString(formattedText), offsetMapping)
-}
-
-fun moneyOnValueChange(oldValue: String, newValue: TextFieldValue): String {
-    val text = newValue.text
-
-    return if (text == "" || (text.length == 1 && !text[0].isDigit())) {
-        "0"
-    } else if (!text[text.length - 1].isDigit()) {
-        (-oldValue.toLong()).toString()
-    } else {
-        text.substring(
-            0,
-            text.length.coerceAtMost(6 + if (text[0] == '-') 1 else 0)
-        ).toLong().toString()
-    }
 }

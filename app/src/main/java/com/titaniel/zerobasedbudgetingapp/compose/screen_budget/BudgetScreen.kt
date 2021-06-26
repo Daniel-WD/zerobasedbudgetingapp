@@ -280,6 +280,7 @@ class BudgetViewModel @Inject constructor(
      * Gets called when the budget editing should stop without saving
      */
     fun onAbortBudgetChange() {
+        // Make edited budget being null
         editedBudgetId.value = null
     }
 
@@ -471,7 +472,7 @@ fun Toolbar(
     onClearAllBudgets: () -> Unit
 ) {
     // Toolbar background color, animated by budget change mode
-    val backgroundColor by animateColorAsState(targetValue = if (!inBudgetChangeMode) SolidToolbarColor else EditedBudgetColor)
+    val backgroundColor by animateColorAsState(targetValue = if (!inBudgetChangeMode) SolidToolbarColor else SolidHighlightColor)
 
     Surface(
         elevation = 4.dp,
@@ -619,7 +620,7 @@ fun BudgetChangeAppBar(onAbortBudgetChange: () -> Unit) {
             }
         },
         contentColor = Color.White,
-        backgroundColor = EditedBudgetColor,
+        backgroundColor = SolidHighlightColor,
         elevation = 0.dp
     )
 }
@@ -808,8 +809,8 @@ fun CategoryItem(
     // Background color, animated by item state
     val backgroundColor by transition.animateColor(label = "") { state ->
         when (state) {
-            CategoryItemState.CHANGE_SELECTED -> EditedBudgetColor
-            else -> EditedBudgetColor.copy(alpha = 0f)
+            CategoryItemState.CHANGE_SELECTED -> SolidHighlightColor
+            else -> SolidHighlightColor.copy(alpha = 0f)
         }
     }
 
@@ -958,7 +959,7 @@ fun CategoryItemBudgetInput(
                 text = editBudgetValue,
                 selection = TextRange(editBudgetValue.length) // Cursor always on the end
             ),
-            onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it) },
+            onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it, 6) },
             textStyle = MaterialTheme.typography.body1.copy(
                 textAlign = TextAlign.End,
                 color = Text87Color

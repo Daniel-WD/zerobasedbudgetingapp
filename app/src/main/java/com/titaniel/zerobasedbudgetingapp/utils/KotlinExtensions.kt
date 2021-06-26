@@ -3,6 +3,7 @@ package com.titaniel.zerobasedbudgetingapp.utils
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.*
 
 /**
  * Add [element] to the list, if the value of the property returned by [uniquePropertyDelegate] will be unique.
