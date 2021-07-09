@@ -27,7 +27,7 @@ val MoneyVisualTransformation = VisualTransformation { text ->
 
     // Indexes of formattedText that is delimiter: ,.[space] and the currency sign
     val delimiterIndexes =
-        formattedText.mapIndexed { index, c -> if (",. $".contains(c)) index else -1 }
+        formattedText.mapIndexed { index, c -> if (",. €".contains(c)) index else -1 }
             .filterNot { it == -1 }
 
     // Cursor offset mapping between original and transformed text
@@ -64,7 +64,7 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                             else -> 4
                         }
                     }
-                else -> offset + delimiterIndexes.filter { it < offset }.size /* Add count of delimiters until offset */
+                else -> offset + delimiterIndexes.filter { it <= offset }.size /* Add count of delimiters until offset */
             }
         }
 
