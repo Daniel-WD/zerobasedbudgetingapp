@@ -101,8 +101,8 @@ class DatabaseModule {
                 Category("Bücher", 1, 2, 1),
 
                 Category("Lebensmittel", 2, 0, 4),
-                Category("Sex", 2, 1, 5),
-                Category("Sexbücher", 2, 2, 6),
+                Category("Ausgehen", 2, 1, 5),
+                Category("Versicherung", 2, 2, 6),
 
                 Category("PC", 3, 0, 7)
             )
