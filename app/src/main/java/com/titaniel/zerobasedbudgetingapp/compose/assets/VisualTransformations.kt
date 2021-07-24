@@ -2,12 +2,10 @@ package com.titaniel.zerobasedbudgetingapp.compose.assets
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.titaniel.zerobasedbudgetingapp.utils.factorialSum
 import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
-import android.R.string.no
-import java.util.*
 
 
 /**
@@ -15,8 +13,8 @@ import java.util.*
  * number of cents, into a usual money format.
  * 0 -> 0,00 €
  * -123 -> -1,23 €
+ * IMPORTANT: Offset mapping has the convention that if a cursor touches a delimiter, it should appear before it.
  */
-
 val MoneyVisualTransformation = VisualTransformation { text ->
 
     // Get plain string
@@ -53,18 +51,18 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                     if (plainText.contains('-')) { // Is input negative?
                         when (offset) {
                             0 -> 0
-                            1 -> 1
+                            1 -> 2
                             2 -> 4
                             else -> 5
                         }
                     } else {
                         when (offset) {
-                            0 -> 2
+                            0 -> 1
                             1 -> 3
                             else -> 4
                         }
                     }
-                else -> offset + delimiterIndexes.filter { it <= offset }.size /* Add count of delimiters until offset */
+                else -> delimiterIndexes.fold(offset, {acc, del -> if(del < acc) acc+1 else acc }) /* Add count of delimiters until offset */
             }
         }
 

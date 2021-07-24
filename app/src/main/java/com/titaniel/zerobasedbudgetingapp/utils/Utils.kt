@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+fun factorialSum(num: Int) = (0..num).reduce(Int::plus)
 
 /**
  * Convert [localDate] to its string representation
