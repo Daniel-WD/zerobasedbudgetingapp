@@ -457,7 +457,7 @@ class BudgetViewModelTest : CoroutinesAndLiveDataTest() {
     }
 
     @Test
-    fun update_in_budget_change_mode_correctly_on_item_click_and_on_budget_confirmation_click_and_on_abort_budget_change() {
+    fun updates_in_budget_change_mode_correctly_on_item_click_and_on_budget_confirmation_click_and_on_abort_budget_change() {
 
         // Mock getBudgetById(2)
         `when`(budgetRepositoryMock.getBudgetById(1)).thenReturn(flow {

@@ -31,27 +31,31 @@ class VisualTransformationsTest {
     fun money_transformation_maps_cursor_from_original_to_transformed_correctly() {
 
         // Offset mapping for 1 digit
-        val offsetMapping1 = MoneyVisualTransformation.filter(AnnotatedString("1" /* "0,01 €" */)).offsetMapping
+        val offsetMapping1 =
+            MoneyVisualTransformation.filter(AnnotatedString("1" /* "0,01 €" */)).offsetMapping
 
         assertThat(offsetMapping1.originalToTransformed(0)).isEqualTo(3)
         assertThat(offsetMapping1.originalToTransformed(1)).isEqualTo(4)
 
         // Offset mapping for 1 digit signed
-        val offsetMapping1Signed = MoneyVisualTransformation.filter(AnnotatedString("-1" /* "-0,01 €" */)).offsetMapping
+        val offsetMapping1Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1" /* "-0,01 €" */)).offsetMapping
 
         assertThat(offsetMapping1Signed.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping1Signed.originalToTransformed(1)).isEqualTo(1)
         assertThat(offsetMapping1Signed.originalToTransformed(2)).isEqualTo(5)
 
         // Offset mapping for 2 digit
-        val offsetMapping2 = MoneyVisualTransformation.filter(AnnotatedString("12" /* "0,12 €" */)).offsetMapping
+        val offsetMapping2 =
+            MoneyVisualTransformation.filter(AnnotatedString("12" /* "0,12 €" */)).offsetMapping
 
         assertThat(offsetMapping2.originalToTransformed(0)).isEqualTo(1)
         assertThat(offsetMapping2.originalToTransformed(1)).isEqualTo(3)
         assertThat(offsetMapping2.originalToTransformed(2)).isEqualTo(4)
 
         // Offset mapping for 2 digit signed
-        val offsetMapping2Signed = MoneyVisualTransformation.filter(AnnotatedString("-12" /* "-0,12 €" */)).offsetMapping
+        val offsetMapping2Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-12" /* "-0,12 €" */)).offsetMapping
 
         assertThat(offsetMapping2Signed.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping2Signed.originalToTransformed(1)).isEqualTo(2)
@@ -59,7 +63,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping2Signed.originalToTransformed(3)).isEqualTo(5)
 
         // Offset mapping for 4 digits
-        val offsetMapping4 = MoneyVisualTransformation.filter(AnnotatedString("1234" /* "12,34 €" */)).offsetMapping
+        val offsetMapping4 =
+            MoneyVisualTransformation.filter(AnnotatedString("1234" /* "12,34 €" */)).offsetMapping
 
         assertThat(offsetMapping4.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping4.originalToTransformed(1)).isEqualTo(1)
@@ -68,7 +73,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping4.originalToTransformed(4)).isEqualTo(5)
 
         // Offset mapping for 4 digits signed
-        val offsetMapping4Signed = MoneyVisualTransformation.filter(AnnotatedString("-1234" /* "-12,34 €" */)).offsetMapping
+        val offsetMapping4Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1234" /* "-12,34 €" */)).offsetMapping
 
         assertThat(offsetMapping4Signed.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping4Signed.originalToTransformed(1)).isEqualTo(1)
@@ -78,7 +84,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping4Signed.originalToTransformed(5)).isEqualTo(6)
 
         // Offset mapping for 7 digits
-        val offsetMapping7 = MoneyVisualTransformation.filter(AnnotatedString("1234567" /* "12.345,67 €" */)).offsetMapping
+        val offsetMapping7 =
+            MoneyVisualTransformation.filter(AnnotatedString("1234567" /* "12.345,67 €" */)).offsetMapping
 
         assertThat(offsetMapping7.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping7.originalToTransformed(1)).isEqualTo(1)
@@ -90,7 +97,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping7.originalToTransformed(7)).isEqualTo(9)
 
         // Offset mapping for 7 digit signed
-        val offsetMapping7Signed = MoneyVisualTransformation.filter(AnnotatedString("-1234567" /* "-12.345,67 €" */)).offsetMapping
+        val offsetMapping7Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1234567" /* "-12.345,67 €" */)).offsetMapping
 
         assertThat(offsetMapping7Signed.originalToTransformed(0)).isEqualTo(0)
         assertThat(offsetMapping7Signed.originalToTransformed(1)).isEqualTo(1)
@@ -108,7 +116,8 @@ class VisualTransformationsTest {
     fun money_transformation_maps_cursor_from_transformed_to_original_correctly() {
 
         // Offset mapping for 1 digit
-        val offsetMapping1 = MoneyVisualTransformation.filter(AnnotatedString("1" /* "0,01 €" */)).offsetMapping
+        val offsetMapping1 =
+            MoneyVisualTransformation.filter(AnnotatedString("1" /* "0,01 €" */)).offsetMapping
 
         assertThat(offsetMapping1.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping1.transformedToOriginal(1)).isEqualTo(0)
@@ -119,7 +128,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping1.transformedToOriginal(6)).isEqualTo(1)
 
         // Offset mapping for 1 digit signed
-        val offsetMapping1Signed = MoneyVisualTransformation.filter(AnnotatedString("-1" /* "-0,01 €" */)).offsetMapping
+        val offsetMapping1Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1" /* "-0,01 €" */)).offsetMapping
 
         assertThat(offsetMapping1Signed.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping1Signed.transformedToOriginal(1)).isEqualTo(1)
@@ -131,7 +141,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping1Signed.transformedToOriginal(7)).isEqualTo(2)
 
         // Offset mapping for 2 digit
-        val offsetMapping2 = MoneyVisualTransformation.filter(AnnotatedString("12" /* "0,12 €" */)).offsetMapping
+        val offsetMapping2 =
+            MoneyVisualTransformation.filter(AnnotatedString("12" /* "0,12 €" */)).offsetMapping
 
         assertThat(offsetMapping2.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping2.transformedToOriginal(1)).isEqualTo(0)
@@ -142,7 +153,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping2.transformedToOriginal(6)).isEqualTo(2)
 
         // Offset mapping for 2 digit signed
-        val offsetMapping2Signed = MoneyVisualTransformation.filter(AnnotatedString("-12" /* "-0,12 €" */)).offsetMapping
+        val offsetMapping2Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-12" /* "-0,12 €" */)).offsetMapping
 
         assertThat(offsetMapping2Signed.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping2Signed.transformedToOriginal(1)).isEqualTo(1)
@@ -154,7 +166,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping2Signed.transformedToOriginal(7)).isEqualTo(3)
 
         // Offset mapping for 4 digits
-        val offsetMapping4 = MoneyVisualTransformation.filter(AnnotatedString("1234" /* "12,34 €" */)).offsetMapping
+        val offsetMapping4 =
+            MoneyVisualTransformation.filter(AnnotatedString("1234" /* "12,34 €" */)).offsetMapping
 
         assertThat(offsetMapping4.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping4.transformedToOriginal(1)).isEqualTo(1)
@@ -166,7 +179,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping4.transformedToOriginal(7)).isEqualTo(4)
 
         // Offset mapping for 4 digits signed
-        val offsetMapping4Signed = MoneyVisualTransformation.filter(AnnotatedString("-1234" /* "-12,34 €" */)).offsetMapping
+        val offsetMapping4Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1234" /* "-12,34 €" */)).offsetMapping
 
         assertThat(offsetMapping4Signed.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping4Signed.transformedToOriginal(1)).isEqualTo(1)
@@ -179,7 +193,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping4Signed.transformedToOriginal(8)).isEqualTo(5)
 
         // Offset mapping for 7 digits
-        val offsetMapping7 = MoneyVisualTransformation.filter(AnnotatedString("1234567" /* "12.345,67 €" */)).offsetMapping
+        val offsetMapping7 =
+            MoneyVisualTransformation.filter(AnnotatedString("1234567" /* "12.345,67 €" */)).offsetMapping
 
         assertThat(offsetMapping7.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping7.transformedToOriginal(1)).isEqualTo(1)
@@ -195,7 +210,8 @@ class VisualTransformationsTest {
         assertThat(offsetMapping7.transformedToOriginal(11)).isEqualTo(7)
 
         // Offset mapping for 7 digit signed
-        val offsetMapping7Signed = MoneyVisualTransformation.filter(AnnotatedString("-1234567" /* "-12.345,67 €" */)).offsetMapping
+        val offsetMapping7Signed =
+            MoneyVisualTransformation.filter(AnnotatedString("-1234567" /* "-12.345,67 €" */)).offsetMapping
 
         assertThat(offsetMapping7Signed.transformedToOriginal(0)).isEqualTo(0)
         assertThat(offsetMapping7Signed.transformedToOriginal(1)).isEqualTo(1)

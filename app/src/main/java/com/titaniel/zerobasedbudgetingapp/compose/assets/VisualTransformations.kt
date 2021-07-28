@@ -4,7 +4,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import com.titaniel.zerobasedbudgetingapp.utils.factorialSum
 import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
 
 
@@ -62,7 +61,9 @@ val MoneyVisualTransformation = VisualTransformation { text ->
                             else -> 4
                         }
                     }
-                else -> delimiterIndexes.fold(offset, {acc, del -> if(del < acc) acc+1 else acc }) /* Add count of delimiters until offset */
+                else -> delimiterIndexes.fold(
+                    offset,
+                    { acc, del -> if (del < acc) acc + 1 else acc }) /* Add count of delimiters until offset */
             }
         }
 

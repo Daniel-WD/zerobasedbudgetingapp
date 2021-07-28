@@ -14,8 +14,8 @@ android {
         applicationId "com.titaniel.zerobasedbudgetingapp"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 11
-        versionName "2.4.0" // Major.Minor.Patch
+        versionCode 12
+        versionName "2.5.0" // Major.Minor.Patch
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

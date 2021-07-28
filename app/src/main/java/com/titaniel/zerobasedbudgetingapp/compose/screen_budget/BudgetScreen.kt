@@ -35,7 +35,6 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
-import com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -259,7 +258,7 @@ class BudgetViewModel @Inject constructor(
      */
     fun onBudgetConfirmationClick(amount: Long) {
 
-        if(editedBudgetId.value == null) {
+        if (editedBudgetId.value == null) {
             throw IllegalStateException()
         }
 
@@ -585,7 +584,10 @@ fun DefaultAppBarMenu(onClearAllBudgets: () -> Unit) {
         expanded = menuExpanded.value,
         onDismissRequest = { menuExpanded.value = false }
     ) {
-        DropdownMenuItem(onClick = onClearAllBudgets) {
+        DropdownMenuItem(
+            modifier = Modifier.testTag("ClearAllBudgets"),
+            onClick = onClearAllBudgets
+        ) {
             Text(
                 stringResource(R.string.clear_all_budgets),
                 color = Text87Color
@@ -615,6 +617,7 @@ fun BudgetChangeAppBar(onAbortBudgetChange: () -> Unit) {
         title = { Text(text = stringResource(R.string.change_budget)) },
         actions = {
             IconButton(
+                modifier = Modifier.testTag("AbortBudgetChange"),
                 onClick = { onAbortBudgetChange() }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_close_24),

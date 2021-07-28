@@ -1,28 +1,5 @@
 package com.titaniel.zerobasedbudgetingapp.fragments
 
-import androidx.lifecycle.MutableLiveData
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.titaniel.zerobasedbudgetingapp.R
-import com.titaniel.zerobasedbudgetingapp._testutils.checkRecyclerViewContentHasCorrectData
-import com.titaniel.zerobasedbudgetingapp._testutils.launchFragmentInHiltContainer
-import com.titaniel.zerobasedbudgetingapp._testutils.replace
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Payee
-import com.titaniel.zerobasedbudgetingapp.database.room.entities.Transaction
-import com.titaniel.zerobasedbudgetingapp.database.room.relations.TransactionWithCategoryAndPayee
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsFragment
-import com.titaniel.zerobasedbudgetingapp.fragments.fragment_transactions.TransactionsViewModel
-import com.titaniel.zerobasedbudgetingapp.utils.convertLocalDateToString
-import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDate
-
 //@RunWith(MockitoJUnitRunner::class)
 //class TransactionsFragmentTest {
 //

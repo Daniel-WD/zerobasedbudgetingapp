@@ -45,7 +45,12 @@ class TextOnValueChangeListenersTest {
 
     @Test
     fun money_on_value_change_cuts_input_to_max_characters_correctly() {
-        assertThat(moneyOnValueChange(TextFieldValue("298399999999991"), 10)).isEqualTo("2983999999")
+        assertThat(
+            moneyOnValueChange(
+                TextFieldValue("298399999999991"),
+                10
+            )
+        ).isEqualTo("2983999999")
 
     }
 

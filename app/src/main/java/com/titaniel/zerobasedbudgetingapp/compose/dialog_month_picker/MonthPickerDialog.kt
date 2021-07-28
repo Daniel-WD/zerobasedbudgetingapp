@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,7 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
 import com.titaniel.zerobasedbudgetingapp.database.repositories.SettingRepository
@@ -25,7 +30,6 @@ import com.titaniel.zerobasedbudgetingapp.utils.monthName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.YearMonth
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -66,7 +70,10 @@ fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDi
     val months by viewModel.selectableMonths.observeAsState(emptyList())
 
     MaterialTheme {
-        MonthPickerDialog(months = months, selectedMonth = month ?: YearMonth.of(1999, 1)) { month ->
+        MonthPickerDialog(
+            months = months,
+            selectedMonth = month ?: YearMonth.of(1999, 1)
+        ) { month ->
             viewModel.onMonthClick(month)
             onDismiss()
         }
@@ -74,7 +81,11 @@ fun MonthPickerDialogWrapper(viewModel: MonthPickerViewModel = viewModel(), onDi
 }
 
 @Composable
-fun MonthPickerDialog(months: List<YearMonth>, selectedMonth: YearMonth, onItemClick: (YearMonth) -> Unit) {
+fun MonthPickerDialog(
+    months: List<YearMonth>,
+    selectedMonth: YearMonth,
+    onItemClick: (YearMonth) -> Unit
+) {
 
     Column {
         Header()
@@ -120,7 +131,7 @@ fun ListItem(month: YearMonth, selected: Boolean, onItemClick: (YearMonth) -> Un
             .clickable { onItemClick(month) }
             .fillMaxWidth()
             .height(48.dp)
-            .background(if(selected) PrimaryColor.copy(0.08f) else Color.Transparent)
+            .background(if (selected) PrimaryColor.copy(0.08f) else Color.Transparent)
             .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -128,13 +139,13 @@ fun ListItem(month: YearMonth, selected: Boolean, onItemClick: (YearMonth) -> Un
             text = month.monthName(),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = if(selected) PrimaryColor else Text60Color
+            color = if (selected) PrimaryColor else Text60Color
         )
         Text(
             text = " " + month.year.toString(),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = if(selected) PrimaryColor else Text40Color
+            color = if (selected) PrimaryColor else Text40Color
         )
     }
 }

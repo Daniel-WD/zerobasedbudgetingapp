@@ -2,13 +2,13 @@ package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onChildAt
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
+import androidx.test.espresso.Espresso
 import com.titaniel.zerobasedbudgetingapp.utils.moneyFormat
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,6 +16,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.verify
 import java.time.YearMonth
 
 @RunWith(MockitoJUnitRunner::class)
@@ -43,50 +44,52 @@ class BudgetScreenTest {
     /**
      * Test groups
      */
-    private val groups = listOf(
-        GroupData(
-            "Persönlich", listOf(
-                CategoryItemData(
-                    categoryName = "Lebensmittel",
-                    budgetedAmount = 1000000,
-                    availableAmount = 1200,
-                    budgetId = 1,
-                    state = CategoryItemState.NORMAL
-                ),
-                CategoryItemData(
-                    categoryName = "Investment",
-                    budgetedAmount = 0,
-                    availableAmount = 0,
-                    budgetId = 2,
-                    state = CategoryItemState.NORMAL
-                ),
-                CategoryItemData(
-                    categoryName = "Bücher",
-                    budgetedAmount = 10000,
-                    availableAmount = -1412,
-                    budgetId = 3,
-                    state = CategoryItemState.NORMAL
+    private val groupsLiveData = MutableLiveData(
+        listOf(
+            GroupData(
+                "Persönlich", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 1,
+                        state = CategoryItemState.NORMAL
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 2,
+                        state = CategoryItemState.NORMAL
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412,
+                        budgetId = 3,
+                        state = CategoryItemState.NORMAL
+                    )
                 )
-            )
-        ),
-        GroupData(
-            "Haushalt", listOf()
-        ),
-        GroupData(
-            "Anderes", listOf(
-                CategoryItemData(
-                    categoryName = "Lebensmittel",
-                    budgetedAmount = 1000000,
-                    availableAmount = 1200,
-                    budgetId = 4,
-                    state = CategoryItemState.NORMAL
-                ),
-                CategoryItemData(
-                    categoryName = "Investment",
-                    budgetedAmount = 0,
-                    availableAmount = 0,
-                    budgetId = 5,
-                    state = CategoryItemState.NORMAL
+            ),
+            GroupData(
+                "Haushalt", listOf()
+            ),
+            GroupData(
+                "Anderes", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 4,
+                        state = CategoryItemState.NORMAL
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 5,
+                        state = CategoryItemState.NORMAL
+                    )
                 )
             )
         )
@@ -95,7 +98,7 @@ class BudgetScreenTest {
     /**
      * Test inBudgetChangeMode
      */
-    private val inBudgetChangeMode = false
+    private val inBudgetChangeMode = MutableLiveData(false)
 
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
@@ -104,8 +107,8 @@ class BudgetScreenTest {
         // Set ViewModel properties
         `when`(mockViewModel.toBeBudgeted).thenReturn(liveData { emit(toBeBudgeted) })
         `when`(mockViewModel.month).thenReturn(liveData { emit(month) })
-        `when`(mockViewModel.groupList).thenReturn(liveData { emit(groups) })
-        `when`(mockViewModel.inBudgetChangeMode).thenReturn(liveData { emit(inBudgetChangeMode) })
+        `when`(mockViewModel.groupList).thenReturn(groupsLiveData)
+        `when`(mockViewModel.inBudgetChangeMode).thenReturn(inBudgetChangeMode)
 
         // Create ui
         composeTestRule.setContent {
@@ -174,6 +177,235 @@ class BudgetScreenTest {
 //
 //        composeTestRule.onNodeWithTag("MonthPickerDialog").assertIsDisplayed()
 
+    }
+
+    @Test
+    fun performs_clear_all_budgets_correctly() {
+
+        // Open context menu
+        composeTestRule.onNodeWithTag("MenuButton").performClick()
+
+        // Click 'Clear All Budgets' btn
+        composeTestRule.onNodeWithTag("ClearAllBudgets").performClick()
+
+        verify(mockViewModel).onClearAllBudgets()
+
+    }
+
+    @Test
+    fun performs_item_click_correctly() {
+
+        // Click item
+        composeTestRule.onNodeWithTag("GroupList").onChildAt(4).performClick()
+
+        verify(mockViewModel).onItemClick(2)
+
+    }
+
+    @Test
+    fun performs_budget_confirmation_correctly() {
+
+        // Group list when item 'Investment' in 'Persönlich' is editable
+        val clickedGroupList = listOf(
+            GroupData(
+                "Persönlich", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 1,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 2,
+                        state = CategoryItemState.CHANGE_SELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412,
+                        budgetId = 3,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf()
+            ),
+            GroupData(
+                "Anderes", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 4,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 5,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            )
+        )
+
+        // Set clickedGroupList
+        composeTestRule.runOnUiThread {
+            groupsLiveData.value = clickedGroupList
+        }
+
+        composeTestRule.onNodeWithTag("GroupList").onChildAt(4).let {
+            // Change budget
+            it.onChildAt(0).performTextInput("123")
+
+            // Confirm budget
+            it.onChildAt(1).performClick()
+        }
+
+
+        verify(mockViewModel).onBudgetConfirmationClick(123)
+    }
+
+    @Test
+    fun budget_editing_gets_canceled_on_cancel_button_click() = runBlocking {
+
+        // Group list when item 'Investment' in 'Persönlich' is editable
+        val clickedGroupList = listOf(
+            GroupData(
+                "Persönlich", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 1,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 2,
+                        state = CategoryItemState.CHANGE_SELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412,
+                        budgetId = 3,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf()
+            ),
+            GroupData(
+                "Anderes", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 4,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 5,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            )
+        )
+
+        composeTestRule.runOnUiThread {
+            // Set clickedGroupList
+            groupsLiveData.value = clickedGroupList
+
+            // Set mode to be in budget change mode
+            inBudgetChangeMode.value = true
+        }
+
+        // Click 'cancel budget editing' button
+        composeTestRule.onNodeWithTag("AbortBudgetChange").performClick()
+
+        verify(mockViewModel).onAbortBudgetChange()
+
+    }
+
+    @Test
+    fun budget_editing_gets_canceled_on_double_back_press() {
+
+        // Group list when item 'Investment' in 'Persönlich' is editable
+        val clickedGroupList = listOf(
+            GroupData(
+                "Persönlich", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 1,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 2,
+                        state = CategoryItemState.CHANGE_SELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Bücher",
+                        budgetedAmount = 10000,
+                        availableAmount = -1412,
+                        budgetId = 3,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            ),
+            GroupData(
+                "Haushalt", listOf()
+            ),
+            GroupData(
+                "Anderes", listOf(
+                    CategoryItemData(
+                        categoryName = "Lebensmittel",
+                        budgetedAmount = 1000000,
+                        availableAmount = 1200,
+                        budgetId = 4,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    ),
+                    CategoryItemData(
+                        categoryName = "Investment",
+                        budgetedAmount = 0,
+                        availableAmount = 0,
+                        budgetId = 5,
+                        state = CategoryItemState.CHANGE_UNSELECTED
+                    )
+                )
+            )
+        )
+
+        composeTestRule.runOnUiThread {
+            // Set clickedGroupList
+            groupsLiveData.value = clickedGroupList
+
+            // Set mode to be in budget change mode
+            inBudgetChangeMode.value = true
+        }
+
+        Espresso.pressBack()
+
+        Espresso.pressBack()
+
+        verify(mockViewModel).onAbortBudgetChange()
     }
 
 }
