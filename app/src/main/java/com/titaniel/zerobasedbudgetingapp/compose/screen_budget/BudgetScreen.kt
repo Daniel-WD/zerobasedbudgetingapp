@@ -403,18 +403,18 @@ fun BudgetScreen(
     // Add material theme
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-            Surface(
-                modifier = Modifier.testTag("MonthPickerDialog"),
-                color = BottomSheetBackgroundColor
-            ) {
-                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-            }
 //            Surface(
-//                modifier = Modifier
-//                    .height(100.dp)
-//                    .testTag("MonthPickerDialog"),
+//                modifier = Modifier.testTag("MonthPickerDialog"),
 //                color = BottomSheetBackgroundColor
-//            ) {}
+//            ) {
+//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+//            }
+            Surface(
+                modifier = Modifier
+                    .height(100.dp)
+                    .testTag("MonthPickerDialog"),
+                color = BottomSheetBackgroundColor
+            ) {}
         }) {
             Scaffold(
                 topBar = {
