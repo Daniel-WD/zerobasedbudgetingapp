@@ -963,7 +963,7 @@ fun CategoryItemBudgetInput(
                 text = editBudgetValue,
                 selection = TextRange(editBudgetValue.length) // Cursor always on the end
             ),
-            onValueChange = { editBudgetValue = moneyOnValueChange(editBudgetValue, it, 6) },
+            onValueChange = { editBudgetValue = moneyOnValueChange(it, 6) },
             textStyle = MaterialTheme.typography.body1.copy(
                 textAlign = TextAlign.End,
                 color = Text87Color
