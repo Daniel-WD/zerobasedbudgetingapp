@@ -4,9 +4,6 @@
     <!-- Zero -->
 
     <!-- Bottom navigation bar -->
-    <string name="navigation_tab_budget">Budget</string>
-    <string name="navigation_tab_add_transaction">Add transaction</string>
-    <string name="navigation_tab_transactions">Transactions</string>
 
     <!-- ManageCategoriesActivity -->
     <string name="activity_manage_categories_title">Manage Categories</string>
@@ -53,7 +50,6 @@
     <string name="activity_add_edit_transaction_to_be_budgeted">To be budgeted</string>
 
     <!-- Fragment budget -->
-    <string name="fragment_budget_search_category">Manage categories</string>
 
     <string name="fragment_budget_category">Category</string>
     <string name="fragment_budget_budgeted">Budgeted</string>
@@ -66,5 +62,6 @@
     <string name="settings">Settings</string>
     <string name="budgets">Budgets</string>
     <string name="transactions">Transactions</string>
+    <string name="change_budget">Change Budget</string>
 
 </resources>

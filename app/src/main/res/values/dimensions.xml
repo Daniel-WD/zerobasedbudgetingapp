@@ -7,6 +7,5 @@
     <!-- Fragment budget -->
     <dimen name="fragment_budget_category_margin">16dp</dimen>
     <dimen name="fragment_budget_budgeted_margin">108dp</dimen>
-    <dimen name="fragment_budget_available_margin">16dp</dimen>
 
 </resources>

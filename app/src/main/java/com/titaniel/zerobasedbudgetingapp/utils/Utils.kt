@@ -5,7 +5,6 @@ import androidx.lifecycle.MediatorLiveData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-
 /**
  * Convert [localDate] to its string representation
  */
@@ -33,20 +32,24 @@ class DoubleLiveData<A, B>(a: LiveData<A>, b: LiveData<B>, fireOnlyOnChange: Boo
     /**
      * Last a value
      */
-    var lastA: A? = a.value
+    private var lastA: A? = a.value
 
     /**
      * Last b value
      */
-    var lastB: B? = b.value
+    private var lastB: B? = b.value
 
     init {
         addSource(a) {
-            if (!fireOnlyOnChange || it != a.value) value = it to lastB
+            if (!fireOnlyOnChange || it != lastA) {
+                value = it to lastB
+            }
             lastA = it
         }
         addSource(b) {
-            if (!fireOnlyOnChange || it != b.value) value = lastA to it
+            if (!fireOnlyOnChange || it != lastB) {
+                value = lastA to it
+            }
             lastB = it
         }
     }
@@ -65,17 +68,17 @@ class TripleLiveData<A, B, C>(
     /**
      * Last a value
      */
-    var lastA: A? = a.value
+    private var lastA: A? = a.value
 
     /**
      * Last b value
      */
-    var lastB: B? = b.value
+    private var lastB: B? = b.value
 
     /**
      * Last c value
      */
-    var lastC: C? = c.value
+    private var lastC: C? = c.value
 
     init {
         addSource(a) {
@@ -107,22 +110,22 @@ class QuadrupleLiveData<A, B, C, D>(
     /**
      * Last a value
      */
-    var lastA: A? = a.value
+    private var lastA: A? = a.value
 
     /**
      * Last b value
      */
-    var lastB: B? = b.value
+    private var lastB: B? = b.value
 
     /**
      * Last c value
      */
-    var lastC: C? = c.value
+    private var lastC: C? = c.value
 
     /**
      * Last d value
      */
-    var lastD: D? = d.value
+    private var lastD: D? = d.value
 
     init {
         addSource(a) {
@@ -159,27 +162,27 @@ class QuintupleLiveData<A, B, C, D, E>(
     /**
      * Last a value
      */
-    var lastA: A? = a.value
+    private var lastA: A? = a.value
 
     /**
      * Last b value
      */
-    var lastB: B? = b.value
+    private var lastB: B? = b.value
 
     /**
      * Last c value
      */
-    var lastC: C? = c.value
+    private var lastC: C? = c.value
 
     /**
      * Last d value
      */
-    var lastD: D? = d.value
+    private var lastD: D? = d.value
 
     /**
      * Last e value
      */
-    var lastE: E? = e.value
+    private var lastE: E? = e.value
 
     init {
         addSource(a) {
@@ -221,32 +224,32 @@ class SextupleLiveData<A, B, C, D, E, F>(
     /**
      * Last a value
      */
-    var lastA: A? = a.value
+    private var lastA: A? = a.value
 
     /**
      * Last b value
      */
-    var lastB: B? = b.value
+    private var lastB: B? = b.value
 
     /**
      * Last c value
      */
-    var lastC: C? = c.value
+    private var lastC: C? = c.value
 
     /**
      * Last d value
      */
-    var lastD: D? = d.value
+    private var lastD: D? = d.value
 
     /**
      * Last e value
      */
-    var lastE: E? = e.value
+    private var lastE: E? = e.value
 
     /**
      * Last f value
      */
-    var lastF: F? = f.value
+    private var lastF: F? = f.value
 
     init {
         addSource(a) {
