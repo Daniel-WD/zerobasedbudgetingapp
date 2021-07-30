@@ -45,11 +45,16 @@ class MonthPickerDialogTest {
         YearMonth.of(2020, 6)
     )
 
+    /**
+     * Example current month
+     */
+    private val month = YearMonth.of(2020, 4)
     @Before
     fun setup() {
 
-        // Mock selectableMonths
+        // Mock view model properties
         `when`(mockViewModel.selectableMonths).thenReturn(liveData { emit(selectableMonths) })
+        `when`(mockViewModel.selectedMonth).thenReturn(liveData { emit(month) })
 
         // Start the app
         composeTestRule.setContent {
@@ -70,7 +75,7 @@ class MonthPickerDialogTest {
                 // Assert list item contains correct representation of yearMonth
                 content.onChildAt(i).assertTextEquals(
                     yearMonth.monthName(),
-                    yearMonth.year.toString()
+                    " " + yearMonth.year.toString()
                 )
 
             }
