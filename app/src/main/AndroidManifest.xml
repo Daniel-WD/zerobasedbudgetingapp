@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZeroBasedBudgetingApp">
         <activity
+            android:exported="false"
             android:name=".compose.HostActivity"
             android:label="@string/app_name">
             <intent-filter>
