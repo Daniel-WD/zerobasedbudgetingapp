@@ -15,6 +15,9 @@ val TextGreen50Color = Color(0x8060ffb5)
 val TextRedColor = Color(0xdeff7373)
 val TextRed50Color = Color(0x80ff7373)
 
+val SwipeToZeroColor = Color(0xFFeb6f50)
+val SwipeLastMonthBudgetColor = Color(0xFF37a3e2)
+
 val PrimaryColor = Color(0xffbb86fc)
 
 val SolidToolbarColor = Color(0xff1c1c1c)

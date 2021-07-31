@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,8 +31,10 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
@@ -47,6 +51,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 
 /**
@@ -305,6 +310,24 @@ class BudgetViewModel @Inject constructor(
 
     }
 
+    /**
+     * Zero budget
+     */
+    fun onZeroBudget(id: Long) {
+
+        viewModelScope.launch {
+
+            // Get budget to zero
+            val budget = budgetRepository.getBudgetById(id).first()
+
+            // Set budget to 0
+            budget.budgeted = 0
+
+            // Update budget
+            budgetRepository.updateBudgets(budget)
+        }
+    }
+
 }
 
 /**
@@ -325,6 +348,26 @@ enum class CategoryItemState {
      * The budget of a different item can be changed
      */
     CHANGE_UNSELECTED
+}
+
+/**
+ * Item swipe state
+ */
+enum class ItemSwipeState {
+    /**
+     * Normal item swipe state
+     */
+    NORMAL,
+
+    /**
+     * State when budget of item should be zeroed
+     */
+    BUDGET_ZERO,
+
+    /**
+     * State when budget of item should be same as last month
+     */
+    BUDGET_LAST_MONTH
 }
 
 /**
@@ -371,7 +414,8 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
         onBudgetConfirmationClick = viewModel::onBudgetConfirmationClick,
         onAbortBudgetChange = viewModel::onAbortBudgetChange,
         inBudgetChangeMode = inBudgetChangeMode,
-        onClearAllBudgets = viewModel::onClearAllBudgets
+        onClearAllBudgets = viewModel::onClearAllBudgets,
+        onZeroBudget = viewModel::onZeroBudget
     )
 
 }
@@ -391,7 +435,8 @@ fun BudgetScreen(
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortBudgetChange: () -> Unit,
     inBudgetChangeMode: Boolean,
-    onClearAllBudgets: () -> Unit
+    onClearAllBudgets: () -> Unit,
+    onZeroBudget: (budgetId: Long) -> Unit
 ) {
     // Month picker state. Can be hidden or shown.
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -435,7 +480,8 @@ fun BudgetScreen(
                     groups = groups,
                     onItemClick = onItemClick,
                     onBudgetConfirmationClick = onBudgetConfirmationClick,
-                    onAbortBudgetChange = onAbortBudgetChange
+                    onAbortBudgetChange = onAbortBudgetChange,
+                    onZeroBudget = onZeroBudget
                 )
             }
         }
@@ -702,20 +748,28 @@ fun BottomBar() {
 /**
  * List of groups
  */
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun GroupList(
     groups: List<GroupData>,
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
-    onAbortBudgetChange: () -> Unit
+    onAbortBudgetChange: () -> Unit,
+    onZeroBudget: (budgetId: Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.testTag("GroupList"),
         contentPadding = PaddingValues(bottom = (2.5 * 55).dp)
     ) {
         items(groups) { groupData ->
-            Group(data = groupData, onItemClick, onBudgetConfirmationClick, onAbortBudgetChange)
+            Group(
+                data = groupData,
+                onItemClick,
+                onBudgetConfirmationClick,
+                onAbortBudgetChange,
+                onZeroBudget
+            )
         }
     }
 }
@@ -723,13 +777,15 @@ fun GroupList(
 /**
  * Group that shows group information and its categories.
  */
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun Group(
     data: GroupData,
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
-    onAbortChange: () -> Unit
+    onAbortChange: () -> Unit,
+    onZeroBudget: (budgetId: Long) -> Unit
 ) {
 
     // Sum budget sum of categories of this group
@@ -782,7 +838,8 @@ fun Group(
                     data = categoryItemData,
                     onItemClick,
                     onBudgetConfirmationClick,
-                    onAbortChange
+                    onAbortChange,
+                    onZeroBudget
                 )
             }
         }
@@ -793,13 +850,15 @@ fun Group(
 /**
  * Category item to represent a category. Budget can be edited.
  */
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Composable
 fun CategoryItem(
     data: CategoryItemData,
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
-    onAbortChange: () -> Unit
+    onAbortChange: () -> Unit,
+    onZeroBudget: (budgetId: Long) -> Unit
 ) {
 
     // Transition to coordinate animations by item state
@@ -817,7 +876,7 @@ fun CategoryItem(
     val backgroundColor by transition.animateColor(label = "") { state ->
         when (state) {
             CategoryItemState.CHANGE_SELECTED -> SolidHighlightColor
-            else -> SolidHighlightColor.copy(alpha = 0f)
+            else -> BackgroundColor
         }
     }
 
@@ -829,62 +888,102 @@ fun CategoryItem(
         }
     }
 
-    Column(
+    // Get screen width, corresponds to item width
+    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+
+    // Swipe state
+    val swipeableState = rememberSwipeableState(ItemSwipeState.NORMAL)
+
+    // Swipe anchor points to state mapping
+    val anchors = mapOf(
+        0f to ItemSwipeState.NORMAL,
+        screenWidth.toFloat() to ItemSwipeState.BUDGET_ZERO
+    )
+
+    // When user has swiped to BUDGET_ZERO state...
+    if(swipeableState.currentValue == ItemSwipeState.BUDGET_ZERO) {
+        LaunchedEffect(true) {
+
+            // Zero budget
+            onZeroBudget(data.budgetId)
+
+            // Animate back to NORMAL swipe state
+            swipeableState.animateTo(ItemSwipeState.NORMAL)
+        }
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onItemClick(data.budgetId)
-            }
-    ) {
-
-        Row(
-            modifier = Modifier
-                .height(54.dp)
-                .background(backgroundColor)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier
-                    .weight(2f)
-                    .padding(end = 16.dp),
-                text = data.categoryName,
-                color = textColor,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2
+            .background(SwipeToZeroColor)
+            .swipeable(
+                state = swipeableState,
+                anchors = anchors,
+                thresholds = { _, _ -> FractionalThreshold(0.7f) },
+                orientation = Orientation.Horizontal
             )
-
-            Box(
-                modifier = Modifier
-                    .weight(2f)
-                    .fillMaxHeight()
-            ) {
-                // View Budget
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = data.state != CategoryItemState.CHANGE_SELECTED,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    CategoryItemShowBudget(data = data, normalTextColor = textColor)
+    ) {
+        Icon(
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+            painter = painterResource(id = R.drawable.ic_baseline_exposure_zero_24),
+            contentDescription = null
+        )
+        Column(
+            modifier = Modifier
+                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                .background(backgroundColor)
+                .clickable {
+                    onItemClick(data.budgetId)
                 }
-                // Change budget
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = data.state == CategoryItemState.CHANGE_SELECTED,
-                    enter = fadeIn(),
-                    exit = fadeOut()
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(54.dp)
+                    .zIndex(5f)
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(end = 16.dp),
+                    text = data.categoryName,
+                    color = textColor,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(2f)
+                        .fillMaxHeight()
                 ) {
-                    CategoryItemBudgetInput(
-                        data = data,
-                        onAbortChange = onAbortChange,
-                        onBudgetConfirmationClick = onBudgetConfirmationClick
-                    )
+                    // View Budget
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = data.state != CategoryItemState.CHANGE_SELECTED,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        CategoryItemShowBudget(data = data, normalTextColor = textColor)
+                    }
+                    // Change budget
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = data.state == CategoryItemState.CHANGE_SELECTED,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        CategoryItemBudgetInput(
+                            data = data,
+                            onAbortChange = onAbortChange,
+                            onBudgetConfirmationClick = onBudgetConfirmationClick
+                        )
+                    }
                 }
             }
+            Divider(
+                modifier = Modifier.height(1.dp),
+                color = dividerColor
+            )
         }
-        Divider(
-            modifier = Modifier.height(1.dp),
-            color = dividerColor
-        )
     }
 }
 
@@ -1018,65 +1117,73 @@ fun CategoryItemBudgetInput(
 @Composable
 fun BudgetScreenPreview() {
 
-    BudgetScreen(
-        month = YearMonth.now(),
-        toBeBudgetedAmount = 100000,
-        groups = listOf(
-            GroupData(
-                "Persönlich", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200,
-                        budgetId = 1,
-                        state = CategoryItemState.NORMAL
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0,
-                        budgetId = 2,
-                        state = CategoryItemState.NORMAL
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412,
-                        budgetId = 3,
-                        state = CategoryItemState.NORMAL
-                    )
-                )
-            ),
-            GroupData(
-                "Haushalt", listOf(
-                    CategoryItemData(
-                        categoryName = "Lebensmittel",
-                        budgetedAmount = 1000000,
-                        availableAmount = 1200,
-                        budgetId = 4,
-                        state = CategoryItemState.NORMAL
-                    ),
-                    CategoryItemData(
-                        categoryName = "Investment",
-                        budgetedAmount = 0,
-                        availableAmount = 0,
-                        budgetId = 5,
-                        state = CategoryItemState.NORMAL
-                    ),
-                    CategoryItemData(
-                        categoryName = "Bücher",
-                        budgetedAmount = 10000,
-                        availableAmount = -1412,
-                        budgetId = 6,
-                        state = CategoryItemState.NORMAL
-                    )
-                )
-            )
-        ),
+    CategoryItem(
+        data = CategoryItemData("name", 100, 50, 2, CategoryItemState.NORMAL),
         onItemClick = {},
         onBudgetConfirmationClick = {},
-        onAbortBudgetChange = {},
-        inBudgetChangeMode = true,
-        onClearAllBudgets = {}
+        onAbortChange = {},
+        onZeroBudget = {}
     )
+
+//    BudgetScreen(
+//        month = YearMonth.now(),
+//        toBeBudgetedAmount = 100000,
+//        groups = listOf(
+//            GroupData(
+//                "Persönlich", listOf(
+//                    CategoryItemData(
+//                        categoryName = "Lebensmittel",
+//                        budgetedAmount = 1000000,
+//                        availableAmount = 1200,
+//                        budgetId = 1,
+//                        state = CategoryItemState.NORMAL
+//                    ),
+//                    CategoryItemData(
+//                        categoryName = "Investment",
+//                        budgetedAmount = 0,
+//                        availableAmount = 0,
+//                        budgetId = 2,
+//                        state = CategoryItemState.NORMAL
+//                    ),
+//                    CategoryItemData(
+//                        categoryName = "Bücher",
+//                        budgetedAmount = 10000,
+//                        availableAmount = -1412,
+//                        budgetId = 3,
+//                        state = CategoryItemState.NORMAL
+//                    )
+//                )
+//            ),
+//            GroupData(
+//                "Haushalt", listOf(
+//                    CategoryItemData(
+//                        categoryName = "Lebensmittel",
+//                        budgetedAmount = 1000000,
+//                        availableAmount = 1200,
+//                        budgetId = 4,
+//                        state = CategoryItemState.NORMAL
+//                    ),
+//                    CategoryItemData(
+//                        categoryName = "Investment",
+//                        budgetedAmount = 0,
+//                        availableAmount = 0,
+//                        budgetId = 5,
+//                        state = CategoryItemState.NORMAL
+//                    ),
+//                    CategoryItemData(
+//                        categoryName = "Bücher",
+//                        budgetedAmount = 10000,
+//                        availableAmount = -1412,
+//                        budgetId = 6,
+//                        state = CategoryItemState.NORMAL
+//                    )
+//                )
+//            )
+//        ),
+//        onItemClick = {},
+//        onBudgetConfirmationClick = {},
+//        onAbortBudgetChange = {},
+//        inBudgetChangeMode = true,
+//        onClearAllBudgets = {}
+//    )
 }
