@@ -47,6 +47,7 @@ import com.titaniel.zerobasedbudgetingapp.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -312,20 +313,61 @@ class BudgetViewModel @Inject constructor(
     }
 
     /**
-     * Zero budget
+     * Zero budget with [budgetId]
      */
-    fun onZeroBudget(id: Long) {
+    fun onZeroBudget(budgetId: Long) {
 
         viewModelScope.launch {
 
             // Get budget to zero
-            val budget = budgetRepository.getBudgetById(id).first()
+            val budget = budgetRepository.getBudgetById(budgetId).first()
 
             // Set budget to 0
             budget.budgeted = 0
 
             // Update budget
             budgetRepository.updateBudgets(budget)
+        }
+    }
+
+    /**
+     * Sets budget from last month to budget with [budgetId]
+     */
+    fun onBudgetFromLastMonth(budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) {
+
+        // Get month
+        val mon = month.value
+        requireNotNull(mon)
+
+        viewModelScope.launch {
+
+            // Get budget to set the budget from last month to
+            val budget = budgetRepository.getBudgetById(budgetId).first()
+
+            // Get budget from last month
+            val lastMonthBudget = budgetRepository.getBudgetByCategoryIdAndMonth(
+                budget.categoryId,
+                mon.minusMonths(1)
+            ).firstOrNull()
+
+            // Check budget in last month exists
+            if (lastMonthBudget == null) {
+
+                // Notify failure
+                onBudgetSet(false)
+
+                // Cancel routine
+                return@launch
+            }
+
+            // Set budget value from last month
+            budget.budgeted = lastMonthBudget.budgeted
+
+            // Update budget
+            budgetRepository.updateBudgets(budget)
+
+            // Notify success
+            onBudgetSet(true)
         }
     }
 
@@ -416,7 +458,8 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
         onAbortBudgetChange = viewModel::onAbortBudgetChange,
         inBudgetChangeMode = inBudgetChangeMode,
         onClearAllBudgets = viewModel::onClearAllBudgets,
-        onZeroBudget = viewModel::onZeroBudget
+        onZeroBudget = viewModel::onZeroBudget,
+        onBudgetFromLastMonth = viewModel::onBudgetFromLastMonth
     )
 
 }
@@ -437,7 +480,8 @@ fun BudgetScreen(
     onAbortBudgetChange: () -> Unit,
     inBudgetChangeMode: Boolean,
     onClearAllBudgets: () -> Unit,
-    onZeroBudget: (budgetId: Long) -> Unit
+    onZeroBudget: (budgetId: Long) -> Unit,
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
 ) {
     // Month picker state. Can be hidden or shown.
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -482,7 +526,8 @@ fun BudgetScreen(
                     onItemClick = onItemClick,
                     onBudgetConfirmationClick = onBudgetConfirmationClick,
                     onAbortBudgetChange = onAbortBudgetChange,
-                    onZeroBudget = onZeroBudget
+                    onZeroBudget = onZeroBudget,
+                    onBudgetFromLastMonth = onBudgetFromLastMonth
                 )
             }
         }
@@ -757,7 +802,8 @@ fun GroupList(
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortBudgetChange: () -> Unit,
-    onZeroBudget: (budgetId: Long) -> Unit
+    onZeroBudget: (budgetId: Long) -> Unit,
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.testTag("GroupList"),
@@ -769,7 +815,8 @@ fun GroupList(
                 onItemClick,
                 onBudgetConfirmationClick,
                 onAbortBudgetChange,
-                onZeroBudget
+                onZeroBudget,
+                onBudgetFromLastMonth
             )
         }
     }
@@ -786,7 +833,8 @@ fun Group(
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortChange: () -> Unit,
-    onZeroBudget: (budgetId: Long) -> Unit
+    onZeroBudget: (budgetId: Long) -> Unit,
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
 ) {
 
     // Sum budget sum of categories of this group
@@ -840,7 +888,8 @@ fun Group(
                     onItemClick,
                     onBudgetConfirmationClick,
                     onAbortChange,
-                    onZeroBudget
+                    onZeroBudget,
+                    onBudgetFromLastMonth
                 )
             }
         }
@@ -859,7 +908,8 @@ fun CategoryItem(
     onItemClick: (budgetId: Long) -> Unit,
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortChange: () -> Unit,
-    onZeroBudget: (budgetId: Long) -> Unit
+    onZeroBudget: (budgetId: Long) -> Unit,
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
 ) {
 
     // Transition to coordinate animations by item state
@@ -890,23 +940,34 @@ fun CategoryItem(
     }
 
     // Get screen width, corresponds to item width
-    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels.toFloat()
 
     // Swipe state
     val swipeableState = rememberSwipeableState(ItemSwipeState.NORMAL)
 
+    // Swipe state, the item is closest
+    val closestSwipeState =
+        if (swipeableState.offset.value > 0) ItemSwipeState.BUDGET_ZERO else ItemSwipeState.BUDGET_LAST_MONTH
+
     // Swipe anchor points to state mapping
     val anchors = mapOf(
         0f to ItemSwipeState.NORMAL,
-        screenWidth.toFloat() to ItemSwipeState.BUDGET_ZERO
+        screenWidth to ItemSwipeState.BUDGET_ZERO,
+        -screenWidth to ItemSwipeState.BUDGET_LAST_MONTH
     )
 
     // When user has swiped to BUDGET_ZERO state...
-    if(swipeableState.currentValue == ItemSwipeState.BUDGET_ZERO) {
+    if (swipeableState.currentValue != ItemSwipeState.NORMAL) {
         LaunchedEffect(true) {
 
-            // Zero budget
-            onZeroBudget(data.budgetId)
+            // Perform action based on side of swipe
+            if (closestSwipeState == ItemSwipeState.BUDGET_ZERO) {
+                // Zero budget
+                onZeroBudget(data.budgetId)
+            } else {
+                // Set budget from last month
+                onBudgetFromLastMonth(data.budgetId) {}
+            }
 
             // Animate back to NORMAL swipe state
             swipeableState.animateTo(ItemSwipeState.NORMAL)
@@ -916,20 +977,34 @@ fun CategoryItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SwipeToZeroColor)
+            // Set background for zeroing if closest swipe state is BUDGET_ZERO, background for last month budget otherwise
+            .background(if (closestSwipeState == ItemSwipeState.BUDGET_ZERO) SwipeToZeroColor else SwipeLastMonthBudgetColor)
             .swipeable(
                 state = swipeableState,
                 anchors = anchors,
                 thresholds = { _, _ -> FractionalThreshold(0.7f) },
                 orientation = Orientation.Horizontal,
+                // Swipeable when nothing is edited and return animation is not running
                 enabled = data.state == CategoryItemState.NORMAL && !swipeableState.isAnimationRunning
             )
     ) {
-        Icon(
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-            painter = painterResource(id = R.drawable.ic_baseline_exposure_zero_24),
-            contentDescription = null
-        )
+        if (closestSwipeState == ItemSwipeState.BUDGET_ZERO) {
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 16.dp),
+                painter = painterResource(id = R.drawable.ic_baseline_exposure_zero_24),
+                contentDescription = null
+            )
+        } else {
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp),
+                painter = painterResource(id = R.drawable.ic_baseline_cached_24),
+                contentDescription = null
+            )
+        }
         Column(
             modifier = Modifier
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
@@ -1124,7 +1199,8 @@ fun BudgetScreenPreview() {
         onItemClick = {},
         onBudgetConfirmationClick = {},
         onAbortChange = {},
-        onZeroBudget = {}
+        onZeroBudget = {},
+        onBudgetFromLastMonth = { a, b -> }
     )
 
 //    BudgetScreen(

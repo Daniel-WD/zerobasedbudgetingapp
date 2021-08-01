@@ -66,6 +66,13 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Get budget by [month] and [categoryId]
+     */
+    fun getBudgetByCategoryIdAndMonth(categoryId: Long, month: YearMonth): Flow<Budget> {
+        return budgetDao.getByCategoryIdAndMonth(categoryId, month)
+    }
+
+    /**
      * Get all BudgetWithCategory
      */
     fun getAllBudgetsWithCategory(): Flow<List<BudgetWithCategory>> {
