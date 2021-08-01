@@ -343,6 +343,7 @@ class BudgetViewModel @Inject constructor(
      * Sets budget from last month to budget with [budgetId]
      */
     fun onBudgetFromLastMonth(budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) {
+        // FIXME What if budget in last month should theoretically exist and be zero but the budget for last month is not created yet.
 
         // Get month
         val mon = month.value
@@ -1085,6 +1086,13 @@ fun CategoryItem(
 
 //            swipeableState.animateTo(ItemSwipeState.NORMAL, FloatSpringSpec(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
         }
+    }
+
+    // If item state changes...
+    if(data.state != CategoryItemState.NORMAL) {
+
+        // Dismiss currently shown snackbar if there is one
+        scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
     }
 
     Box(
