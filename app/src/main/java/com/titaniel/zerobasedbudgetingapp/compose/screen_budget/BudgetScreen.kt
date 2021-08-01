@@ -64,7 +64,7 @@ class BudgetViewModel @Inject constructor(
     transactionRepository: TransactionRepository,
     categoryRepository: CategoryRepository,
     val budgetRepository: BudgetRepository,
-    settingRepository: SettingRepository,
+    val settingRepository: SettingRepository,
     groupRepository: GroupRepository
 ) : ViewModel() {
 
@@ -343,13 +343,24 @@ class BudgetViewModel @Inject constructor(
      * Sets budget from last month to budget with [budgetId]
      */
     fun onBudgetFromLastMonth(budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) {
-        // FIXME What if budget in last month should theoretically exist and be zero but the budget for last month is not created yet.
 
         // Get month
         val mon = month.value
         requireNotNull(mon)
 
+        // Calc last month
+        val lastMonth = mon.minusMonths(1)
+
         viewModelScope.launch {
+
+            // Get available months
+            val availMonths = settingRepository.availableMonths.first()
+
+            // No success when last month doesn't exist
+            if(!availMonths.contains(lastMonth)) {
+                onBudgetSet(false)
+                return@launch
+            }
 
             // Get budget to set the budget from last month to
             val budget = budgetRepository.getBudgetById(budgetId).first()
@@ -360,21 +371,11 @@ class BudgetViewModel @Inject constructor(
             // Get budget from last month
             val lastMonthBudget = budgetRepository.getBudgetByCategoryIdAndMonth(
                 budget.categoryId,
-                mon.minusMonths(1)
+                lastMonth
             ).firstOrNull()
 
-            // Check budget in last month exists
-            if (lastMonthBudget == null) {
-
-                // Notify failure
-                onBudgetSet(false)
-
-                // Cancel routine
-                return@launch
-            }
-
             // Set budget value from last month
-            budget.budgeted = lastMonthBudget.budgeted
+            budget.budgeted = lastMonthBudget?.budgeted ?: 0
 
             // Update budget
             budgetRepository.updateBudgets(budget)
