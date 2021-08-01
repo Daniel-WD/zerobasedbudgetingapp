@@ -39,6 +39,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.titaniel.zerobasedbudgetingapp.R
 import com.titaniel.zerobasedbudgetingapp.compose.assets.*
+import com.titaniel.zerobasedbudgetingapp.compose.dialog_month_picker.MonthPickerDialogWrapper
 import com.titaniel.zerobasedbudgetingapp.database.repositories.*
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Budget
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
@@ -447,18 +448,18 @@ fun BudgetScreen(
     // Add material theme
     MaterialTheme {
         ModalBottomSheetLayout(sheetState = monthPickerState, sheetContent = {
-//            Surface(
-//                modifier = Modifier.testTag("MonthPickerDialog"),
-//                color = BottomSheetBackgroundColor
-//            ) {
-//                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
-//            }
             Surface(
-                modifier = Modifier
-                    .height(100.dp)
-                    .testTag("MonthPickerDialog"),
+                modifier = Modifier.testTag("MonthPickerDialog"),
                 color = BottomSheetBackgroundColor
-            ) {}
+            ) {
+                MonthPickerDialogWrapper { scope.launch { monthPickerState.hide() } }
+            }
+//            Surface(
+//                modifier = Modifier
+//                    .height(100.dp)
+//                    .testTag("MonthPickerDialog"),
+//                color = BottomSheetBackgroundColor
+//            ) {}
         }) {
             Scaffold(
                 topBar = {
@@ -920,7 +921,8 @@ fun CategoryItem(
                 state = swipeableState,
                 anchors = anchors,
                 thresholds = { _, _ -> FractionalThreshold(0.7f) },
-                orientation = Orientation.Horizontal
+                orientation = Orientation.Horizontal,
+                enabled = data.state == CategoryItemState.NORMAL && !swipeableState.isAnimationRunning
             )
     ) {
         Icon(
