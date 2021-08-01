@@ -69,6 +69,12 @@ class BudgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
+     * Budgets before they have been changed through zeroing or setting the budget from last month
+     * <budget id, budgeted value>
+     */
+    private val lastBudgets = mutableMapOf<Long, Long>()
+
+    /**
      * Id of currently edited budget
      */
     private val editedBudgetId: MutableLiveData<Long> = MutableLiveData()
@@ -322,6 +328,9 @@ class BudgetViewModel @Inject constructor(
             // Get budget to zero
             val budget = budgetRepository.getBudgetById(budgetId).first()
 
+            // Save current budgeted value
+            lastBudgets[budgetId] = budget.budgeted
+
             // Set budget to 0
             budget.budgeted = 0
 
@@ -343,6 +352,9 @@ class BudgetViewModel @Inject constructor(
 
             // Get budget to set the budget from last month to
             val budget = budgetRepository.getBudgetById(budgetId).first()
+
+            // Save current budgeted value
+            lastBudgets[budgetId] = budget.budgeted
 
             // Get budget from last month
             val lastMonthBudget = budgetRepository.getBudgetByCategoryIdAndMonth(
@@ -368,6 +380,31 @@ class BudgetViewModel @Inject constructor(
 
             // Notify success
             onBudgetSet(true)
+        }
+    }
+
+    /**
+     * Undo a budget change through zeroing or setting the budget form last month
+     */
+    fun onUndoBudget(budgetId: Long) {
+
+        // Get saved budget
+        val lastBudget = lastBudgets[budgetId]
+        requireNotNull(lastBudget)
+
+        viewModelScope.launch {
+
+            // Get budget to zero
+            val budget = budgetRepository.getBudgetById(budgetId).first()
+
+            // Set budget to saved
+            budget.budgeted = lastBudget
+
+            // Remove saved budget
+            lastBudgets.remove(budgetId)
+
+            // Update budget
+            budgetRepository.updateBudgets(budget)
         }
     }
 
@@ -459,7 +496,8 @@ fun BudgetScreenWrapper(viewModel: BudgetViewModel = viewModel()) {
         inBudgetChangeMode = inBudgetChangeMode,
         onClearAllBudgets = viewModel::onClearAllBudgets,
         onZeroBudget = viewModel::onZeroBudget,
-        onBudgetFromLastMonth = viewModel::onBudgetFromLastMonth
+        onBudgetFromLastMonth = viewModel::onBudgetFromLastMonth,
+        onUndoBudget = viewModel::onUndoBudget
     )
 
 }
@@ -481,8 +519,12 @@ fun BudgetScreen(
     inBudgetChangeMode: Boolean,
     onClearAllBudgets: () -> Unit,
     onZeroBudget: (budgetId: Long) -> Unit,
-    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit,
+    onUndoBudget: (budgetId: Long) -> Unit
 ) {
+    // Scaffold state
+    val scaffoldState = rememberScaffoldState()
+
     // Month picker state. Can be hidden or shown.
     val monthPickerState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
@@ -506,6 +548,7 @@ fun BudgetScreen(
 //            ) {}
         }) {
             Scaffold(
+                scaffoldState = scaffoldState,
                 topBar = {
                     Toolbar(
                         selectedMonth = month,
@@ -527,7 +570,10 @@ fun BudgetScreen(
                     onBudgetConfirmationClick = onBudgetConfirmationClick,
                     onAbortBudgetChange = onAbortBudgetChange,
                     onZeroBudget = onZeroBudget,
-                    onBudgetFromLastMonth = onBudgetFromLastMonth
+                    onBudgetFromLastMonth = onBudgetFromLastMonth,
+                    scaffoldState = scaffoldState,
+                    screenScope = scope,
+                    onUndoBudget = onUndoBudget
                 )
             }
         }
@@ -803,7 +849,10 @@ fun GroupList(
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortBudgetChange: () -> Unit,
     onZeroBudget: (budgetId: Long) -> Unit,
-    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit,
+    scaffoldState: ScaffoldState,
+    screenScope: CoroutineScope,
+    onUndoBudget: (budgetId: Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.testTag("GroupList"),
@@ -812,11 +861,14 @@ fun GroupList(
         items(groups) { groupData ->
             Group(
                 data = groupData,
-                onItemClick,
-                onBudgetConfirmationClick,
-                onAbortBudgetChange,
-                onZeroBudget,
-                onBudgetFromLastMonth
+                onItemClick = onItemClick,
+                onBudgetConfirmationClick = onBudgetConfirmationClick,
+                onAbortChange = onAbortBudgetChange,
+                onZeroBudget = onZeroBudget,
+                onBudgetFromLastMonth = onBudgetFromLastMonth,
+                scaffoldState = scaffoldState,
+                screenScope = screenScope,
+                onUndoBudget = onUndoBudget
             )
         }
     }
@@ -834,7 +886,10 @@ fun Group(
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortChange: () -> Unit,
     onZeroBudget: (budgetId: Long) -> Unit,
-    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit,
+    scaffoldState: ScaffoldState,
+    screenScope: CoroutineScope,
+    onUndoBudget: (budgetId: Long) -> Unit
 ) {
 
     // Sum budget sum of categories of this group
@@ -885,11 +940,14 @@ fun Group(
             data.items.forEach { categoryItemData ->
                 CategoryItem(
                     data = categoryItemData,
-                    onItemClick,
-                    onBudgetConfirmationClick,
-                    onAbortChange,
-                    onZeroBudget,
-                    onBudgetFromLastMonth
+                    onItemClick = onItemClick,
+                    onBudgetConfirmationClick = onBudgetConfirmationClick,
+                    onAbortChange = onAbortChange,
+                    onZeroBudget = onZeroBudget,
+                    onBudgetFromLastMonth = onBudgetFromLastMonth,
+                    scaffoldState = scaffoldState,
+                    screenScope = screenScope,
+                    onUndoBudget = onUndoBudget
                 )
             }
         }
@@ -909,7 +967,10 @@ fun CategoryItem(
     onBudgetConfirmationClick: (amount: Long) -> Unit,
     onAbortChange: () -> Unit,
     onZeroBudget: (budgetId: Long) -> Unit,
-    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit
+    onBudgetFromLastMonth: (budgetId: Long, onBudgetSet: (success: Boolean) -> Unit) -> Unit,
+    scaffoldState: ScaffoldState,
+    screenScope: CoroutineScope,
+    onUndoBudget: (budgetId: Long) -> Unit
 ) {
 
     // Transition to coordinate animations by item state
@@ -964,13 +1025,65 @@ fun CategoryItem(
             if (closestSwipeState == ItemSwipeState.BUDGET_ZERO) {
                 // Zero budget
                 onZeroBudget(data.budgetId)
+
+                // Show snackbar
+                screenScope.launch {
+
+                    // Dismiss currently shown snackbar if there is one
+                    scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
+
+                    // Show new snackbar
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        "Set budgeted value of ${data.categoryName} to 0.",
+                        "UNDO"
+                    ).let { result ->
+
+                        // If 'UNDO' has been clicked
+                        if (result == SnackbarResult.ActionPerformed) {
+                            onUndoBudget(data.budgetId)
+                        }
+                    }
+                }
+
             } else {
                 // Set budget from last month
-                onBudgetFromLastMonth(data.budgetId) {}
+                onBudgetFromLastMonth(data.budgetId) { success ->
+
+                    // Show snackbar
+                    screenScope.launch {
+
+                        // Dismiss currently shown snackbar if there is one
+                        scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
+
+                        // Was there are last months budget?
+                        if (success) {
+
+                            // Show snackbar for successful change
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                "Set same budget as last month for ${data.categoryName}.",
+                                "UNDO"
+                            ).let { result ->
+
+                                // If 'UNDO' has been clicked
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    onUndoBudget(data.budgetId)
+                                }
+                            }
+                        } else {
+
+                            // Show snackbar for no last months budget
+                            scaffoldState.snackbarHostState.showSnackbar("There is no budget for ${data.categoryName} in the last month.")
+                        }
+                    }
+
+                }
             }
 
             // Animate back to NORMAL swipe state
             swipeableState.animateTo(ItemSwipeState.NORMAL)
+
+
+//            swipeableState.animateTo(ItemSwipeState.NORMAL, FloatSpringSpec(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
         }
     }
 
@@ -1200,7 +1313,10 @@ fun BudgetScreenPreview() {
         onBudgetConfirmationClick = {},
         onAbortChange = {},
         onZeroBudget = {},
-        onBudgetFromLastMonth = { a, b -> }
+        onBudgetFromLastMonth = { a, b -> },
+        scaffoldState = rememberScaffoldState(),
+        screenScope = rememberCoroutineScope(),
+        onUndoBudget = {}
     )
 
 //    BudgetScreen(
