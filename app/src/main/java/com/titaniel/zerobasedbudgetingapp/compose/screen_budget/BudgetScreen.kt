@@ -1,6 +1,8 @@
 package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FloatSpringSpec
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -357,7 +359,7 @@ class BudgetViewModel @Inject constructor(
             val availMonths = settingRepository.availableMonths.first()
 
             // No success when last month doesn't exist
-            if(!availMonths.contains(lastMonth)) {
+            if (!availMonths.contains(lastMonth)) {
                 onBudgetSet(false)
                 return@launch
             }
@@ -374,7 +376,7 @@ class BudgetViewModel @Inject constructor(
                 lastMonth
             ).firstOrNull()
 
-            // Set budget value from last month
+            // Set budget value from last month, zero when it doesn't exist
             budget.budgeted = lastMonthBudget?.budgeted ?: 0
 
             // Update budget
@@ -1025,6 +1027,7 @@ fun CategoryItem(
 
             // Perform action based on side of swipe
             if (closestSwipeState == ItemSwipeState.BUDGET_ZERO) {
+
                 // Zero budget
                 onZeroBudget(data.budgetId)
 
@@ -1071,26 +1074,24 @@ fun CategoryItem(
                                     onUndoBudget(data.budgetId)
                                 }
                             }
+
                         } else {
 
                             // Show snackbar for no last months budget
                             scaffoldState.snackbarHostState.showSnackbar("There is no budget for ${data.categoryName} in the last month.")
                         }
                     }
-
                 }
             }
 
             // Animate back to NORMAL swipe state
             swipeableState.animateTo(ItemSwipeState.NORMAL)
 
-
-//            swipeableState.animateTo(ItemSwipeState.NORMAL, FloatSpringSpec(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
         }
     }
 
     // If item state changes...
-    if(data.state != CategoryItemState.NORMAL) {
+    if (data.state != CategoryItemState.NORMAL) {
 
         // Dismiss currently shown snackbar if there is one
         scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
