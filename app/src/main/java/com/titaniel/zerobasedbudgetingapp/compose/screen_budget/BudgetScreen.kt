@@ -1,8 +1,6 @@
 package com.titaniel.zerobasedbudgetingapp.compose.screen_budget
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.FloatSpringSpec
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -977,6 +975,14 @@ fun CategoryItem(
     onUndoBudget: (budgetId: Long) -> Unit
 ) {
 
+    // Text resources for snackbar
+    val textUndo = stringResource(R.string.undo)
+    val textBudgetValueZero = stringResource(id = R.string.budget_value_zero, data.categoryName)
+    val textBudgetValueLastMonth =
+        stringResource(id = R.string.budget_value_last_month, data.categoryName)
+    val textNoBudgetLastMonth =
+        stringResource(id = R.string.no_budget_last_month, data.categoryName)
+
     // Transition to coordinate animations by item state
     val transition = updateTransition(targetState = data.state, label = null)
 
@@ -1039,8 +1045,8 @@ fun CategoryItem(
 
                     // Show new snackbar
                     scaffoldState.snackbarHostState.showSnackbar(
-                        "Set budgeted value of ${data.categoryName} to 0.",
-                        "UNDO"
+                        textBudgetValueZero,
+                        textUndo
                     ).let { result ->
 
                         // If 'UNDO' has been clicked
@@ -1065,8 +1071,8 @@ fun CategoryItem(
 
                             // Show snackbar for successful change
                             scaffoldState.snackbarHostState.showSnackbar(
-                                "Set same budget as last month for ${data.categoryName}.",
-                                "UNDO"
+                                textBudgetValueLastMonth,
+                                textUndo
                             ).let { result ->
 
                                 // If 'UNDO' has been clicked
@@ -1078,7 +1084,7 @@ fun CategoryItem(
                         } else {
 
                             // Show snackbar for no last months budget
-                            scaffoldState.snackbarHostState.showSnackbar("There is no budget for ${data.categoryName} in the last month.")
+                            scaffoldState.snackbarHostState.showSnackbar(textNoBudgetLastMonth)
                         }
                     }
                 }
