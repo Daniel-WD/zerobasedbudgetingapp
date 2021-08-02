@@ -10,6 +10,7 @@ import com.titaniel.zerobasedbudgetingapp.database.room.entities.Category
 import com.titaniel.zerobasedbudgetingapp.database.room.entities.Group
 import com.titaniel.zerobasedbudgetingapp.database.room.relations.BudgetWithCategory
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -185,6 +186,21 @@ class BudgetDaoTest {
             listOf(
                 budget1, budget2, budget4
             )
+        )
+
+    }
+
+    @Test
+    fun gets_budget_by_category_id_and_month_correctly(): Unit = runBlocking {
+
+        // Gets correct budget
+        assertThat(budgetDao.getByCategoryIdAndMonth(3, YearMonth.of(2000, 12)).first()).isEqualTo(
+            budget3
+        )
+
+        // Returns null when no such item
+        assertThat(budgetDao.getByCategoryIdAndMonth(4, YearMonth.of(2000, 12)).firstOrNull()).isEqualTo(
+            null
         )
 
     }
