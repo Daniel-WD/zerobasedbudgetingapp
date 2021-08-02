@@ -151,4 +151,18 @@ class BudgetRepositoryTest {
 
     }
 
+    @Test
+    fun performs_get_budget_by_category_id_and_month_correclty() {
+
+        val catId = 4L
+        val month = YearMonth.of(2000, 12)
+
+        // Call method
+        budgetRepository.getBudgetByCategoryIdAndMonth(catId, month)
+
+        // Verify dao call
+        verify(budgetDaoMock).getByCategoryIdAndMonth(catId, month)
+
+    }
+
 }
