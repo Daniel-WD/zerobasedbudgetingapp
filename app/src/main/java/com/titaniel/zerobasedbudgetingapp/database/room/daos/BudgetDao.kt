@@ -56,6 +56,12 @@ interface BudgetDao {
     fun getAll(): Flow<List<Budget>>
 
     /**
+     * Get budget by [categoryId] and [month]
+     */
+    @Query("SELECT * FROM budget WHERE budget.categoryId == :categoryId AND budget.month == :month")
+    fun getByCategoryIdAndMonth(categoryId: Long, month: YearMonth): Flow<Budget>
+
+    /**
      * Get all BudgetWithCategory
      */
     @Transaction

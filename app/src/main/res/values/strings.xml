@@ -63,5 +63,9 @@
     <string name="budgets">Budgets</string>
     <string name="transactions">Transactions</string>
     <string name="change_budget">Change Budget</string>
+    <string name="undo">UNDO</string>
+    <string name="budget_value_zero">Set budgeted value of %s to 0.</string>
+    <string name="budget_value_last_month">Set same budget as last month for %s.</string>
+    <string name="no_budget_last_month">There is no budget for %s in the last month.</string>
 
 </resources>
